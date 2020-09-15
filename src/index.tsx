@@ -27,7 +27,7 @@ const CurrentAuthorContext = React.createContext<{
   >;
 }>({ currentAuthor: undefined, setCurrentAuthor: () => {} });
 
-export function EarthstarClient({
+export function EarthstarPeer({
   initWorkspaces,
   initPubs,
   initCurrentAuthor,
