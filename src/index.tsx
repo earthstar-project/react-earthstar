@@ -21,21 +21,19 @@ const PubsContext = React.createContext<{
 }>({ pubs: {}, setPubs: () => {} });
 
 const CurrentAuthorContext = React.createContext<{
-  currentAuthor: AuthorKeypair | undefined;
-  setCurrentAuthor: React.Dispatch<
-    React.SetStateAction<AuthorKeypair | undefined>
-  >;
-}>({ currentAuthor: undefined, setCurrentAuthor: () => {} });
+  currentAuthor: AuthorKeypair | null;
+  setCurrentAuthor: React.Dispatch<React.SetStateAction<AuthorKeypair | null>>;
+}>({ currentAuthor: null, setCurrentAuthor: () => {} });
 
 export function EarthstarPeer({
-  initWorkspaces,
-  initPubs,
-  initCurrentAuthor,
+  initWorkspaces = [],
+  initPubs = {},
+  initCurrentAuthor = null,
   children,
 }: {
-  initWorkspaces: IStorage[];
-  initPubs: Record<string, string[]>;
-  initCurrentAuthor?: AuthorKeypair;
+  initWorkspaces?: IStorage[];
+  initPubs?: Record<string, string[]>;
+  initCurrentAuthor?: AuthorKeypair | null;
   children: React.ReactNode;
 }) {
   const [storages, setStorages] = React.useState(
@@ -49,11 +47,15 @@ export function EarthstarPeer({
   const [currentAuthor, setCurrentAuthor] = React.useState(initCurrentAuthor);
 
   React.useEffect(() => {
-    Object.values(initWorkspaces).forEach(storage => {
-      storage.onChange.subscribe(() => {
+    const unsubscribes = initWorkspaces.map(storage => {
+      return storage.onChange.subscribe(() => {
         setStorages(prev => ({ ...prev }));
       });
     });
+
+    return () => {
+      unsubscribes.forEach(unsubscribe => unsubscribe());
+    };
   });
 
   return (
@@ -129,8 +131,8 @@ export function usePubs(
 }
 
 export function useCurrentAuthor(): [
-  AuthorKeypair | undefined,
-  (keypair: AuthorKeypair | undefined) => void
+  AuthorKeypair | null,
+  React.Dispatch<React.SetStateAction<AuthorKeypair | null>>
 ] {
   const { currentAuthor, setCurrentAuthor } = React.useContext(
     CurrentAuthorContext
@@ -229,4 +231,13 @@ export function useDocument(
   };
 
   return [document, set, deleteDoc];
+}
+
+export function useStorages(): [
+  Record<string, IStorage>,
+  React.Dispatch<React.SetStateAction<Record<string, IStorage>>>
+] {
+  const { storages, setStorages } = React.useContext(StorageContext);
+
+  return [storages, setStorages];
 }
