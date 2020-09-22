@@ -2,7 +2,7 @@ import React from 'react';
 import { checkAuthorKeypairIsValid, isErr } from 'earthstar';
 import { useCurrentAuthor } from '../hooks';
 
-export function AuthorKeypairUpload() {
+export default function AuthorKeypairUpload() {
   const [, setCurrentAuthor] = useCurrentAuthor();
 
   return (
