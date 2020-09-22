@@ -1,2 +1,1 @@
-- AddWorkspaceForm (add workspace and initial pub...)
 - NewKeypairForm (create a new keypair, set as current author...)

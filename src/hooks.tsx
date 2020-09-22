@@ -8,6 +8,8 @@ import {
   QueryOpts,
   DocToSet,
   Document,
+  isErr,
+  EarthstarError,
 } from 'earthstar';
 
 const StorageContext = React.createContext<{
@@ -82,10 +84,22 @@ export function useAddWorkspace() {
 
   return React.useCallback(
     (address: string) => {
-      setStorages(prev => ({
-        ...prev,
-        [address]: new StorageMemory([ValidatorEs4], address),
-      }));
+      try {
+        const newStorage = new StorageMemory([ValidatorEs4], address);
+
+        setStorages(prev => ({
+          ...prev,
+          [address]: newStorage,
+        }));
+
+        return void 0;
+      } catch (err) {
+        if (isErr(err)) {
+          return err;
+        }
+
+        return new EarthstarError('Something went wrong!');
+      }
     },
     [setStorages]
   );
