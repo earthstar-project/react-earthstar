@@ -10,7 +10,7 @@ export default function AuthorKeypairUpload() {
       type="file"
       accept={'application/json,.keypair.json'}
       onChange={e => {
-        if (!e.target.files || e.target.files.length > 0) {
+        if (!e.target.files || e.target.files.length === 0) {
           return;
         }
 

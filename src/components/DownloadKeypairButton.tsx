@@ -24,7 +24,9 @@ export default function DownloadKeypairButton() {
     document.body.removeChild(a);
   }, [currentAuthor]);
 
-  return currentAuthor ? (
-    <button onClick={download}>{'Download keypair.json'}</button>
-  ) : null;
+  return (
+    <button onClick={download} disabled={currentAuthor === null}>
+      {'Download keypair.json'}
+    </button>
+  );
 }

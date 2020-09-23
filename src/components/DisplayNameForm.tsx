@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDocument, useCurrentAuthor } from '../hooks';
+import { getAuthorShortName } from '../util';
 
 export default function DisplayNameForm({ workspace }: { workspace: string }) {
   const [currentAuthor] = useCurrentAuthor();
@@ -13,7 +14,9 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
   );
 
   if (!currentAuthor) {
-    return "You can't change your display name because you're not signed in.";
+    return (
+      <>{"You can't change your display name because you're not signed in."}</>
+    );
   }
 
   return (
@@ -22,8 +25,17 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
       <input
         value={newDisplayName}
         onChange={e => setNewDisplayName(e.target.value)}
+        placeholder={
+          displayNameDoc?.content ||
+          getAuthorShortName(currentAuthor?.address || '')
+        }
       />
-      <button onClick={() => setDisplayNameDoc(newDisplayName)}>
+      <button
+        onClick={() => {
+          setNewDisplayName('');
+          setDisplayNameDoc(newDisplayName);
+        }}
+      >
         {'Set display name'}
       </button>
     </>

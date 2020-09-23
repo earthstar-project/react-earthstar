@@ -127,15 +127,15 @@ export function usePubs(
 ): [string[], (pubs: React.SetStateAction<string[]>) => void] {
   const { pubs: existingPubs, setPubs } = React.useContext(PubsContext);
 
-  const workspacePubs = existingPubs[workspaceAddress];
+  const workspacePubs = existingPubs[workspaceAddress] || [];
   const setWorkspacePubs = React.useCallback(
     (pubs: React.SetStateAction<string[]>) => {
       setPubs(({ [workspaceAddress]: prevWorkspacePubs, ...rest }) => {
         if (Array.isArray(pubs)) {
-          return { ...rest, [workspaceAddress]: pubs };
+          return { ...rest, [workspaceAddress]: Array.from(new Set(pubs)) };
         }
         const next = pubs(prevWorkspacePubs || []);
-        return { ...rest, [workspaceAddress]: next };
+        return { ...rest, [workspaceAddress]: Array.from(new Set(next)) };
       });
     },
     [existingPubs, setPubs]

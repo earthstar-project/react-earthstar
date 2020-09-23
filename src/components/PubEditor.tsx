@@ -10,6 +10,7 @@ export default function PubEditor({ workspace }: { workspace: string }) {
   }, []);
 
   const addPub = React.useCallback((pubToAdd: string) => {
+    setPubToAdd('');
     setPubs(prev => [...prev, pubToAdd]);
   }, []);
 
@@ -19,12 +20,12 @@ export default function PubEditor({ workspace }: { workspace: string }) {
         <ul>
           {pubs.map(pubUrl => {
             return (
-              <>
-                <li>{pubUrl}</li>
+              <li key={`${pubUrl}`}>
+                {pubUrl}
                 <button onClick={() => removePub(pubUrl)}>
                   {'Remove pub'}
                 </button>
-              </>
+              </li>
             );
           })}
         </ul>
@@ -39,7 +40,10 @@ export default function PubEditor({ workspace }: { workspace: string }) {
       />
       <button
         onClick={() => {
-          addPub(pubToAdd);
+          if (pubToAdd.length > 0) {
+            addPub(pubToAdd);
+          }
+          
         }}
       >
         {'Add new pub'}
