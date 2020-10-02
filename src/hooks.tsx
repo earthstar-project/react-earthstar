@@ -13,12 +13,12 @@ import {
 } from 'earthstar';
 
 const StorageContext = React.createContext<{
-  storages: Record<string, IStorage>;
+  storages: Record<string, IStorage>;  // workspace address --> IStorage instance
   setStorages: React.Dispatch<React.SetStateAction<Record<string, IStorage>>>;
 }>({ storages: {}, setStorages: () => {} });
 
 const PubsContext = React.createContext<{
-  pubs: Record<string, string[]>;
+  pubs: Record<string, string[]>;  // workspace address --> pub urls
   setPubs: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
 }>({ pubs: {}, setPubs: () => {} });
 
