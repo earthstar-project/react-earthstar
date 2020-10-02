@@ -1,8 +1,12 @@
 # Components to make
 
-- Can't think of any right now!
+- RemoveWorkspaceButton
 
 # Things to do
+
+- Basics
+
+  - Add placeholder text to AddWorkspaceForm
 
 - Styling
   - Add `className` props to components

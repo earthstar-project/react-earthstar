@@ -1,18 +1,24 @@
 import React from 'react';
-import { usePubs } from '../hooks';
+import { useWorkspacePubs } from '../hooks';
 
 export default function PubEditor({ workspace }: { workspace: string }) {
   const [pubToAdd, setPubToAdd] = React.useState('');
-  const [pubs, setPubs] = usePubs(workspace);
+  const [pubs, setPubs] = useWorkspacePubs(workspace);
 
-  const removePub = React.useCallback((pubToRemove: string) => {
-    setPubs(prev => prev.filter(pub => pub !== pubToRemove));
-  }, []);
+  const removePub = React.useCallback(
+    (pubToRemove: string) => {
+      setPubs(prev => prev.filter(pub => pub !== pubToRemove));
+    },
+    [setPubs]
+  );
 
-  const addPub = React.useCallback((pubToAdd: string) => {
-    setPubToAdd('');
-    setPubs(prev => [...prev, pubToAdd]);
-  }, []);
+  const addPub = React.useCallback(
+    (pubToAdd: string) => {
+      setPubToAdd('');
+      setPubs(prev => [...prev, pubToAdd]);
+    },
+    [setPubs, setPubToAdd]
+  );
 
   return (
     <>
@@ -43,7 +49,6 @@ export default function PubEditor({ workspace }: { workspace: string }) {
           if (pubToAdd.length > 0) {
             addPub(pubToAdd);
           }
-          
         }}
       >
         {'Add new pub'}
