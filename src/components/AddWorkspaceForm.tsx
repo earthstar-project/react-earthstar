@@ -1,14 +1,14 @@
 import React from 'react';
 import { isErr } from 'earthstar';
 
-import { useAddWorkspace, usePubs } from '../hooks';
+import { useAddWorkspace, useWorkspacePubs } from '../hooks';
 
 export default function AddWorkspaceForm() {
   const [workspaceAddress, setWorkspaceAddress] = React.useState('');
   const [initialPub, setInitialPub] = React.useState('');
 
   const add = useAddWorkspace();
-  const [, setPubs] = usePubs(workspaceAddress);
+  const [, setPubs] = useWorkspacePubs(workspaceAddress);
 
   return (
     <div>
