@@ -55,9 +55,10 @@ function Example({
       <div
         style={{
           margin: '0 1rem 0 2rem',
-          border: '2px solid #eee',
-          padding: '0.5em',
-          borderRadius: 10,
+          border: '2px dotted #084',
+          padding: '1em',
+          boxShadow: '5px 5px 5px 0px rgba(0,0,0,0.3)',
+          background: 'rgb(208, 232, 220)',
         }}
       >
         {children}
