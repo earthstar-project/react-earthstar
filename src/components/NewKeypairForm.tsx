@@ -29,15 +29,23 @@ export default function NewKeypairForm() {
   }, [setCurrentAuthor, shortName, currentAuthor]);
 
   return (
-    <div>
-      <label htmlFor={'short-name-input'}>Short name</label>
+    <>
+      <label
+        react-earthstar-keypair-form-shortname-label
+        htmlFor={'short-name-input'}
+      >
+        Short name
+      </label>
       <input
+        react-earthstar-keypair-form-shortname-input
         name={'short-name-input'}
         placeholder={'4-letter nickname'}
         value={shortName}
         onChange={e => setShortName(e.target.value)}
       />
-      <button onClick={onCreate}>{'Create'}</button>
-    </div>
+      <button react-earthstar-keypair-form-button onClick={onCreate}>
+        {'Create'}
+      </button>
+    </>
   );
 }

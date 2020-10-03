@@ -1,7 +1,9 @@
 import React from 'react';
 import { useCurrentAuthor } from '../hooks';
 
-export default function DownloadKeypairButton() {
+export default function DownloadKeypairButton(
+  props: React.HTMLAttributes<HTMLButtonElement>
+) {
   const [currentAuthor] = useCurrentAuthor();
 
   const download = React.useCallback(() => {
@@ -25,7 +27,12 @@ export default function DownloadKeypairButton() {
   }, [currentAuthor]);
 
   return (
-    <button onClick={download} disabled={currentAuthor === null}>
+    <button
+      {...props}
+      data-react-earthstar-download-keypair-button
+      onClick={download}
+      disabled={currentAuthor === null}
+    >
       {'Download keypair.json'}
     </button>
   );

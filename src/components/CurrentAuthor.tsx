@@ -6,13 +6,9 @@ import { useCurrentAuthor } from '../hooks';
 export default function CurrentAuthor() {
   const [currentAuthor] = useCurrentAuthor();
 
-  return (
-    <div>
-      {currentAuthor ? (
-        <AuthorLabel address={currentAuthor.address} />
-      ) : (
-        'Not signed in'
-      )}
-    </div>
+  return currentAuthor ? (
+    <AuthorLabel address={currentAuthor.address} />
+  ) : (
+    'Not signed in'
   );
 }

@@ -1,12 +1,9 @@
 # Components to make
 
 - RemoveWorkspaceButton
+- Rework AddWorkspaceForm to use Earthstar URL
 
 # Things to do
-
-- Basics
-
-  - Add placeholder text to AddWorkspaceForm
 
 - Styling
   - Add `className` props to components
