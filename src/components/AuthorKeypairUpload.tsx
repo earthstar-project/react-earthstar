@@ -2,11 +2,15 @@ import React from 'react';
 import { checkAuthorKeypairIsValid, isErr } from 'earthstar';
 import { useCurrentAuthor } from '../hooks';
 
-export default function AuthorKeypairUpload() {
+type AuthorKeypairUploadProps = React.InputHTMLAttributes<HTMLInputElement>;
+
+export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
   const [, setCurrentAuthor] = useCurrentAuthor();
 
   return (
     <input
+      {...props}
+      data-react-earthstar-keypair-upload-input
       type="file"
       accept={'application/json,.keypair.json'}
       onChange={e => {

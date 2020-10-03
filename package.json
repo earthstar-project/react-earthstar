@@ -34,6 +34,7 @@
   "author": "Sam Gwilym",
   "module": "dist/react-earthstar.esm.js",
   "devDependencies": {
+    "@types/react-dom": "^16.9.8",
     "eslint-plugin-react-hooks": "^4.1.2",
     "husky": "^4.3.0",
     "parcel": "^1.12.4",

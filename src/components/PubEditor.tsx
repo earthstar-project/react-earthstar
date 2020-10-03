@@ -23,12 +23,15 @@ export default function PubEditor({ workspace }: { workspace: string }) {
   return (
     <>
       {pubs.length > 0 ? (
-        <ul>
+        <ul data-react-earthstar-pubeditor-list>
           {pubs.map(pubUrl => {
             return (
-              <li key={`${pubUrl}`}>
+              <li data-react-earthstar-pubeditor-list-item key={`${pubUrl}`}>
                 {pubUrl}
-                <button onClick={() => removePub(pubUrl)}>
+                <button
+                  data-react-earthstar-pubeditor-list-item-delete-button
+                  onClick={() => removePub(pubUrl)}
+                >
                   {'Remove pub'}
                 </button>
               </li>
@@ -36,8 +39,11 @@ export default function PubEditor({ workspace }: { workspace: string }) {
           })}
         </ul>
       ) : null}
-      <label htmlFor={'pub-to-add'}>{'Pub URL'}</label>
+      <label data-react-earthstar-pubeditor-newpub-label htmlFor={'pub-to-add'}>
+        {'Pub URL'}
+      </label>
       <input
+        data-react-earthstar-pubeditor-newpub-input
         type="url"
         name={'pub-to-add'}
         value={pubToAdd}
@@ -45,6 +51,7 @@ export default function PubEditor({ workspace }: { workspace: string }) {
         placeholder={'https://my.pub/'}
       />
       <button
+        data-react-earthstar-pubeditor-add-button
         onClick={() => {
           if (pubToAdd.length > 0) {
             addPub(pubToAdd);
