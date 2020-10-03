@@ -6,11 +6,11 @@ import WorkspaceLabel from './WorkspaceLabel';
 export default function WorkspaceChooser() {
   const workspaces = useWorkspaces();
 
-  return <div>
+  return <ul>
     {workspaces.map(ws =>
-      <div key={ws}>
+      <li key={ws}>
         <WorkspaceLabel address={ws} />
-      </div>
+      </li>
     )}
-  </div>; 
+  </ul>; 
 }
