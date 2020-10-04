@@ -10,3 +10,4 @@ export { default as NewKeypairForm } from './components/NewKeypairForm';
 export { default as PubEditor } from './components/PubEditor';
 export { default as SignOutButton } from './components/SignOutButton';
 export { default as WorkspaceLabel } from './components/WorkspaceLabel';
+export { default as WorkspaceList } from './components/WorkspaceList';

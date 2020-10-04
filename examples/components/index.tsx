@@ -14,9 +14,12 @@ import {
   PubEditor,
   SignOutButton,
   WorkspaceLabel,
+  WorkspaceList,
 } from '../../src/index';
 
-const EXAMPLE_WORKSPACE_ADDR = '+example.a123';
+const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
+const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
+const EXAMPLE_WORKSPACE_ADDR3 = '+sailing.a123';
 
 function Example({
   children,
@@ -72,9 +75,9 @@ function Examples() {
       <h1>react-earthstar components</h1>
       <EarthstarPeer
         initWorkspaces={[
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR + 'b'),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR + 'c'),
+          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR1),
+          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR2),
+          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
         ]}
       >
         <hr />
@@ -85,11 +88,11 @@ function Examples() {
         >
           <AddWorkspaceForm />
         </Example>
-        <Example
-          title={'PubEditor'}
-          notes="Add or remove pubs from a given workspace.  Input: a workspace address"
-        >
-          <PubEditor workspace={EXAMPLE_WORKSPACE_ADDR} />
+        <Example title={'PubEditor'} notes="Add or remove pubs from a given workspace.">
+          <PubEditor workspace={EXAMPLE_WORKSPACE_ADDR1} />
+        </Example>
+        <Example title={'WorkspaceList'} notes="List the known workspaces">
+          <WorkspaceList />
         </Example>
         <hr />
         <h2>Current author: logging in and signing up</h2>
@@ -127,11 +130,8 @@ function Examples() {
         >
           <CurrentAuthor />
         </Example>
-        <Example
-          title={'DisplayNameForm'}
-          notes="Change the display name of the currently signed in author, in a given workspace"
-        >
-          <DisplayNameForm workspace={EXAMPLE_WORKSPACE_ADDR} />
+        <Example title={'DisplayNameForm'} notes="Change the display name of the currently signed in author, in a given workspace">
+          <DisplayNameForm workspace={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
         <hr />
         <h2>Stateless helpers</h2>
@@ -145,11 +145,8 @@ function Examples() {
             }
           />
         </Example>
-        <Example
-          title={'WorkspaceLabel'}
-          notes="Abbreviate an workspace address for easy viewing"
-        >
-          <WorkspaceLabel address={EXAMPLE_WORKSPACE_ADDR} />
+        <Example title={'WorkspaceLabel'} notes="Abbreviate a workspace address for easy viewing">
+          <WorkspaceLabel address={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
       </EarthstarPeer>
     </>
