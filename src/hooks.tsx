@@ -10,6 +10,8 @@ import {
   Document,
   isErr,
   EarthstarError,
+  WriteResult,
+  ValidationError,
 } from 'earthstar';
 
 const StorageContext = React.createContext<{
@@ -122,7 +124,7 @@ export function useRemoveWorkspace() {
   );
 }
 
-export function usePubs(
+export function useWorkspacePubs(
   workspaceAddress: string
 ): [string[], (pubs: React.SetStateAction<string[]>) => void] {
   const { pubs: existingPubs, setPubs } = React.useContext(PubsContext);
@@ -142,6 +144,15 @@ export function usePubs(
   );
 
   return [workspacePubs, setWorkspacePubs];
+}
+
+export function usePubs(): [
+  Record<string, string[]>,
+  React.Dispatch<React.SetStateAction<Record<string, string[]>>>
+] {
+  const { pubs, setPubs } = React.useContext(PubsContext);
+
+  return [pubs, setPubs];
 }
 
 export function useCurrentAuthor(): [
@@ -205,7 +216,10 @@ export function useDocument(
   path: string
 ): [
   Document | undefined,
-  (content: string, deleteAfter?: number | null | undefined) => void,
+  (
+    content: string,
+    deleteAfter?: number | null | undefined
+  ) => WriteResult | ValidationError,
   () => void
 ] {
   const { storages } = React.useContext(StorageContext);
@@ -215,7 +229,14 @@ export function useDocument(
 
   if (!storage) {
     console.error(`useDocument couldn't get the workspace ${workspaceAddress}`);
-    return [undefined, () => {}, () => {}];
+    return [
+      undefined,
+      () =>
+        new ValidationError(
+          "useDocument couldn't get the workspace ${workspaceAddress}"
+        ),
+      () => {},
+    ];
   }
 
   const document = storage.getDocument(path);
@@ -224,7 +245,9 @@ export function useDocument(
     (content: string, deleteAfter?: number | null | undefined) => {
       if (!currentAuthor) {
         console.warn('Tried to set a document when no current author was set.');
-        return;
+        return new ValidationError(
+          'Tried to set a document when no current author was set.'
+        );
       }
 
       const docToSet: DocToSet = {
@@ -234,7 +257,7 @@ export function useDocument(
         deleteAfter,
       };
 
-      storage.set(currentAuthor, docToSet);
+      return storage.set(currentAuthor, docToSet);
     },
     [path, currentAuthor]
   );

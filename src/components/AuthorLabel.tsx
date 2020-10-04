@@ -1,6 +1,15 @@
 import React from 'react';
 import { getAuthorShortName } from '../util';
 
-export default function AuthorLabel({ address }: { address: string }) {
-  return <span title={address}>{`@${getAuthorShortName(address)}`}</span>;
+export default function AuthorLabel({
+  address,
+  ...props
+}: { address: string } & React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span
+      {...props}
+      data-react-earthstar-author-label
+      title={address}
+    >{`@${getAuthorShortName(address)}`}</span>
+  );
 }

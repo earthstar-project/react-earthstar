@@ -1,6 +1,7 @@
 # Components to make
 
-- Can't think of any right now!
+- RemoveWorkspaceButton
+- Rework AddWorkspaceForm to use Earthstar URL
 
 # Things to do
 

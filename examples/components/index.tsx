@@ -36,11 +36,33 @@ function Example({
         marginBottom: '2em',
       }}
     >
-      <h3 style={{ margin: '1em 0 0.5rem 1rem', padding: 0, color: '#3a5', fontSize: '1.5em' }}>
+      <h3
+        style={{
+          margin: '1em 0 0.5rem 1rem',
+          padding: 0,
+          color: '#3a5',
+          fontSize: '1.5em',
+        }}
+      >
         <code>{title}</code>
       </h3>
-      <div style={{ margin: '0 0 0.5rem 1rem', fontStyle: 'italic', color: '#084' }}>{notes}</div>
-      <div style={{ margin: '0 1rem 0 2rem', border: '2px solid #3a5', padding: '0.5em', background: '#eee', borderRadius: 10 }}>
+      <div
+        style={{
+          margin: '0 0 0.5rem 1rem',
+          fontStyle: 'italic',
+          color: '#084',
+        }}
+      >
+        {notes}
+      </div>
+      <div
+        style={{
+          margin: '0 1rem 0 2rem',
+          border: '2px solid #eee',
+          padding: '0.5em',
+          borderRadius: 10,
+        }}
+      >
         {children}
       </div>
     </section>
@@ -58,9 +80,12 @@ function Examples() {
           new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
         ]}
       >
-        <hr/>
+        <hr />
         <h2>Adding and editing workspaces</h2>
-        <Example title={'AddWorkspaceForm'} notes="Add a new workspace to the list of possible workspaces">
+        <Example
+          title={'AddWorkspaceForm'}
+          notes="Add a new workspace to the list of possible workspaces"
+        >
           <AddWorkspaceForm />
         </Example>
         <Example title={'PubEditor'} notes="Add or remove pubs from a given workspace.">
@@ -69,18 +94,27 @@ function Examples() {
         <Example title={'WorkspaceList'} notes="List the known workspaces">
           <WorkspaceList />
         </Example>
-        <hr/>
+        <hr />
         <h2>Current author: logging in and signing up</h2>
-        <Example title={'AuthorKeypairForm'} notes="Log in with an author address and secret">
+        <Example
+          title={'AuthorKeypairForm'}
+          notes="Log in with an author address and secret"
+        >
           <AuthorKeypairForm />
         </Example>
-        <Example title={'AuthorKeypairUpload'} notes="Log in with a keypair.json file">
+        <Example
+          title={'AuthorKeypairUpload'}
+          notes="Log in with a keypair.json file"
+        >
           <AuthorKeypairUpload />
         </Example>
-        <Example title={'NewKeypairForm'} notes="Generate a new author keypair and sign in">
+        <Example
+          title={'NewKeypairForm'}
+          notes="Generate a new author keypair and sign in"
+        >
           <NewKeypairForm />
         </Example>
-        <hr/>
+        <hr />
         <h2>Current author: logging out</h2>
         <Example title={'DownloadKeypairButton'}>
           <DownloadKeypairButton />
@@ -88,18 +122,28 @@ function Examples() {
         <Example title={'SignOutButton'}>
           <SignOutButton />
         </Example>
-        <hr/>
+        <hr />
         <h2>Current author: etc</h2>
-        <Example title={'CurrentAuthor'} notes="Display an <AuthorLabel> which abbreviates the currenly signed in author's address">
+        <Example
+          title={'CurrentAuthor'}
+          notes="Display an <AuthorLabel> which abbreviates the currenly signed in author's address"
+        >
           <CurrentAuthor />
         </Example>
         <Example title={'DisplayNameForm'} notes="Change the display name of the currently signed in author, in a given workspace">
           <DisplayNameForm workspace={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
-        <hr/>
+        <hr />
         <h2>Stateless helpers</h2>
-        <Example title={'AuthorLabel'} notes="Abbreviate an author address for easy viewing">
-          <AuthorLabel address={'@suzy.b63a5eqlqqkv5im37s6vebgf3ledhkyt63gzt4ylvcyatlxmrprma'} />
+        <Example
+          title={'AuthorLabel'}
+          notes="Abbreviate an author address for easy viewing"
+        >
+          <AuthorLabel
+            address={
+              '@suzy.b63a5eqlqqkv5im37s6vebgf3ledhkyt63gzt4ylvcyatlxmrprma'
+            }
+          />
         </Example>
         <Example title={'WorkspaceLabel'} notes="Abbreviate a workspace address for easy viewing">
           <WorkspaceLabel address={EXAMPLE_WORKSPACE_ADDR1} />

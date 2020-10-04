@@ -23,6 +23,15 @@ function getWorkspaceName(address: string) {
   return address;
 }
 
-export default function WorkspaceLabel({ address }: { address: string }) {
-  return <span title={address}>{`+${getWorkspaceName(address)}`}</span>;
+export default function WorkspaceLabel({
+  address,
+  ...props
+}: { address: string } & React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span
+      {...props}
+      data-react-earthstar-workspace-label
+      title={address}
+    >{`+${getWorkspaceName(address)}`}</span>
+  );
 }
