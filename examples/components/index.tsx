@@ -12,6 +12,7 @@ import {
   EarthstarPeer,
   NewKeypairForm,
   PubEditor,
+  RemoveWorkspaceButton,
   SignOutButton,
   WorkspaceLabel,
   WorkspaceList,
@@ -81,14 +82,25 @@ function Examples() {
         ]}
       >
         <hr />
-        <h2>Adding and editing workspaces</h2>
+        <h2>Adding, removing and editing workspaces</h2>
         <Example
           title={'AddWorkspaceForm'}
           notes="Add a new workspace to the list of possible workspaces"
         >
           <AddWorkspaceForm />
         </Example>
-        <Example title={'PubEditor'} notes="Add or remove pubs from a given workspace.">
+        <Example
+          title={'RemoveWorkspaceButton'}
+          notes={'Remove a workspace from the list of known workspaces'}
+        >
+          <RemoveWorkspaceButton workspaceAddress={EXAMPLE_WORKSPACE_ADDR3}>
+            {`Remove ${EXAMPLE_WORKSPACE_ADDR3}`}
+          </RemoveWorkspaceButton>
+        </Example>
+        <Example
+          title={'PubEditor'}
+          notes="Add or remove pubs from a given workspace."
+        >
           <PubEditor workspace={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
         <Example title={'WorkspaceList'} notes="List the known workspaces">
@@ -130,7 +142,10 @@ function Examples() {
         >
           <CurrentAuthor />
         </Example>
-        <Example title={'DisplayNameForm'} notes="Change the display name of the currently signed in author, in a given workspace">
+        <Example
+          title={'DisplayNameForm'}
+          notes="Change the display name of the currently signed in author, in a given workspace"
+        >
           <DisplayNameForm workspace={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
         <hr />
@@ -145,7 +160,10 @@ function Examples() {
             }
           />
         </Example>
-        <Example title={'WorkspaceLabel'} notes="Abbreviate a workspace address for easy viewing">
+        <Example
+          title={'WorkspaceLabel'}
+          notes="Abbreviate a workspace address for easy viewing"
+        >
           <WorkspaceLabel address={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
       </EarthstarPeer>
