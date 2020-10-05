@@ -12,6 +12,7 @@ import {
   EarthstarError,
   WriteResult,
   ValidationError,
+  WriteEvent,
 } from 'earthstar';
 
 const StorageContext = React.createContext<{
@@ -50,18 +51,6 @@ export function EarthstarPeer({
 
   const [currentAuthor, setCurrentAuthor] = React.useState(initCurrentAuthor);
 
-  React.useEffect(() => {
-    const unsubscribes = initWorkspaces.map(storage => {
-      return storage.onChange.subscribe(() => {
-        setStorages(prev => ({ ...prev }));
-      });
-    });
-
-    return () => {
-      unsubscribes.forEach(unsubscribe => unsubscribe());
-    };
-  });
-
   return (
     <StorageContext.Provider value={{ storages, setStorages }}>
       <PubsContext.Provider value={{ pubs, setPubs }}>
@@ -76,13 +65,13 @@ export function EarthstarPeer({
 }
 
 export function useWorkspaces() {
-  const { storages } = React.useContext(StorageContext);
+  const [storages] = useStorages();
 
   return Object.keys(storages);
 }
 
 export function useAddWorkspace() {
-  const { setStorages } = React.useContext(StorageContext);
+  const [, setStorages] = useStorages();
 
   return React.useCallback(
     (address: string) => {
@@ -108,7 +97,7 @@ export function useAddWorkspace() {
 }
 
 export function useRemoveWorkspace() {
-  const { setStorages } = React.useContext(StorageContext);
+  const [, setStorages] = useStorages();
 
   return React.useCallback(
     (address: string) => {
@@ -127,7 +116,7 @@ export function useRemoveWorkspace() {
 export function useWorkspacePubs(
   workspaceAddress: string
 ): [string[], (pubs: React.SetStateAction<string[]>) => void] {
-  const { pubs: existingPubs, setPubs } = React.useContext(PubsContext);
+  const [existingPubs, setPubs] = usePubs();
 
   const workspacePubs = existingPubs[workspaceAddress] || [];
   const setWorkspacePubs = React.useCallback(
@@ -167,8 +156,8 @@ export function useCurrentAuthor(): [
 }
 
 export function useSync() {
-  const { storages } = React.useContext(StorageContext);
-  const { pubs } = React.useContext(PubsContext);
+  const [storages] = useStorages();
+  const [pubs] = usePubs();
 
   return React.useCallback(
     (address: string) => {
@@ -194,24 +183,31 @@ export function useSync() {
   );
 }
 
-export function usePaths(workspaceAddress: string) {
-  const { storages } = React.useContext(StorageContext);
+export function usePaths(workspaceAddress: string, query: QueryOpts) {
+  const [storages] = useStorages();
 
-  return React.useCallback(
-    (query: QueryOpts) => {
-      const storage = storages[workspaceAddress];
+  const storage = storages[workspaceAddress];
 
+  if (!storage) {
+    console.warn(`Couldn't find workspace with address ${workspaceAddress}`);
+  }
+
+  const paths = storage ? storage.paths(query) : [];
+
+  const [localPaths, setLocalPaths] = React.useState(paths);
+
+  useSubscribeToStorages({
+    workspaces: [workspaceAddress],
+    onWrite: () => {
       if (!storage) {
-        console.warn(
-          `Couldn't find workspace with address ${workspaceAddress}`
-        );
-        return [];
+        return;
       }
 
-      return storage.paths(query);
+      setLocalPaths(storage.paths(query));
     },
-    [storages, workspaceAddress]
-  );
+  });
+
+  return localPaths;
 }
 
 export function useDocument(
@@ -225,12 +221,20 @@ export function useDocument(
   ) => WriteResult | ValidationError,
   () => void
 ] {
-  const { storages } = React.useContext(StorageContext);
+  const [storages] = useStorages();
   const [currentAuthor] = useCurrentAuthor();
 
   const storage = storages[workspaceAddress];
 
   const document = storage ? storage.getDocument(path) : undefined;
+
+  const [localDocument, setLocalDocument] = React.useState(document);
+
+  useSubscribeToStorages({
+    workspaces: [workspaceAddress],
+    paths: [path],
+    onWrite: event => setLocalDocument(event.document),
+  });
 
   const set = React.useCallback(
     (content: string, deleteAfter?: number | null | undefined) => {
@@ -263,7 +267,7 @@ export function useDocument(
     set('');
   };
 
-  return [document, set, deleteDoc];
+  return [localDocument, set, deleteDoc];
 }
 
 export function useStorages(): [
@@ -273,4 +277,39 @@ export function useStorages(): [
   const { storages, setStorages } = React.useContext(StorageContext);
 
   return [storages, setStorages];
+}
+
+export function useSubscribeToStorages(options: {
+  workspaces?: string[];
+  paths?: string[];
+  onWrite: (event: WriteEvent) => void;
+}) {
+  const [storages] = useStorages();
+
+  React.useEffect(() => {
+    const unsubscribes = Object.values(storages)
+      .filter(storage => {
+        if (options.workspaces) {
+          return options.workspaces.includes(storage.workspace);
+        }
+
+        return true;
+      })
+      .map(storage => {
+        return storage.onWrite.subscribe(event => {
+          if (options.paths) {
+            if (options.paths.includes(event.document.path)) {
+              options.onWrite(event);
+            }
+            return;
+          }
+
+          options.onWrite(event);
+        });
+      });
+
+    return () => {
+      unsubscribes.forEach(unsubscribe => unsubscribe());
+    };
+  }, [options, storages]);
 }
