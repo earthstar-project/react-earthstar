@@ -15,12 +15,12 @@ import {
 } from 'earthstar';
 
 const StorageContext = React.createContext<{
-  storages: Record<string, IStorage>;  // workspace address --> IStorage instance
+  storages: Record<string, IStorage>; // workspace address --> IStorage instance
   setStorages: React.Dispatch<React.SetStateAction<Record<string, IStorage>>>;
 }>({ storages: {}, setStorages: () => {} });
 
 const PubsContext = React.createContext<{
-  pubs: Record<string, string[]>;  // workspace address --> pub urls
+  pubs: Record<string, string[]>; // workspace address --> pub urls
   setPubs: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
 }>({ pubs: {}, setPubs: () => {} });
 
@@ -140,7 +140,7 @@ export function useWorkspacePubs(
         return { ...rest, [workspaceAddress]: Array.from(new Set(next)) };
       });
     },
-    [existingPubs, setPubs]
+    [setPubs, workspaceAddress]
   );
 
   return [workspacePubs, setWorkspacePubs];
@@ -170,25 +170,28 @@ export function useSync() {
   const { storages } = React.useContext(StorageContext);
   const { pubs } = React.useContext(PubsContext);
 
-  return React.useCallback((address: string) => {
-    return new Promise((resolve, reject) => {
-      const storage = storages[address];
+  return React.useCallback(
+    (address: string) => {
+      return new Promise((resolve, reject) => {
+        const storage = storages[address];
 
-      if (!storage) {
-        reject(new Error('Workspace not found'));
-      }
+        if (!storage) {
+          reject(new Error('Workspace not found'));
+        }
 
-      const workspacePubs = pubs[address];
+        const workspacePubs = pubs[address];
 
-      if (!workspacePubs) {
-        reject(new Error('No pubs found for workspace'));
-      }
+        if (!workspacePubs) {
+          reject(new Error('No pubs found for workspace'));
+        }
 
-      Promise.all(
-        workspacePubs.map(pubUrl => syncLocalAndHttp(storage, pubUrl))
-      ).finally(resolve);
-    });
-  }, []);
+        Promise.all(
+          workspacePubs.map(pubUrl => syncLocalAndHttp(storage, pubUrl))
+        ).finally(resolve);
+      });
+    },
+    [pubs, storages]
+  );
 }
 
 export function usePaths(workspaceAddress: string) {
@@ -207,7 +210,7 @@ export function usePaths(workspaceAddress: string) {
 
       return storage.paths(query);
     },
-    [storages]
+    [storages, workspaceAddress]
   );
 }
 
@@ -227,22 +230,16 @@ export function useDocument(
 
   const storage = storages[workspaceAddress];
 
-  if (!storage) {
-    console.error(`useDocument couldn't get the workspace ${workspaceAddress}`);
-    return [
-      undefined,
-      () =>
-        new ValidationError(
-          "useDocument couldn't get the workspace ${workspaceAddress}"
-        ),
-      () => {},
-    ];
-  }
-
-  const document = storage.getDocument(path);
+  const document = storage ? storage.getDocument(path) : undefined;
 
   const set = React.useCallback(
     (content: string, deleteAfter?: number | null | undefined) => {
+      if (!storage) {
+        return new ValidationError(
+          `useDocument couldn't get the workspace ${workspaceAddress}`
+        );
+      }
+
       if (!currentAuthor) {
         console.warn('Tried to set a document when no current author was set.');
         return new ValidationError(
@@ -259,7 +256,7 @@ export function useDocument(
 
       return storage.set(currentAuthor, docToSet);
     },
-    [path, currentAuthor]
+    [path, currentAuthor, storage, workspaceAddress]
   );
 
   const deleteDoc = () => {
