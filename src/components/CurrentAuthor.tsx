@@ -9,6 +9,6 @@ export default function CurrentAuthor() {
   return currentAuthor ? (
     <AuthorLabel address={currentAuthor.address} />
   ) : (
-    'Not signed in'
+    <>'Not signed in'</>
   );
 }
