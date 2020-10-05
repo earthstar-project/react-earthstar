@@ -40,7 +40,7 @@ function Example({
         style={{
           margin: '1em 0 0.5rem 1rem',
           padding: 0,
-          color: '#3a5',
+          color: '#097',
           fontSize: '1.5em',
         }}
       >
@@ -50,7 +50,7 @@ function Example({
         style={{
           margin: '0 0 0.5rem 1rem',
           fontStyle: 'italic',
-          color: '#084',
+          color: '#097',
         }}
       >
         {notes}
@@ -58,9 +58,10 @@ function Example({
       <div
         style={{
           margin: '0 1rem 0 2rem',
-          border: '2px solid #eee',
-          padding: '0.5em',
-          borderRadius: 10,
+          border: '2px dotted #888',
+          padding: '1em',
+          boxShadow: '5px 5px 5px 0px rgba(0,0,0,0.3)',
+          background: '#eee',
         }}
       >
         {children}
