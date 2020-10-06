@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@testing-library/react-hooks": "^3.4.1",
-    "earthstar": "^5.3.0",
+    "earthstar": "^5.4.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-test-renderer": "^16.13.1"

@@ -198,6 +198,7 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
 
   useSubscribeToStorages({
     workspaces: [workspaceAddress],
+    includeHistory: query.includeHistory,
     onWrite: () => {
       if (!storage) {
         return;
@@ -282,11 +283,20 @@ export function useStorages(): [
 export function useSubscribeToStorages(options: {
   workspaces?: string[];
   paths?: string[];
+  includeHistory?: Boolean;
   onWrite: (event: WriteEvent) => void;
 }) {
   const [storages] = useStorages();
 
   React.useEffect(() => {
+    const onWrite = (event: WriteEvent) => {
+      if (!event.isLatest && !!options.includeHistory) {
+        return;
+      }
+
+      options.onWrite(event);
+    };
+
     const unsubscribes = Object.values(storages)
       .filter(storage => {
         if (options.workspaces) {
@@ -299,12 +309,12 @@ export function useSubscribeToStorages(options: {
         return storage.onWrite.subscribe(event => {
           if (options.paths) {
             if (options.paths.includes(event.document.path)) {
-              options.onWrite(event);
+              onWrite(event);
             }
             return;
           }
 
-          options.onWrite(event);
+          onWrite(event);
         });
       });
 
