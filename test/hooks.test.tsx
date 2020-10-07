@@ -1,5 +1,11 @@
 import React from 'react';
-import { ValidatorEs4, StorageMemory } from 'earthstar';
+import {
+  ValidatorEs4,
+  StorageMemory,
+  QueryOpts,
+  generateAuthorKeypair,
+  AuthorKeypair,
+} from 'earthstar';
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
   EarthstarPeer,
@@ -8,7 +14,11 @@ import {
   useRemoveWorkspace,
   useWorkspacePubs,
   usePubs,
+  usePaths,
+  useStorages,
 } from '../src';
+
+const keypair = generateAuthorKeypair('test') as AuthorKeypair;
 
 const WORKSPACE_ADDR_A = '+testa.a123';
 const WORKSPACE_ADDR_B = '+testb.b234';
@@ -126,4 +136,33 @@ test('usePubs', () => {
   });
 
   expect(result.current[0]).toEqual({ [WORKSPACE_ADDR_A]: [PUB_C] });
+});
+
+test.todo('useSync');
+
+test('usePaths', () => {
+  const useTest = (query: QueryOpts) => {
+    const paths = usePaths(WORKSPACE_ADDR_A, query);
+    const [storages] = useStorages();
+
+    return { paths, storage: storages[WORKSPACE_ADDR_A] };
+  };
+
+  const { result } = renderHook(
+    () =>
+      useTest({
+        pathPrefix: '/test',
+      }),
+    { wrapper }
+  );
+
+  act(() => {
+    result.current.storage.set(keypair, {
+      format: 'es.4',
+      path: '/test/1',
+      content: 'Hello!',
+    });
+  });
+
+  expect(result.current.paths).toEqual(['/test/1']);
 });
