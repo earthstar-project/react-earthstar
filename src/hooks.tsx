@@ -71,10 +71,14 @@ export function useWorkspaces() {
 }
 
 export function useAddWorkspace() {
-  const [, setStorages] = useStorages();
+  const [storages, setStorages] = useStorages();
 
   return React.useCallback(
     (address: string) => {
+      if (storages[address]) {
+        return void 0;
+      }
+
       try {
         const newStorage = new StorageMemory([ValidatorEs4], address);
 
@@ -92,7 +96,7 @@ export function useAddWorkspace() {
         return new EarthstarError('Something went wrong!');
       }
     },
-    [setStorages]
+    [setStorages, storages]
   );
 }
 

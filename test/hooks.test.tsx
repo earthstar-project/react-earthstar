@@ -1,7 +1,7 @@
 import React from 'react';
 import { ValidatorEs4, StorageMemory } from 'earthstar';
-import { renderHook } from '@testing-library/react-hooks';
-import { EarthstarPeer, useWorkspaces } from '../src';
+import { renderHook, act } from '@testing-library/react-hooks';
+import { EarthstarPeer, useWorkspaces, useAddWorkspace } from '../src';
 
 const WORKSPACE_ADDR_A = '+testa.a123';
 const WORKSPACE_ADDR_B = '+testb.b234';
@@ -36,5 +36,38 @@ test('useWorkspace returns workspaces', () => {
     WORKSPACE_ADDR_A,
     WORKSPACE_ADDR_B,
     WORKSPACE_ADDR_C,
+  ]);
+});
+
+test('useAddWorkspace adds a workspace', () => {
+  const useTest = () => {
+    const add = useAddWorkspace();
+    const workspaces = useWorkspaces();
+
+    return { add, workspaces };
+  };
+
+  const { result } = renderHook(() => useTest(), { wrapper });
+
+  act(() => {
+    result.current.add('+testd.d789');
+  });
+
+  expect(result.current.workspaces).toEqual([
+    WORKSPACE_ADDR_A,
+    WORKSPACE_ADDR_B,
+    WORKSPACE_ADDR_C,
+    '+testd.d789',
+  ]);
+
+  act(() => {
+    result.current.add(WORKSPACE_ADDR_A);
+  });
+
+  expect(result.current.workspaces).toEqual([
+    WORKSPACE_ADDR_A,
+    WORKSPACE_ADDR_B,
+    WORKSPACE_ADDR_C,
+    '+testd.d789',
   ]);
 });
