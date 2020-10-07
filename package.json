@@ -34,10 +34,13 @@
   "author": "Sam Gwilym",
   "module": "dist/react-earthstar.esm.js",
   "devDependencies": {
+    "@types/jest": "^26.0.14",
     "@types/react-dom": "^16.9.8",
+    "babel-jest": "^26.5.2",
     "eslint-plugin-react-hooks": "^4.1.2",
     "husky": "^4.3.0",
     "parcel": "^1.12.4",
+    "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0",
     "tslib": "^2.0.1",
     "typescript": "4.0.3"
@@ -47,7 +50,7 @@
     "**/@typescript-eslint/parser": "^4.1.1"
   },
   "dependencies": {
-    "@testing-library/react-hooks": "^3.4.1",
+    "@testing-library/react-hooks": "^3.4.2",
     "earthstar": "^5.4.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
