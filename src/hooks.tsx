@@ -199,8 +199,27 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
   useSubscribeToStorages({
     workspaces: [workspaceAddress],
     includeHistory: query.includeHistory,
-    onWrite: () => {
+    onWrite: event => {
       if (!storage) {
+        return;
+      }
+
+      if (
+        query.pathPrefix &&
+        !event.document.path.startsWith(query.pathPrefix)
+      ) {
+        return;
+      }
+
+      if (query.lowPath && query.lowPath <= event.document.path === false) {
+        return;
+      }
+
+      if (query.highPath && event.document.path < query.highPath === false) {
+        return;
+      }
+
+      if (query.contentIsEmpty && event.document.content !== '') {
         return;
       }
 
@@ -283,7 +302,7 @@ export function useStorages(): [
 export function useSubscribeToStorages(options: {
   workspaces?: string[];
   paths?: string[];
-  includeHistory?: Boolean;
+  includeHistory?: boolean;
   onWrite: (event: WriteEvent) => void;
 }) {
   const [storages] = useStorages();
