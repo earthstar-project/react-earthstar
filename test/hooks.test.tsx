@@ -5,6 +5,7 @@ import {
   QueryOpts,
   generateAuthorKeypair,
   AuthorKeypair,
+  WriteEvent,
 } from 'earthstar';
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
@@ -16,9 +17,11 @@ import {
   usePubs,
   usePaths,
   useStorages,
+  useSubscribeToStorages,
 } from '../src';
 
 const keypair = generateAuthorKeypair('test') as AuthorKeypair;
+const otherKeypair = generateAuthorKeypair('test') as AuthorKeypair;
 
 const WORKSPACE_ADDR_A = '+testa.a123';
 const WORKSPACE_ADDR_B = '+testb.b234';
@@ -156,6 +159,8 @@ test('usePaths', () => {
     { wrapper }
   );
 
+  expect(result.current.paths).toEqual([]);
+
   act(() => {
     result.current.storage.set(keypair, {
       format: 'es.4',
@@ -165,4 +170,131 @@ test('usePaths', () => {
   });
 
   expect(result.current.paths).toEqual(['/test/1']);
+});
+
+test('useSubscribeToStorages', () => {
+  const useTest = (options?: {
+    workspaces?: string[];
+    paths?: string[];
+    includeHistory?: boolean;
+  }) => {
+    const [storages] = useStorages();
+    const [state, setState] = React.useState<WriteEvent | null>(null);
+    useSubscribeToStorages({ ...options, onWrite: event => setState(event) });
+
+    return { event: state, storages };
+  };
+
+  const { result } = renderHook(() => useTest(), { wrapper });
+
+  expect(result.current.event).toEqual(null);
+
+  act(() => {
+    result.current.storages[WORKSPACE_ADDR_A].set(keypair, {
+      format: 'es.4',
+      content: 'Hello!',
+      path: '/test/1',
+    });
+  });
+
+  expect(result.current.event?.document.path).toEqual('/test/1');
+
+  // Can listen for specific workspaces
+  const { result: workspaceResult } = renderHook(
+    () =>
+      useTest({
+        workspaces: [WORKSPACE_ADDR_B],
+      }),
+    { wrapper }
+  );
+
+  expect(workspaceResult.current.event).toEqual(null);
+
+  act(() => {
+    workspaceResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
+      format: 'es.4',
+      content: 'Hello!',
+      path: '/test/1',
+    });
+  });
+
+  expect(workspaceResult.current.event).toEqual(null);
+
+  act(() => {
+    workspaceResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
+      format: 'es.4',
+      content: 'Hello!',
+      path: '/test/2',
+    });
+  });
+
+  expect(workspaceResult.current.event?.document.path).toEqual('/test/2');
+
+  // Can listen for paths
+  const { result: pathResult } = renderHook(
+    () =>
+      useTest({
+        paths: ['/test/b'],
+      }),
+    { wrapper }
+  );
+
+  expect(pathResult.current.event).toEqual(null);
+
+  act(() => {
+    pathResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
+      format: 'es.4',
+      content: 'Hello!',
+      path: '/test/a',
+    });
+  });
+
+  expect(pathResult.current.event).toEqual(null);
+
+  act(() => {
+    pathResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
+      format: 'es.4',
+      content: 'Hello!',
+      path: '/test/b',
+    });
+  });
+
+  expect(workspaceResult.current.event?.document.path).toEqual('/test/b');
+
+  // Can listen for all history
+  const { result: historyResult } = renderHook(
+    () =>
+      useTest({
+        includeHistory: true,
+      }),
+    { wrapper }
+  );
+
+  expect(historyResult.current.event).toEqual(null);
+
+  const publishDate = Date.now();
+
+  act(() => {
+    historyResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
+      format: 'es.4',
+      content: 'Latest!',
+      path: '/test/1',
+      timestamp: publishDate,
+    });
+  });
+
+  expect(historyResult.current.event?.document.author).toEqual(keypair.address);
+
+  act(() => {
+    historyResult.current.storages[WORKSPACE_ADDR_B].set(otherKeypair, {
+      format: 'es.4',
+      content: 'Oldest!',
+      path: '/test/1',
+      timestamp: publishDate - 10000,
+    });
+  });
+
+  expect(historyResult.current.event?.document.author).toEqual(
+    otherKeypair.address
+  );
 });

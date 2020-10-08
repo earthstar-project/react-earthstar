@@ -227,6 +227,10 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
         return;
       }
 
+      if (query.contentIsEmpty === false && event.document.content === '') {
+        return;
+      }
+
       setLocalPaths(storage.paths(query));
     },
   });
@@ -313,7 +317,8 @@ export function useSubscribeToStorages(options: {
 
   React.useEffect(() => {
     const onWrite = (event: WriteEvent) => {
-      if (!event.isLatest && !!options.includeHistory) {
+      if (!event.isLatest && !options.includeHistory) {
+        console.log('pop');
         return;
       }
 
