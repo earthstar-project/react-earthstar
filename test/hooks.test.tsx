@@ -16,6 +16,7 @@ import {
   useWorkspacePubs,
   usePubs,
   usePaths,
+  useDocument,
   useStorages,
   useSubscribeToStorages,
 } from '../src';
@@ -43,7 +44,11 @@ const pubs = {
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <EarthstarPeer initWorkspaces={storages} initPubs={pubs}>
+    <EarthstarPeer
+      initWorkspaces={storages}
+      initPubs={pubs}
+      initCurrentAuthor={keypair}
+    >
       {children}
     </EarthstarPeer>
   );
@@ -170,6 +175,27 @@ test('usePaths', () => {
   });
 
   expect(result.current.paths).toEqual(['/test/1']);
+});
+
+test('useDocument', () => {
+  const { result } = renderHook(
+    () => useDocument(WORKSPACE_ADDR_A, '/test/doc'),
+    { wrapper }
+  );
+
+  expect(result.current[0]).toEqual(undefined);
+
+  act(() => {
+    result.current[1]('Hey!');
+  });
+
+  expect(result.current[0]?.content).toEqual('Hey!');
+
+  act(() => {
+    result.current[2]();
+  });
+
+  expect(result.current[0]?.content).toEqual('');
 });
 
 test('useSubscribeToStorages', () => {

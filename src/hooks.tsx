@@ -318,7 +318,6 @@ export function useSubscribeToStorages(options: {
   React.useEffect(() => {
     const onWrite = (event: WriteEvent) => {
       if (!event.isLatest && !options.includeHistory) {
-        console.log('pop');
         return;
       }
 
