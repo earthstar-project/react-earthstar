@@ -21,8 +21,8 @@ import {
   useSubscribeToStorages,
 } from '../src';
 
-const keypair = generateAuthorKeypair('test') as AuthorKeypair;
-const otherKeypair = generateAuthorKeypair('test') as AuthorKeypair;
+const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
+const otherKeypair = generateAuthorKeypair('twoo') as AuthorKeypair;
 
 const WORKSPACE_ADDR_A = '+testa.a123';
 const WORKSPACE_ADDR_B = '+testb.b234';
@@ -224,6 +224,8 @@ test('useSubscribeToStorages', () => {
   });
 
   expect(result.current.event?.document.path).toEqual('/test/1');
+  expect(result.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_A);
+  expect(result.current.event?.document.author).toEqual(keypair.address);
 
   // Can listen for specific workspaces
   const { result: workspaceResult } = renderHook(
@@ -255,6 +257,8 @@ test('useSubscribeToStorages', () => {
   });
 
   expect(workspaceResult.current.event?.document.path).toEqual('/test/2');
+  expect(workspaceResult.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_B);
+  expect(workspaceResult.current.event?.document.author).toEqual(keypair.address);
 
   // Can listen for paths
   const { result: pathResult } = renderHook(
@@ -298,7 +302,7 @@ test('useSubscribeToStorages', () => {
 
   expect(historyResult.current.event).toEqual(null);
 
-  const publishDate = Date.now();
+  const publishDate = Date.now() * 1000;
 
   act(() => {
     historyResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
@@ -309,7 +313,11 @@ test('useSubscribeToStorages', () => {
     });
   });
 
+  expect(historyResult.current.event?.document.content).toEqual('Latest!');
   expect(historyResult.current.event?.document.author).toEqual(keypair.address);
+  expect(historyResult.current.event?.document.path).toEqual('/test/1');
+  expect(historyResult.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_A);
+  expect(historyResult.current.event?.document.timestamp).toEqual(publishDate);
 
   act(() => {
     historyResult.current.storages[WORKSPACE_ADDR_B].set(otherKeypair, {
@@ -320,7 +328,9 @@ test('useSubscribeToStorages', () => {
     });
   });
 
-  expect(historyResult.current.event?.document.author).toEqual(
-    otherKeypair.address
-  );
+  expect(historyResult.current.event?.document.content).toEqual('Oldest!');
+  expect(historyResult.current.event?.document.author).toEqual(otherKeypair.address);
+  expect(historyResult.current.event?.document.path).toEqual('/test/1');
+  expect(historyResult.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_B);
+  expect(historyResult.current.event?.document.timestamp).toEqual(publishDate - 10000);
 });
