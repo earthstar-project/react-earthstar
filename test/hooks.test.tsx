@@ -206,7 +206,12 @@ test('useSubscribeToStorages', () => {
   }) => {
     const [storages] = useStorages();
     const [state, setState] = React.useState<WriteEvent | null>(null);
-    useSubscribeToStorages({ ...options, onWrite: event => setState(event) });
+    useSubscribeToStorages({
+      ...options,
+      onWrite: event => {
+        setState(event);
+      },
+    });
 
     return { event: state, storages };
   };
@@ -257,8 +262,12 @@ test('useSubscribeToStorages', () => {
   });
 
   expect(workspaceResult.current.event?.document.path).toEqual('/test/2');
-  expect(workspaceResult.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_B);
-  expect(workspaceResult.current.event?.document.author).toEqual(keypair.address);
+  expect(workspaceResult.current.event?.document.workspace).toEqual(
+    WORKSPACE_ADDR_B
+  );
+  expect(workspaceResult.current.event?.document.author).toEqual(
+    keypair.address
+  );
 
   // Can listen for paths
   const { result: pathResult } = renderHook(
@@ -308,29 +317,41 @@ test('useSubscribeToStorages', () => {
     historyResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
       format: 'es.4',
       content: 'Latest!',
-      path: '/test/1',
+      path: '/test/history',
       timestamp: publishDate,
     });
   });
 
   expect(historyResult.current.event?.document.content).toEqual('Latest!');
   expect(historyResult.current.event?.document.author).toEqual(keypair.address);
-  expect(historyResult.current.event?.document.path).toEqual('/test/1');
-  expect(historyResult.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_A);
+  expect(historyResult.current.event?.document.path).toEqual('/test/history');
+  expect(historyResult.current.event?.document.workspace).toEqual(
+    WORKSPACE_ADDR_A
+  );
   expect(historyResult.current.event?.document.timestamp).toEqual(publishDate);
 
+  const otherStorage = new StorageMemory([ValidatorEs4], WORKSPACE_ADDR_A);
+
   act(() => {
-    historyResult.current.storages[WORKSPACE_ADDR_B].set(otherKeypair, {
+    otherStorage.set(otherKeypair, {
       format: 'es.4',
       content: 'Oldest!',
-      path: '/test/1',
+      path: '/test/history',
       timestamp: publishDate - 10000,
     });
+    historyResult.current.storages[WORKSPACE_ADDR_A].sync(otherStorage);
   });
 
+  expect(historyResult.current.event?.isLocal).toBeFalsy();
   expect(historyResult.current.event?.document.content).toEqual('Oldest!');
-  expect(historyResult.current.event?.document.author).toEqual(otherKeypair.address);
-  expect(historyResult.current.event?.document.path).toEqual('/test/1');
-  expect(historyResult.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_B);
-  expect(historyResult.current.event?.document.timestamp).toEqual(publishDate - 10000);
+  expect(historyResult.current.event?.document.author).toEqual(
+    otherKeypair.address
+  );
+  expect(historyResult.current.event?.document.path).toEqual('/test/history');
+  expect(historyResult.current.event?.document.workspace).toEqual(
+    WORKSPACE_ADDR_A
+  );
+  expect(historyResult.current.event?.document.timestamp).toEqual(
+    publishDate - 10000
+  );
 });
