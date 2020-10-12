@@ -1,0 +1,11 @@
+{
+  "actions" : {
+    "run" : {
+      "enabled" : true,
+      "script" : "yarn earthbar-example"
+    }
+  },
+  "identifier" : "C406890C-12ED-4248-A89E-D0A787FCD2AC",
+  "openLogOnRun" : "fail",
+  "persistent" : true
+}
