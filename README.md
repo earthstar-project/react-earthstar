@@ -20,11 +20,11 @@ All of these components are being built with accessibility as a given.
 
 ## Installation
 
-`npm install react-earthstar`
+`npm install react-earthstar@preview`
 
 or 
 
-`yarn add react-earthstar`
+`yarn add react-earthstar@preview`
 
 ## EarthstarPeer
 
