@@ -28,7 +28,13 @@ or
 
 ## EarthstarPeer
 
-The hooks and components in this package rely on being rendered within a `EarthstarPeer` component to get the data and functions they need. This provider stores Earthstar-related information like your workspaces, pubs, and the current author. 
+The hooks and components in this package rely on being rendered within a `EarthstarPeer` component to get the data and functions they need.
+
+This provider has a few assumptions it organises itself around conceptually. It assumes:
+
+- A collection of workspaces
+- A collection of pubs associated with each of those
+- And a current author, which is represented by one of Earthstar's `AuthorKeypair`s (or null)
 
 Wrap it around your app like this:
 
