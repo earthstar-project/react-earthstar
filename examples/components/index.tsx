@@ -2,6 +2,9 @@ import React from 'react';
 import { render } from 'react-dom';
 import { StorageMemory, ValidatorEs4 } from 'earthstar';
 import {
+  EarthstarPeer,
+} from '../../src/index';
+import {
   AddWorkspaceForm,
   AuthorKeypairForm,
   AuthorKeypairUpload,
@@ -9,14 +12,13 @@ import {
   CurrentAuthor,
   DisplayNameForm,
   DownloadKeypairButton,
-  EarthstarPeer,
   NewKeypairForm,
   PubEditor,
   RemoveWorkspaceButton,
   SignOutButton,
   WorkspaceLabel,
   WorkspaceList,
-} from '../../src/index';
+} from '../../src/components/index';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
