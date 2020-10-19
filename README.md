@@ -111,7 +111,7 @@ Returns a function you can use to remove an existing workspace from your app.
 ```jsx
 const remove = useRemoveWorkspace();
 
-add("+myworkspace.a123")
+remove("+myworkspace.a123")
 ```
 
 ### useWorkspacePubs
