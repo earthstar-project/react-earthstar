@@ -1,0 +1,36 @@
+/* NewKeypairForm */
+
+[data-react-earthstar-keypair-form] {
+  display: grid;
+  grid-template-areas: 'label label label label' 'input input input button';
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+[data-react-earthstar-keypair-form-shortname-label] {
+  grid-area: label;
+}
+
+[data-react-earthstar-keypair-form-shortname-input] {
+  grid-area: input;
+}
+
+[data-react-earthstar-keypair-form-button] {
+  grid-area: button;
+}
+
+/* AuthorKeypairUpload */
+
+[data-react-earthstar-keypair-upload-input] {
+  visibility: hidden;
+  position: absolute;
+}
+
+[data-react-earthstar-keypair-upload-label] {
+  color: white;
+  background: black;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+ 
+
+

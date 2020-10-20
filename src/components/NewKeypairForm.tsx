@@ -1,8 +1,12 @@
 import React from 'react';
-import { generateAuthorKeypair, isErr } from 'earthstar';
+import { generateAuthorKeypair, isErr, AuthorKeypair } from 'earthstar';
 import { useCurrentAuthor } from '../hooks';
 
-export default function NewKeypairForm() {
+type NewKeypairFormProps = {
+  onSuccess?: (keypair: AuthorKeypair) => void;
+};
+
+export default function NewKeypairForm({ onSuccess }: NewKeypairFormProps) {
   const [currentAuthor, setCurrentAuthor] = useCurrentAuthor();
   const [shortName, setShortName] = React.useState('');
 
@@ -26,10 +30,14 @@ export default function NewKeypairForm() {
 
     setShortName('');
     setCurrentAuthor(keypair);
-  }, [setCurrentAuthor, shortName, currentAuthor]);
+
+    if (onSuccess) {
+      onSuccess(keypair);
+    }
+  }, [setCurrentAuthor, shortName, currentAuthor, onSuccess]);
 
   return (
-    <>
+    <div data-react-earthstar-keypair-form>
       <label
         data-react-earthstar-keypair-form-shortname-label
         htmlFor={'short-name-input'}
@@ -46,6 +54,6 @@ export default function NewKeypairForm() {
       <button data-react-earthstar-keypair-form-button onClick={onCreate}>
         {'Create'}
       </button>
-    </>
+    </div>
   );
 }
