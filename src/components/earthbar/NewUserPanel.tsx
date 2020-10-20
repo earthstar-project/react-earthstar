@@ -1,9 +1,9 @@
 import React from 'react';
 import { NewKeypairForm, AuthorKeypairUpload } from '../../index';
-import { useDownloadAuthorKeypair } from '../../util';
+import { useDownload } from '../../util';
 
 export default function NewUserPanel() {
-  const download = useDownloadAuthorKeypair();
+  const download = useDownload();
 
   return (
     <div>

@@ -3,8 +3,6 @@ import { render } from 'react-dom';
 import { StorageMemory, ValidatorEs4 } from 'earthstar';
 import {
   EarthstarPeer,
-} from '../../src/index';
-import {
   AddWorkspaceForm,
   AuthorKeypairForm,
   AuthorKeypairUpload,
@@ -18,7 +16,7 @@ import {
   SignOutButton,
   WorkspaceLabel,
   WorkspaceList,
-} from '../../src/components/index';
+} from '../../src/index';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';

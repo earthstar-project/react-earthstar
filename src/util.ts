@@ -1,5 +1,4 @@
 import React from 'react';
-import { useCurrentAuthor } from './hooks';
 
 const AUTHOR_NAME_REGEX = /@(.*)\./;
 
@@ -13,15 +12,9 @@ export function getAuthorShortName(address: string): string {
   return address;
 }
 
-export function useDownloadAuthorKeypair() {
-  const [currentAuthor] = useCurrentAuthor();
-
-  return React.useCallback(() => {
-    if (!currentAuthor) {
-      return;
-    }
-
-    const blob = new Blob([JSON.stringify(currentAuthor)], {
+export function useDownload() {
+  return React.useCallback((data: any) => {
+    const blob = new Blob([JSON.stringify(data)], {
       type: 'octet/stream',
     });
     const url = window.URL.createObjectURL(blob);
@@ -34,5 +27,5 @@ export function useDownloadAuthorKeypair() {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-  }, [currentAuthor]);
+  }, []);
 }
