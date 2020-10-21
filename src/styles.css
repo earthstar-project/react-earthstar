@@ -1,10 +1,37 @@
-/* NewKeypairForm */
+/* ***** COMMON ***** */
 
-[data-react-earthstar-keypair-form] {
+/* A grid layout for a common text input layout*/
+
+[data-react-earthstar-keypair-form],
+[data-react-earthstar-display-name-form] {
   display: grid;
   grid-template-areas: 'label label label label' 'input input input button';
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
+
+/* ***** COMPONENTS ***** */
+
+/* AuthorKeypairUpload */
+
+[data-react-earthstar-keypair-upload-input] {
+  visibility: hidden;
+  position: absolute;
+}
+
+/* DisplayNameForm */
+[data-react-earthstar-display-name-label] {
+  grid-area: label;
+}
+
+[data-react-earthstar-display-name-input] {
+  grid-area: input;
+}
+
+[data-react-earthstar-display-name-button] {
+  grid-area: button;
+}
+
+/* NewKeypairForm */
 
 [data-react-earthstar-keypair-form-shortname-label] {
   grid-area: label;
@@ -18,19 +45,9 @@
   grid-area: button;
 }
 
-/* AuthorKeypairUpload */
+/* ***** EARTHBAR ***** */
 
-[data-react-earthstar-keypair-upload-input] {
-  visibility: hidden;
-  position: absolute;
-}
 
-[data-react-earthstar-keypair-upload-label] {
-  color: white;
-  background: black;
-  padding: 8px 12px;
-  border-radius: 4px;
-}
- 
+
 
 

@@ -18,3 +18,4 @@ export { default as WorkspaceList } from './components/WorkspaceList';
 
 // Earthbar
 export { default as NewUserPanel } from './components/earthbar/NewUserPanel';
+export { default as UserPanel } from './components/earthbar/UserPanel';

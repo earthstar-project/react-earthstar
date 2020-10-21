@@ -20,13 +20,15 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
   }
 
   return (
-    <>
+    <div data-react-earthstar-keypair-form>
       <label
-        react-earthstar-display-name-label
+        data-react-earthstar-display-name-label
         htmlFor={`author-display-name-${workspace}`}
-      ></label>
+      >
+        {'Display name'}
+      </label>
       <input
-        react-earthstar-display-name-input
+        data-react-earthstar-display-name-input
         value={newDisplayName}
         onChange={e => setNewDisplayName(e.target.value)}
         placeholder={
@@ -35,7 +37,7 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
         }
       />
       <button
-        react-earthstar-display-name-button
+        data-react-earthstar-display-name-button
         onClick={() => {
           setNewDisplayName('');
           setDisplayNameDoc(newDisplayName);
@@ -43,6 +45,6 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
       >
         {'Set display name'}
       </button>
-    </>
+    </div>
   );
 }

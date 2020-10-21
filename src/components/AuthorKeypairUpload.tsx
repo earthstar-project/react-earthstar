@@ -7,6 +7,8 @@ type AuthorKeypairUploadProps = React.InputHTMLAttributes<HTMLInputElement>;
 export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
   const [, setCurrentAuthor] = useCurrentAuthor();
 
+  const labelRef = React.useRef<HTMLLabelElement | null>(null);
+
   return (
     <>
       <input
@@ -48,10 +50,19 @@ export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
         }}
       />
       <label
+        ref={labelRef}
         data-react-earthstar-keypair-upload-label
         htmlFor={'keypair-upload-button'}
       >
-        Upload keypair.json
+        <button
+          onClick={() => {
+            if (labelRef.current) {
+              labelRef.current.click();
+            }
+          }}
+        >
+          Upload keypair.json
+        </button>
       </label>
     </>
   );

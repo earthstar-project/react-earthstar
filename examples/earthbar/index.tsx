@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { StorageMemory, ValidatorEs4 } from 'earthstar';
-import { EarthstarPeer, NewUserPanel } from '../../src/index';
+import { EarthstarPeer, NewUserPanel, UserPanel } from '../../src/index';
 import '../../src/styles.css';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
@@ -75,6 +75,12 @@ function Examples() {
           notes="Authenticate using a keypair.json"
         >
           <NewUserPanel />
+        </Example>
+        <Example
+          title={'UserPanel'}
+          notes={"Manage the current author's identity"}
+        >
+          <UserPanel />
         </Example>
       </EarthstarPeer>
     </>
