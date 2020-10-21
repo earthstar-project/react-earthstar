@@ -42,13 +42,13 @@
     "eslint-plugin-react-hooks": "^4.1.2",
     "husky": "^4.3.0",
     "parcel": "^1.12.4",
+    "react": "~16.13.1",
+    "react-dom": "^16.13.1",
+    "react-test-renderer": "^16.13.1",
     "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0",
     "tslib": "^2.0.1",
-    "typescript": "4.0.3",
-    "react-dom": "^16.13.1",
-    "react": "~16.13.1",
-    "react-test-renderer": "^16.13.1"
+    "typescript": "4.0.3"
   },
   "resolutions": {
     "**/@typescript-eslint/eslint-plugin": "^4.1.1",
@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "@testing-library/react-hooks": "^3.4.2",
-    "earthstar": "^5.4.0"
+    "earthstar": "^5.4.0",
+    "use-deep-compare-effect": "^1.4.0"
   }
 }

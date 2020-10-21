@@ -149,11 +149,12 @@ test('usePubs', () => {
 test.todo('useSync');
 
 test('usePaths', () => {
-  const useTest = (query: QueryOpts) => {
+  const useTest = (q: QueryOpts) => {
+    const [query, setQuery] = React.useState(q);
     const paths = usePaths(WORKSPACE_ADDR_A, query);
     const [storages] = useStorages();
 
-    return { paths, storage: storages[WORKSPACE_ADDR_A] };
+    return { paths, storage: storages[WORKSPACE_ADDR_A], setQuery };
   };
 
   const { result } = renderHook(
@@ -175,27 +176,59 @@ test('usePaths', () => {
   });
 
   expect(result.current.paths).toEqual(['/test/1']);
+
+  act(() => {
+    result.current.setQuery({ pathPrefix: '/nothing' });
+  });
+
+  expect(result.current.paths).toEqual([]);
 });
 
 test('useDocument', () => {
-  const { result } = renderHook(
-    () => useDocument(WORKSPACE_ADDR_A, '/test/doc'),
-    { wrapper }
-  );
+  const useTest = () => {
+    const [storages] = useStorages();
+    const [path, setPath] = React.useState('/test/test.txt');
+    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
+    const [doc, setDoc, deleteDoc] = useDocument(workspace, path);
 
-  expect(result.current[0]).toEqual(undefined);
+    return { setWorkspace, setPath, doc, setDoc, deleteDoc, storages };
+  };
 
-  act(() => {
-    result.current[1]('Hey!');
+  const { result } = renderHook(() => useTest(), {
+    wrapper,
   });
 
-  expect(result.current[0]?.content).toEqual('Hey!');
+  expect(result.current.doc).toBeUndefined();
 
   act(() => {
-    result.current[2]();
+    result.current.setDoc('Hey!');
   });
 
-  expect(result.current[0]?.content).toEqual('');
+  expect(result.current.doc?.content).toEqual('Hey!');
+
+  act(() => {
+    result.current.deleteDoc();
+  });
+
+  expect(result.current.doc?.content).toEqual('');
+
+  act(() => {
+    result.current.setPath('/test/no.txt');
+  });
+
+  expect(result.current.doc?.content).toBeUndefined();
+
+  act(() => {
+    result.current.storages[WORKSPACE_ADDR_B].set(keypair, {
+      format: 'es.4',
+      path: '/test/workspace-changed.txt',
+      content: 'Switched!',
+    });
+    result.current.setWorkspace(WORKSPACE_ADDR_B);
+    result.current.setPath('/test/workspace-changed.txt');
+  });
+
+  expect(result.current.doc?.content).toEqual('Switched!');
 });
 
 test('useSubscribeToStorages', () => {

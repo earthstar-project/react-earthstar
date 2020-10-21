@@ -6,7 +6,6 @@ import {
   ValidatorEs4,
   syncLocalAndHttp,
   QueryOpts,
-  DocToSet,
   Document,
   isErr,
   EarthstarError,
@@ -14,6 +13,7 @@ import {
   ValidationError,
   WriteEvent,
 } from 'earthstar';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 const StorageContext = React.createContext<{
   storages: Record<string, IStorage>; // workspace address --> IStorage instance
@@ -188,51 +188,128 @@ export function useSync() {
 }
 
 export function usePaths(workspaceAddress: string, query: QueryOpts) {
+  const {
+    pathPrefix,
+    lowPath,
+    highPath,
+    contentIsEmpty,
+    includeHistory,
+    participatingAuthor,
+    path,
+    versionsByAuthor,
+    now,
+    limit,
+  } = query;
+
   const [storages] = useStorages();
 
-  const storage = storages[workspaceAddress];
+  const storage = React.useMemo(() => storages[workspaceAddress], [
+    storages,
+    workspaceAddress,
+  ]);
 
   if (!storage) {
     console.warn(`Couldn't find workspace with address ${workspaceAddress}`);
   }
 
-  const paths = storage ? storage.paths(query) : [];
+  const paths = React.useMemo(
+    () =>
+      storage
+        ? storage.paths({
+            pathPrefix,
+            lowPath,
+            highPath,
+            contentIsEmpty,
+            includeHistory,
+            participatingAuthor,
+            path,
+            versionsByAuthor,
+            now,
+            limit,
+          })
+        : [],
+    [
+      storage,
+      pathPrefix,
+      lowPath,
+      highPath,
+      contentIsEmpty,
+      includeHistory,
+      participatingAuthor,
+      path,
+      versionsByAuthor,
+      now,
+      limit,
+    ]
+  );
 
   const [localPaths, setLocalPaths] = React.useState(paths);
 
-  useSubscribeToStorages({
-    workspaces: [workspaceAddress],
-    includeHistory: query.includeHistory,
-    onWrite: event => {
+  useDeepCompareEffect(() => {
+    const paths = storage ? storage.paths(query) : [];
+    setLocalPaths(paths);
+  }, [query]);
+
+  const onWrite = React.useCallback(
+    event => {
       if (!storage) {
         return;
       }
 
-      if (
-        query.pathPrefix &&
-        !event.document.path.startsWith(query.pathPrefix)
-      ) {
+      if (pathPrefix && !event.document.path.startsWith(pathPrefix)) {
         return;
       }
 
-      if (query.lowPath && query.lowPath <= event.document.path === false) {
+      if (lowPath && lowPath <= event.document.path === false) {
         return;
       }
 
-      if (query.highPath && event.document.path < query.highPath === false) {
+      if (highPath && event.document.path < highPath === false) {
         return;
       }
 
-      if (query.contentIsEmpty && event.document.content !== '') {
+      if (contentIsEmpty && event.document.content !== '') {
         return;
       }
 
-      if (query.contentIsEmpty === false && event.document.content === '') {
+      if (contentIsEmpty === false && event.document.content === '') {
         return;
       }
 
-      setLocalPaths(storage.paths(query));
+      setLocalPaths(
+        storage.paths({
+          pathPrefix,
+          lowPath,
+          highPath,
+          contentIsEmpty,
+          includeHistory,
+          participatingAuthor,
+          path,
+          versionsByAuthor,
+          now,
+          limit,
+        })
+      );
     },
+    [
+      storage,
+      pathPrefix,
+      lowPath,
+      highPath,
+      contentIsEmpty,
+      includeHistory,
+      participatingAuthor,
+      path,
+      versionsByAuthor,
+      now,
+      limit,
+    ]
+  );
+
+  useSubscribeToStorages({
+    workspaces: [workspaceAddress],
+    includeHistory: query.includeHistory,
+    onWrite,
   });
 
   return localPaths;
@@ -252,20 +329,36 @@ export function useDocument(
   const [storages] = useStorages();
   const [currentAuthor] = useCurrentAuthor();
 
-  const storage = storages[workspaceAddress];
+  const [localDocument, setLocalDocument] = React.useState(
+    storages[workspaceAddress]
+      ? storages[workspaceAddress].getDocument(path)
+      : undefined
+  );
 
-  const document = storage ? storage.getDocument(path) : undefined;
+  React.useEffect(() => {
+    setLocalDocument(
+      storages[workspaceAddress]
+        ? storages[workspaceAddress].getDocument(path)
+        : undefined
+    );
+  }, [workspaceAddress, path, storages]);
 
-  const [localDocument, setLocalDocument] = React.useState(document);
+  const onWrite = React.useCallback(
+    event => {
+      setLocalDocument(event.document);
+    },
+    [setLocalDocument]
+  );
 
   useSubscribeToStorages({
     workspaces: [workspaceAddress],
     paths: [path],
-    onWrite: event => setLocalDocument(event.document),
+    onWrite,
   });
 
   const set = React.useCallback(
     (content: string, deleteAfter?: number | null | undefined) => {
+      const storage = storages[workspaceAddress];
       if (!storage) {
         return new ValidationError(
           `useDocument couldn't get the workspace ${workspaceAddress}`
@@ -279,16 +372,14 @@ export function useDocument(
         );
       }
 
-      const docToSet: DocToSet = {
+      return storage.set(currentAuthor, {
         format: 'es.4',
         path,
         content,
         deleteAfter,
-      };
-
-      return storage.set(currentAuthor, docToSet);
+      });
     },
-    [path, currentAuthor, storage, workspaceAddress]
+    [path, currentAuthor, storages, workspaceAddress]
   );
 
   const deleteDoc = () => {
@@ -315,9 +406,9 @@ export function useSubscribeToStorages(options: {
 }) {
   const [storages] = useStorages();
 
-  React.useEffect(() => {
+  useDeepCompareEffect(() => {
     const onWrite = (event: WriteEvent) => {
-      if (!event.isLatest && !options.includeHistory) {
+      if (event.isLatest === false && options.includeHistory !== true) {
         return;
       }
 
@@ -348,5 +439,5 @@ export function useSubscribeToStorages(options: {
     return () => {
       unsubscribes.forEach(unsubscribe => unsubscribe());
     };
-  }, [options, storages]);
+  }, [storages, options]);
 }
