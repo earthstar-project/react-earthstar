@@ -212,24 +212,20 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
     console.warn(`Couldn't find workspace with address ${workspaceAddress}`);
   }
 
-  const paths = React.useMemo(
-    () =>
-      storage
-        ? storage.paths({
-            pathPrefix,
-            lowPath,
-            highPath,
-            contentIsEmpty,
-            includeHistory,
-            participatingAuthor,
-            path,
-            versionsByAuthor,
-            now,
-            limit,
-          })
-        : [],
+  const queryMemo: QueryOpts = React.useMemo(
+    () => ({
+      pathPrefix,
+      lowPath,
+      highPath,
+      contentIsEmpty,
+      includeHistory,
+      participatingAuthor,
+      path,
+      versionsByAuthor,
+      now,
+      limit,
+    }),
     [
-      storage,
       pathPrefix,
       lowPath,
       highPath,
@@ -242,6 +238,10 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
       limit,
     ]
   );
+
+  const paths = React.useMemo(() => (storage ? storage.paths(queryMemo) : []), [
+    queryMemo,
+  ]);
 
   const [localPaths, setLocalPaths] = React.useState(paths);
 
@@ -256,54 +256,35 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
         return;
       }
 
-      if (pathPrefix && !event.document.path.startsWith(pathPrefix)) {
+      if (queryMemo.pathPrefix && !event.document.path.startsWith(pathPrefix)) {
         return;
       }
 
-      if (lowPath && lowPath <= event.document.path === false) {
+      if (
+        queryMemo.lowPath &&
+        queryMemo.lowPath <= event.document.path === false
+      ) {
         return;
       }
 
-      if (highPath && event.document.path < highPath === false) {
+      if (
+        queryMemo.highPath &&
+        event.document.path < queryMemo.highPath === false
+      ) {
         return;
       }
 
-      if (contentIsEmpty && event.document.content !== '') {
+      if (queryMemo.contentIsEmpty && event.document.content !== '') {
         return;
       }
 
-      if (contentIsEmpty === false && event.document.content === '') {
+      if (queryMemo.contentIsEmpty === false && event.document.content === '') {
         return;
       }
 
-      setLocalPaths(
-        storage.paths({
-          pathPrefix,
-          lowPath,
-          highPath,
-          contentIsEmpty,
-          includeHistory,
-          participatingAuthor,
-          path,
-          versionsByAuthor,
-          now,
-          limit,
-        })
-      );
+      setLocalPaths(storage.paths(queryMemo));
     },
-    [
-      storage,
-      pathPrefix,
-      lowPath,
-      highPath,
-      contentIsEmpty,
-      includeHistory,
-      participatingAuthor,
-      path,
-      versionsByAuthor,
-      now,
-      limit,
-    ]
+    [queryMemo]
   );
 
   useSubscribeToStorages({
