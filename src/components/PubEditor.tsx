@@ -27,7 +27,7 @@ export default function PubEditor({ workspace }: { workspace: string }) {
           {pubs.map(pubUrl => {
             return (
               <li data-react-earthstar-pubeditor-list-item key={`${pubUrl}`}>
-                {pubUrl}
+                <a href={'pubUrl'}>{pubUrl}</a>
                 <button
                   data-react-earthstar-pubeditor-list-item-delete-button
                   onClick={() => removePub(pubUrl)}
@@ -39,27 +39,32 @@ export default function PubEditor({ workspace }: { workspace: string }) {
           })}
         </ul>
       ) : null}
-      <label data-react-earthstar-pubeditor-newpub-label htmlFor={'pub-to-add'}>
-        {'Pub URL'}
-      </label>
-      <input
-        data-react-earthstar-pubeditor-newpub-input
-        type="url"
-        name={'pub-to-add'}
-        value={pubToAdd}
-        onChange={e => setPubToAdd(e.target.value)}
-        placeholder={'https://my.pub/'}
-      />
-      <button
-        data-react-earthstar-pubeditor-add-button
-        onClick={() => {
-          if (pubToAdd.length > 0) {
-            addPub(pubToAdd);
-          }
-        }}
-      >
-        {'Add new pub'}
-      </button>
+      <section data-react-earthstar-pubeditor-add-form>
+        <label
+          data-react-earthstar-pubeditor-newpub-label
+          htmlFor={'pub-to-add'}
+        >
+          {'Pub URL'}
+        </label>
+        <input
+          data-react-earthstar-pubeditor-newpub-input
+          type="url"
+          name={'pub-to-add'}
+          value={pubToAdd}
+          onChange={e => setPubToAdd(e.target.value)}
+          placeholder={'https://my.pub/'}
+        />
+        <button
+          data-react-earthstar-pubeditor-add-button
+          onClick={() => {
+            if (pubToAdd.length > 0) {
+              addPub(pubToAdd);
+            }
+          }}
+        >
+          {'Add new pub'}
+        </button>
+      </section>
     </>
   );
 }

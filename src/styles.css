@@ -1,7 +1,8 @@
 /* ***** COMMON ***** */
 
-/* A grid layout for a common text input layout*/
+/* A grid layout for a single text input with label and button*/
 
+[data-react-earthstar-pubeditor-add-form],
 [data-react-earthstar-keypair-form],
 [data-react-earthstar-display-name-form] {
   display: grid;
@@ -70,6 +71,31 @@
 }
 
 [data-react-earthstar-keypair-form-button] {
+  grid-area: button;
+}
+
+/* PubEditor */
+
+[data-react-earthstar-pubeditor-list] {
+  padding: 0;
+  list-style: none
+}
+
+[data-react-earthstar-pubeditor-list-item] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between
+}
+
+[data-react-earthstar-pubeditor-newpub-label] {
+  grid-area: label;
+}
+
+[data-react-earthstar-pubeditor-newpub-input] {
+  grid-area: input;
+}
+
+[data-react-earthstar-pubeditor-add-button] {
   grid-area: button;
 }
 
