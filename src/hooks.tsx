@@ -241,6 +241,7 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
 
   const paths = React.useMemo(() => (storage ? storage.paths(queryMemo) : []), [
     queryMemo,
+    storage,
   ]);
 
   const [localPaths, setLocalPaths] = React.useState(paths);
@@ -256,7 +257,10 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
         return;
       }
 
-      if (queryMemo.pathPrefix && !event.document.path.startsWith(pathPrefix)) {
+      if (
+        queryMemo.pathPrefix &&
+        !event.document.path.startsWith(query.pathPrefix)
+      ) {
         return;
       }
 
@@ -284,7 +288,7 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
 
       setLocalPaths(storage.paths(queryMemo));
     },
-    [queryMemo]
+    [queryMemo, storage]
   );
 
   useSubscribeToStorages({
@@ -330,10 +334,6 @@ export function useDocument(
     },
     [setLocalDocument]
   );
-
-  React.useEffect(() => {
-    setLocalDocument(document);
-  }, [workspaceAddress, document]);
 
   useSubscribeToStorages({
     workspaces: [workspaceAddress],
