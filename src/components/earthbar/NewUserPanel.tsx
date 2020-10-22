@@ -6,7 +6,7 @@ export default function NewUserPanel() {
   const download = useDownload();
 
   return (
-    <div>
+    <div data-react-eartshar-new-user-panel>
       <section data-react-earthstar-new-user-panel-make-section>
         <h1 data-react-earthstar-new-user-panel-make-section-title>
           {'Make a new identity'}
