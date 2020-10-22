@@ -11,6 +11,34 @@
 
 /* ***** COMPONENTS ***** */
 
+/* AddWorkspaceForm */
+
+[data-react-earthstar-add-workspace-form] {
+  display: grid;
+  grid-template-areas: 'workspace-label pub-label .' 'workspace-input pub-input add-workspace-button';
+  grid-template-columns: 1.5fr 1.5fr 1fr
+}
+
+[data-react-earthstar-add-workspace-address-label] {
+  grid-area: workspace-label
+}
+
+[data-react-earthstar-add-workspace-address-input] {
+  grid-area: workspace-input
+}
+
+[data-react-earthstar-add-workspace-pub-label] {
+  grid-area: pub-label
+}
+
+[data-react-earthstar-add-workspace-pub-input] {
+  grid-area: pub-input
+}
+
+[data-react-earthstar-add-workspace-button] {
+  grid-area: add-workspace-button;
+}
+
 /* AuthorKeypairUpload */
 
 [data-react-earthstar-keypair-upload-input] {

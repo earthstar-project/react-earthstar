@@ -11,7 +11,7 @@ export default function AddWorkspaceForm() {
   const [, setPubs] = useWorkspacePubs(workspaceAddress);
 
   return (
-    <>
+    <div data-react-earthstar-add-workspace-form>
       <label
         data-react-earthstar-add-workspace-address-label
         htmlFor={'new-workspace-address'}
@@ -54,6 +54,6 @@ export default function AddWorkspaceForm() {
       >
         {'Add workspace'}
       </button>
-    </>
+    </div>
   );
 }
