@@ -331,6 +331,10 @@ export function useDocument(
     [setLocalDocument]
   );
 
+  React.useEffect(() => {
+    setLocalDocument(document);
+  }, [workspaceAddress, document]);
+
   useSubscribeToStorages({
     workspaces: [workspaceAddress],
     paths: [path],

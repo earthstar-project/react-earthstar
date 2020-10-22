@@ -33,7 +33,7 @@ const PUB_B = 'https://b.pub';
 const PUB_C = 'https://c.pub';
 
 const storages = [WORKSPACE_ADDR_A, WORKSPACE_ADDR_B, WORKSPACE_ADDR_C].map(
-  address => new StorageMemory([ValidatorEs4], address)
+  (address) => new StorageMemory([ValidatorEs4], address)
 );
 
 const pubs = {
@@ -126,7 +126,7 @@ test('useWorkspacePubs', () => {
   expect(result.current[0]).toEqual([PUB_A]);
 
   act(() => {
-    result.current[1](prev => [...prev, PUB_B]);
+    result.current[1]((prev) => [...prev, PUB_B]);
   });
 
   expect(result.current[0]).toEqual([PUB_A, PUB_B]);
@@ -241,7 +241,7 @@ test('useSubscribeToStorages', () => {
     const [state, setState] = React.useState<WriteEvent | null>(null);
     useSubscribeToStorages({
       ...options,
-      onWrite: event => {
+      onWrite: (event) => {
         setState(event);
       },
     });
