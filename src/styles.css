@@ -101,7 +101,32 @@
 
 /* ***** EARTHBAR ***** */
 
+/* WorkspaceRow */
 
+[data-react-earthstar-workspace-row] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between
+}
+
+
+
+/* WorkspaceList*/
+
+[data-react-earthstar-workspace-list-workspaces] {
+  padding: 0;
+  list-style: none
+}
+
+
+
+/* WorkspaceOptions */
+
+[data-react-earthstar-workpace-options-header] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between
+}
 
 
 

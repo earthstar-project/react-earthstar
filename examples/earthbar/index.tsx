@@ -1,12 +1,25 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { StorageMemory, ValidatorEs4 } from 'earthstar';
-import { EarthstarPeer, NewUserPanel, UserPanel } from '../../src/index';
+import {
+  EarthstarPeer,
+  NewUserPanel,
+  UserPanel,
+  WorkspaceManager,
+} from '../../src/index';
 import '../../src/styles.css';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
 const EXAMPLE_WORKSPACE_ADDR3 = '+sailing.a123';
+
+const pubs = {
+  [EXAMPLE_WORKSPACE_ADDR1]: [
+    'https://my.pub',
+    'https://your.pub',
+    'https://their.pub',
+  ],
+};
 
 function Example({
   children,
@@ -67,6 +80,7 @@ function Examples() {
           new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR2),
           new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
         ]}
+        initPubs={pubs}
       >
         <hr />
         <h2>Author-related panels</h2>
@@ -81,6 +95,10 @@ function Examples() {
           notes={"Manage the current author's identity"}
         >
           <UserPanel />
+        </Example>
+        <h2>Workspace-related panels</h2>
+        <Example title={'WorkspaceManager'} notes={'Manage workspaces'}>
+          <WorkspaceManager />
         </Example>
       </EarthstarPeer>
     </>
