@@ -11,3 +11,4 @@ export { default as RemoveWorkspaceButton } from './RemoveWorkspaceButton';
 export { default as SignOutButton } from './SignOutButton';
 export { default as WorkspaceLabel } from './WorkspaceLabel';
 export { default as WorkspaceList } from './WorkspaceList';
+export { default as CurrentWorkspaceSelect } from './CurrentWorkspaceSelect';

@@ -30,15 +30,25 @@ const CurrentAuthorContext = React.createContext<{
   setCurrentAuthor: React.Dispatch<React.SetStateAction<AuthorKeypair | null>>;
 }>({ currentAuthor: null, setCurrentAuthor: () => {} });
 
+const CurrentWorkspaceContext = React.createContext<{
+  currentWorkspace: null | string;
+  setCurrentWorkspace: React.Dispatch<React.SetStateAction<string | null>>;
+}>({
+  currentWorkspace: null,
+  setCurrentWorkspace: () => {},
+});
+
 export function EarthstarPeer({
   initWorkspaces = [],
   initPubs = {},
   initCurrentAuthor = null,
+  initCurrentWorkspace = null,
   children,
 }: {
   initWorkspaces?: IStorage[];
   initPubs?: Record<string, string[]>;
   initCurrentAuthor?: AuthorKeypair | null;
+  initCurrentWorkspace?: string | null;
   children: React.ReactNode;
 }) {
   const [storages, setStorages] = React.useState(
@@ -51,13 +61,21 @@ export function EarthstarPeer({
 
   const [currentAuthor, setCurrentAuthor] = React.useState(initCurrentAuthor);
 
+  const [currentWorkspace, setCurrentWorkspace] = React.useState(
+    initCurrentWorkspace
+  );
+
   return (
     <StorageContext.Provider value={{ storages, setStorages }}>
       <PubsContext.Provider value={{ pubs, setPubs }}>
         <CurrentAuthorContext.Provider
           value={{ currentAuthor, setCurrentAuthor }}
         >
-          {children}
+          <CurrentWorkspaceContext.Provider
+            value={{ currentWorkspace, setCurrentWorkspace }}
+          >
+            {children}
+          </CurrentWorkspaceContext.Provider>
         </CurrentAuthorContext.Provider>
       </PubsContext.Provider>
     </StorageContext.Provider>
@@ -157,6 +175,35 @@ export function useCurrentAuthor(): [
   );
 
   return [currentAuthor, setCurrentAuthor];
+}
+
+export function useCurrentWorkspace(): [
+  string | null,
+  React.Dispatch<React.SetStateAction<string | null>>
+] {
+  const workspaces = useWorkspaces();
+  const { currentWorkspace, setCurrentWorkspace } = React.useContext(
+    CurrentWorkspaceContext
+  );
+
+  const set = React.useCallback(
+    (address: React.SetStateAction<string | null>) => {
+      console.log(address);
+      const addressToSet =
+        typeof address === 'function' ? address(currentWorkspace) : address;
+
+      console.log(addressToSet, workspaces);
+
+      if (addressToSet && workspaces.includes(addressToSet) === false) {
+        return;
+      }
+
+      setCurrentWorkspace(address);
+    },
+    [currentWorkspace, setCurrentWorkspace, workspaces]
+  );
+
+  return [currentWorkspace, set];
 }
 
 export function useSync() {
@@ -259,7 +306,7 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
 
       if (
         queryMemo.pathPrefix &&
-        !event.document.path.startsWith(query.pathPrefix)
+        !event.document.path.startsWith(queryMemo.pathPrefix)
       ) {
         return;
       }

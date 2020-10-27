@@ -19,6 +19,7 @@ import {
   useDocument,
   useStorages,
   useSubscribeToStorages,
+  useCurrentWorkspace,
 } from '../src';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
@@ -147,6 +148,24 @@ test('usePubs', () => {
 });
 
 test.todo('useSync');
+
+test('useCurrentWorkspace', () => {
+  const { result } = renderHook(() => useCurrentWorkspace(), { wrapper });
+
+  expect(result.current[0]).toBeNull();
+
+  act(() => {
+    result.current[1](WORKSPACE_ADDR_A);
+  });
+
+  expect(result.current[0]).toEqual(WORKSPACE_ADDR_A);
+
+  act(() => {
+    result.current[1]('+somethingunknown.a123');
+  });
+
+  expect(result.current[0]).toEqual(WORKSPACE_ADDR_A);
+});
 
 test('usePaths', () => {
   const useTest = (q: QueryOpts) => {

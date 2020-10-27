@@ -5,6 +5,7 @@ import {
   EarthstarPeer,
   NewUserPanel,
   UserPanel,
+  MultiWorkspaceManager,
   WorkspaceManager,
 } from '../../src/index';
 import '../../src/styles.css';
@@ -97,8 +98,14 @@ function Examples() {
           <UserPanel />
         </Example>
         <h2>Workspace-related panels</h2>
-        <Example title={'WorkspaceManager'} notes={'Manage workspaces'}>
+        <Example title={'WorkspaceManager'}>
           <WorkspaceManager />
+        </Example>
+        <Example
+          title={'MultiWorkspaceManager'}
+          notes={'Manage many workspaces at once'}
+        >
+          <MultiWorkspaceManager />
         </Example>
       </EarthstarPeer>
     </>

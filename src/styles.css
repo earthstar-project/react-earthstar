@@ -47,6 +47,13 @@
   position: absolute;
 }
 
+/* CurrentWorkspaceSelect */
+
+[data-react-earthstar-current-workspace-select-form] {
+  display: flex;
+  flex-direction: column
+}
+
 /* DisplayNameForm */
 [data-react-earthstar-display-name-label] {
   grid-area: label;
