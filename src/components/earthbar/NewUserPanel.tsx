@@ -1,4 +1,5 @@
 import React from 'react';
+import { EarthbarPanel } from './Earthbar';
 import { NewKeypairForm, AuthorKeypairUpload } from '../../index';
 import { useDownload } from '../../util';
 
@@ -6,7 +7,7 @@ export default function NewUserPanel() {
   const download = useDownload();
 
   return (
-    <div data-react-eartshar-new-user-panel>
+    <EarthbarPanel data-react-eartshar-new-user-panel>
       <section data-react-earthstar-new-user-panel-make-section>
         <h1 data-react-earthstar-new-user-panel-make-section-title>
           {'Make a new identity'}
@@ -30,6 +31,6 @@ export default function NewUserPanel() {
         </h1>
         <AuthorKeypairUpload />
       </section>
-    </div>
+    </EarthbarPanel>
   );
 }

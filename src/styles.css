@@ -108,6 +108,31 @@
 
 /* ***** EARTHBAR ***** */
 
+/* AuthorTab */
+
+[data-react-earthstar-earthbar-author-tab] {
+  
+}
+
+/* Earthbar */
+
+[data-react-earthstar-earthbar] {
+ 
+}
+
+[data-react-earthstar-earthbar-tabs] {
+  display: flex;
+}
+
+/* EarthbarButton */
+
+/* EarthbarSpacer */
+
+[data-react-earthstar-earthbar-spacer] {
+  flex: 1
+}
+
+
 /* WorkspaceRow */
 
 [data-react-earthstar-workspace-row] {
@@ -124,8 +149,6 @@
   padding: 0;
   list-style: none
 }
-
-
 
 /* WorkspaceOptions */
 

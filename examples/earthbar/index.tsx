@@ -3,10 +3,10 @@ import { render } from 'react-dom';
 import { StorageMemory, ValidatorEs4 } from 'earthstar';
 import {
   EarthstarPeer,
-  NewUserPanel,
-  UserPanel,
-  MultiWorkspaceManager,
-  WorkspaceManager,
+  Earthbar,
+  AuthorTab,
+  WorkspaceTab,
+  EarthbarSpacer,
 } from '../../src/index';
 import '../../src/styles.css';
 
@@ -22,7 +22,7 @@ const pubs = {
   ],
 };
 
-function Example({
+function EarthbarExample({
   children,
   title,
   notes,
@@ -65,7 +65,7 @@ function Example({
           background: '#eee',
         }}
       >
-        {children}
+        <Earthbar>{children}</Earthbar>
       </div>
     </section>
   );
@@ -85,28 +85,14 @@ function Examples() {
       >
         <hr />
         <h2>Author-related panels</h2>
-        <Example
-          title={'NewUserPanel'}
+        <EarthbarExample
+          title={'Earthbar with Auth Upload, Workspace Selection'}
           notes="Authenticate using a keypair.json"
         >
-          <NewUserPanel />
-        </Example>
-        <Example
-          title={'UserPanel'}
-          notes={"Manage the current author's identity"}
-        >
-          <UserPanel />
-        </Example>
-        <h2>Workspace-related panels</h2>
-        <Example title={'WorkspaceManager'}>
-          <WorkspaceManager />
-        </Example>
-        <Example
-          title={'MultiWorkspaceManager'}
-          notes={'Manage many workspaces at once'}
-        >
-          <MultiWorkspaceManager />
-        </Example>
+          <WorkspaceTab />
+          <EarthbarSpacer />
+          <AuthorTab />
+        </EarthbarExample>
       </EarthstarPeer>
     </>
   );

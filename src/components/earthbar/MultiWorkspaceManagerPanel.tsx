@@ -1,4 +1,5 @@
 import React from 'react';
+import { EarthbarPanel } from './Earthbar';
 import { AddWorkspaceForm, WorkspaceLabel } from '..';
 import { useWorkspaces, useSync } from '../..';
 import { WorkspaceOptions } from './WorkspaceOptions';
@@ -85,25 +86,31 @@ function WorkspaceList({
   );
 }
 
-export default function MultiWorkspaceManager() {
+export default function MultiWorkspaceManagerPanel() {
   const [state, dispatch] = React.useReducer(workspaceManagerReducer, {
     screen: 'list',
   });
 
-  return state.screen === 'list' ? (
-    <WorkspaceList
-      navToWorkspace={address => dispatch({ type: 'nav-workspace', address })}
-    />
-  ) : (
-    <div>
-      <nav data-react-earthstar-workpace-options-header>
-        <button onClick={() => dispatch({ type: 'nav-list' })}>
-          {'← Back'}
-        </button>
-        <WorkspaceLabel address={state.address} />
-      </nav>
-      <hr />
-      <WorkspaceOptions address={state.address} />
-    </div>
+  return (
+    <EarthbarPanel>
+      {state.screen === 'list' ? (
+        <WorkspaceList
+          navToWorkspace={address =>
+            dispatch({ type: 'nav-workspace', address })
+          }
+        />
+      ) : (
+        <div>
+          <nav data-react-earthstar-workpace-options-header>
+            <button onClick={() => dispatch({ type: 'nav-list' })}>
+              {'← Back'}
+            </button>
+            <WorkspaceLabel address={state.address} />
+          </nav>
+          <hr />
+          <WorkspaceOptions address={state.address} />
+        </div>
+      )}
+    </EarthbarPanel>
   );
 }
