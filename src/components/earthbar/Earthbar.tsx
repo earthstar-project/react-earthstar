@@ -15,6 +15,8 @@ import {
   useUpdateEffect,
   isFunction,
 } from '@reach/utils';
+import WorkspaceTab from './WorkspaceTab';
+import AuthorTab from './AuthorTab';
 
 type TabDescendant = Descendant<HTMLButtonElement> & {
   disabled: boolean;
@@ -48,7 +50,17 @@ const EarthbarTabContext = React.createContext<{
   id: string | undefined;
 }>({ id: undefined });
 
-export function Earthbar({ children }: { children: React.ReactNode }) {
+export function Earthbar({
+  children = (
+    <>
+      <WorkspaceTab />
+      <Spacer />
+      <AuthorTab />
+    </>
+  ),
+}: {
+  children?: React.ReactNode;
+}) {
   const [tabs, setTabs] = useDescendantsInit<TabDescendant>();
   const [panels, setPanels] = useDescendantsInit<TabPanelDescendant>();
   const [activeIndex, setActiveIndex] = React.useState(-1);
