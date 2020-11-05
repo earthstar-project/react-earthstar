@@ -136,7 +136,7 @@ export function useRemoveWorkspace() {
         return prevCopy;
       });
     },
-    [setStorages]
+    [setStorages, currentWorkspace, setCurrentWorkspace]
   );
 }
 
@@ -196,8 +196,6 @@ export function useCurrentWorkspace(): [
       console.log(address);
       const addressToSet =
         typeof address === 'function' ? address(currentWorkspace) : address;
-
-      console.log(addressToSet, workspaces);
 
       if (addressToSet && workspaces.includes(addressToSet) === false) {
         return;

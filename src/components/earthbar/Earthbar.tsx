@@ -178,14 +178,12 @@ export function EarthbarTabLabel({
 
   let handleFocus = useEventCallback(
     wrapEvent(onFocus, () => {
-      console.log('focusing');
       setFocusedIndex(index);
     })
   );
 
   let handleBlur = useEventCallback(
     wrapEvent(onBlur, () => {
-      console.log('blurring');
       setFocusedIndex(-1);
     })
   );
