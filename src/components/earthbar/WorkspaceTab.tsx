@@ -4,7 +4,7 @@ import { WorkspaceLabel } from '../..';
 import { useCurrentWorkspace } from '../../index';
 import { EarthbarTabLabel, EarthbarTab } from './Earthbar';
 
-export default function AuthorTab() {
+export default function WorkspaceTab() {
   const [currentWorkspace] = useCurrentWorkspace();
 
   return (

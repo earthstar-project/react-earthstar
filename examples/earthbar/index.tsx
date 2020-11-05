@@ -7,6 +7,7 @@ import {
   AuthorTab,
   WorkspaceTab,
   Spacer,
+  MultiWorkspaceTab,
 } from '../../src/index';
 import '../../src/styles.css';
 
@@ -89,7 +90,13 @@ function Examples() {
           title={'Earthbar with Workspace Selection, Auth Upload'}
         >
           <WorkspaceTab />
-
+          <Spacer />
+          <AuthorTab />
+        </EarthbarExample>
+        <EarthbarExample
+          title={'Earthbar with Multi-Workspace Selection, Auth Upload'}
+        >
+          <MultiWorkspaceTab />
           <Spacer />
           <AuthorTab />
         </EarthbarExample>
