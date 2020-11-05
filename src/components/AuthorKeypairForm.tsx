@@ -9,7 +9,23 @@ export default function AuthorKeypairForm() {
   const [, setCurrentAuthor] = useCurrentAuthor();
 
   return (
-    <>
+    <form
+      data-react-earthstar-author-keypair-form
+      onSubmit={e => {
+        e.preventDefault();
+
+        const keypair = { address, secret };
+
+        const result = checkAuthorKeypairIsValid(keypair);
+
+        if (isErr(result)) {
+          alert(result.message);
+          return;
+        }
+
+        setCurrentAuthor(keypair);
+      }}
+    >
       <label
         data-react-earthstar-author-form-address-label
         htmlFor="author-address"
@@ -38,23 +54,9 @@ export default function AuthorKeypairForm() {
         onChange={e => setSecret(e.target.value)}
       />
 
-      <button
-        data-react-earthstar-author-form-button
-        onClick={() => {
-          const keypair = { address, secret };
-
-          const result = checkAuthorKeypairIsValid(keypair);
-
-          if (isErr(result)) {
-            alert(result.message);
-            return;
-          }
-
-          setCurrentAuthor(keypair);
-        }}
-      >
+      <button data-react-earthstar-author-form-button type={'submit'}>
         {'Sign in'}
       </button>
-    </>
+    </form>
   );
 }
