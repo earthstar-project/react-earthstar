@@ -1,18 +1,15 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
 import { NewKeypairForm, AuthorKeypairUpload } from '../../index';
-import { useDownload } from '../../util';
 
 export default function NewUserPanel() {
-  const download = useDownload();
-
   return (
     <EarthbarTabPanel data-react-eartshar-new-user-panel>
       <section data-react-earthstar-new-user-panel-make-section>
         <h1 data-react-earthstar-new-user-panel-make-section-title>
           {'Make a new identity'}
         </h1>
-        <NewKeypairForm onSuccess={download} />
+        <NewKeypairForm />
         <p data-react-earthstar-new-user-panel-make-section-note>
           {
             'A new, unique identity will be created for you. A keypair.json file which you can use to prove your identity will be generated and downloaded to your device.'
