@@ -120,9 +120,14 @@ export function useAddWorkspace() {
 
 export function useRemoveWorkspace() {
   const [, setStorages] = useStorages();
+  const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
 
   return React.useCallback(
     (address: string) => {
+      if (currentWorkspace === address) {
+        setCurrentWorkspace(null);
+      }
+
       setStorages(prev => {
         const prevCopy = { ...prev };
 
