@@ -6,7 +6,7 @@ import {
   Earthbar,
   AuthorTab,
   WorkspaceTab,
-  EarthbarSpacer,
+  Spacer,
 } from '../../src/index';
 import '../../src/styles.css';
 
@@ -86,11 +86,11 @@ function Examples() {
         <hr />
         <h2>Author-related panels</h2>
         <EarthbarExample
-          title={'Earthbar with Auth Upload, Workspace Selection'}
-          notes="Authenticate using a keypair.json"
+          title={'Earthbar with Workspace Selection, Auth Upload'}
         >
           <WorkspaceTab />
-          <EarthbarSpacer />
+
+          <Spacer />
           <AuthorTab />
         </EarthbarExample>
       </EarthstarPeer>

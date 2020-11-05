@@ -1,5 +1,5 @@
 import React from 'react';
-import { EarthbarPanel } from './Earthbar';
+import { EarthbarTabPanel } from './Earthbar';
 
 import { SignOutButton, DownloadKeypairButton, AuthorLabel } from '../';
 import { useCurrentAuthor } from '../..';
@@ -8,7 +8,7 @@ export default function UserPanel() {
   const [currentAuthor] = useCurrentAuthor();
 
   return (
-    <EarthbarPanel data-react-earthstar-user-panel>
+    <EarthbarTabPanel data-react-earthstar-user-panel>
       <h1 data-react-earthstar-user-panel-author-address>
         {currentAuthor ? (
           <AuthorLabel address={currentAuthor.address} />
@@ -21,6 +21,6 @@ export default function UserPanel() {
         <DownloadKeypairButton />
         <SignOutButton />
       </section>
-    </EarthbarPanel>
+    </EarthbarTabPanel>
   );
 }

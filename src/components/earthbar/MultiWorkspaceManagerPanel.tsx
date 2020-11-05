@@ -1,5 +1,5 @@
 import React from 'react';
-import { EarthbarPanel } from './Earthbar';
+import { EarthbarTabPanel } from './Earthbar';
 import { AddWorkspaceForm, WorkspaceLabel } from '..';
 import { useWorkspaces, useSync } from '../..';
 import { WorkspaceOptions } from './WorkspaceOptions';
@@ -92,7 +92,7 @@ export default function MultiWorkspaceManagerPanel() {
   });
 
   return (
-    <EarthbarPanel>
+    <EarthbarTabPanel>
       {state.screen === 'list' ? (
         <WorkspaceList
           navToWorkspace={address =>
@@ -111,6 +111,6 @@ export default function MultiWorkspaceManagerPanel() {
           <WorkspaceOptions address={state.address} />
         </div>
       )}
-    </EarthbarPanel>
+    </EarthbarTabPanel>
   );
 }

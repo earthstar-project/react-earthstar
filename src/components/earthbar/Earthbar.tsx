@@ -5,95 +5,215 @@ import {
   DescendantProvider,
   useDescendantsInit,
   useDescendant,
+  useDescendantKeyDown,
+  Descendant,
 } from '@reach/descendants';
+import { useId } from '@reach/auto-id';
+import {
+  useEventCallback,
+  wrapEvent,
+  useUpdateEffect,
+  isFunction,
+} from '@reach/utils';
 
-const DescendantContext = createDescendantContext('DescendantContext');
+type TabDescendant = Descendant<HTMLButtonElement> & {
+  disabled: boolean;
+};
+
+type TabPanelDescendant = Descendant<HTMLDivElement>;
+
+const TabButtonDescendantContext = createDescendantContext<TabDescendant>(
+  'TabButtonDescendantContext'
+);
+
+const TabPanelDescendantContext = createDescendantContext<TabPanelDescendant>(
+  'TabButtonDescendantContext'
+);
+
 const EarthbarContext = React.createContext<{
   panelRef: HTMLDivElement | undefined;
   activeIndex: number;
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>;
+  focusedIndex: number;
+  setFocusedIndex: React.Dispatch<React.SetStateAction<number>>;
 }>({
   panelRef: undefined,
   activeIndex: -1,
   setActiveIndex: () => {},
+  focusedIndex: -1,
+  setFocusedIndex: () => {},
 });
+
 const EarthbarTabContext = React.createContext<{
-  setIsSelected: () => void;
-  isSelected: boolean;
-}>({ setIsSelected: () => {}, isSelected: false });
+  id: string | undefined;
+}>({ id: undefined });
 
 export function Earthbar({ children }: { children: React.ReactNode }) {
-  const [descendants, setDescendants] = useDescendantsInit();
+  const [tabs, setTabs] = useDescendantsInit<TabDescendant>();
+  const [panels, setPanels] = useDescendantsInit<TabPanelDescendant>();
   const [activeIndex, setActiveIndex] = React.useState(-1);
+  const [focusedIndex, setFocusedIndex] = React.useState(-1);
   const [panelRef, setPanelRef] = React.useState<HTMLDivElement | undefined>();
 
   return (
     <div data-react-earthstar-earthbar>
       <DescendantProvider
-        context={DescendantContext}
-        items={descendants}
-        set={setDescendants}
+        context={TabButtonDescendantContext}
+        items={tabs}
+        set={setTabs}
       >
-        <EarthbarContext.Provider
-          value={{ panelRef, activeIndex, setActiveIndex }}
+        <DescendantProvider
+          context={TabPanelDescendantContext}
+          items={panels}
+          set={setPanels}
         >
-          <div data-react-earthstar-earthbar-tabs>{children}</div>
-          <hr />
-          <div
-            data-react-earthstar-earthbar-panel
-            ref={inst => {
-              if (inst) {
-                setPanelRef(inst);
-              }
+          <EarthbarContext.Provider
+            value={{
+              panelRef,
+              activeIndex,
+              setActiveIndex,
+              focusedIndex,
+              setFocusedIndex,
             }}
-          />
-        </EarthbarContext.Provider>
+          >
+            <EarthbarTabs>{children}</EarthbarTabs>
+            <hr />
+            <div
+              data-react-earthstar-earthbar-panel
+              ref={inst => {
+                if (inst) {
+                  setPanelRef(inst);
+                }
+              }}
+            />
+          </EarthbarContext.Provider>
+        </DescendantProvider>
       </DescendantProvider>
     </div>
   );
 }
 
-export function EarthbarTab({ children }: { children: React.ReactNode }) {
-  const { activeIndex, setActiveIndex } = React.useContext(EarthbarContext);
+function EarthbarTabs({ children }: { children: React.ReactNode }) {
+  const { focusedIndex } = React.useContext(EarthbarContext);
+  const { descendants: tabs } = React.useContext(TabButtonDescendantContext);
 
-  const ref = React.useRef(null);
-  const index = useDescendant(
-    {
-      element: ref.current,
-    },
-    DescendantContext
+  const handleKeyDown = useEventCallback(
+    useDescendantKeyDown(TabButtonDescendantContext, {
+      currentIndex: focusedIndex,
+      orientation: 'horizontal',
+      rotate: true,
+      callback: (index: number) => {
+        const tabElement = tabs[index] && tabs[index].element;
+        if (tabElement && isFunction(tabElement.focus)) {
+          tabElement.focus();
+        }
+      },
+      rtl: false,
+    })
   );
 
-  const isSelected = activeIndex === index;
+  return (
+    <div
+      data-react-earthstar-earthbar-tabs
+      role={'tablist'}
+      aria-orientation={'horizontal'}
+      onKeyDown={event => {
+        handleKeyDown(event);
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function EarthbarTab({
+  children,
+}: {
+  children: React.ReactNode;
+} & React.HTMLAttributes<HTMLDivElement>) {
+  const id = useId();
 
   return (
     <EarthbarTabContext.Provider
       value={{
-        isSelected,
-        setIsSelected: () => {
-          setActiveIndex(index);
-        },
+        id,
       }}
     >
-      <div ref={ref} data-react-earthstar-earthbar-tab>
-        {children}
-      </div>
+      {children}
     </EarthbarTabContext.Provider>
   );
 }
 
-export function EarthbarButton({
+export function EarthbarTabLabel({
   children,
   ...rest
-}: { children: React.ReactNode } & React.Attributes) {
-  // todo: find out how to link with panel a11y
-  const { setIsSelected, isSelected } = React.useContext(EarthbarTabContext);
+}: {
+  children: React.ReactNode;
+} & React.HTMLAttributes<HTMLButtonElement>) {
+  const { onFocus, onBlur } = rest;
+
+  const { setActiveIndex, activeIndex } = React.useContext(EarthbarContext);
+  const { id } = React.useContext(EarthbarTabContext);
+  const { setFocusedIndex } = React.useContext(EarthbarContext);
+
+  const ref = React.useRef<HTMLButtonElement | null>(null);
+
+  const index = useDescendant(
+    {
+      element: ref.current,
+      disabled: false,
+    },
+    TabButtonDescendantContext
+  );
+
+  const isSelected = activeIndex === index;
+
+  useUpdateEffect(() => {
+    if (isSelected && ref.current) {
+      if (isFunction(ref.current.focus)) {
+        ref.current.focus();
+      }
+    }
+  }, [isSelected]);
+
+  let handleFocus = useEventCallback(
+    wrapEvent(onFocus, () => {
+      console.log('focusing');
+      setFocusedIndex(index);
+    })
+  );
+
+  let handleBlur = useEventCallback(
+    wrapEvent(onBlur, () => {
+      console.log('blurring');
+      setFocusedIndex(-1);
+    })
+  );
+
+  const handleKeyDown = useEventCallback<React.KeyboardEvent>(event => {
+    if (['Enter', 'Return', ' '].includes(event.key)) {
+      event.preventDefault();
+      setActiveIndex(prevActive => {
+        return prevActive === index ? -1 : index;
+      });
+    }
+  });
 
   return (
     <button
-      disabled={isSelected}
+      ref={ref}
+      role={'tab'}
+      aria-selected={isSelected}
+      aria-controls={`panel-${id}`}
+      id={`tab-${id}`}
       data-react-earthstar-earthbar-button
-      onClick={setIsSelected}
+      onClick={() => {
+        setActiveIndex(prevIndex => (prevIndex === index ? -1 : index));
+      }}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      tabIndex={isSelected ? 0 : -1}
       {...rest}
     >
       {children}
@@ -101,24 +221,43 @@ export function EarthbarButton({
   );
 }
 
-export function EarthbarPanel({
+export function EarthbarTabPanel({
   children,
   ...rest
 }: { children: React.ReactNode } & React.Attributes) {
-  // todo: find out how to link with button a11y
-  const { panelRef } = React.useContext(EarthbarContext);
-  const { isSelected } = React.useContext(EarthbarTabContext);
+  const { panelRef, activeIndex } = React.useContext(EarthbarContext);
+  const { id } = React.useContext(EarthbarTabContext);
+  const thisPanelRef = React.useRef(null);
 
-  return panelRef
-    ? ReactDOM.createPortal(
-        isSelected ? (
-          <div data-react-earthstar-earthbar-panel {...rest}>
-            {children}
-          </div>
-        ) : null,
-        panelRef
-      )
-    : null;
+  const index = useDescendant(
+    {
+      element: thisPanelRef.current,
+    },
+    TabPanelDescendantContext
+  );
+
+  return (
+    <>
+      <div ref={thisPanelRef} />
+      {panelRef
+        ? ReactDOM.createPortal(
+            activeIndex === index ? (
+              <div
+                data-react-earthstar-earthbar-panel
+                aria-labelledby={`tab-${id}`}
+                id={`panel-${id}`}
+                role={'tabpanel'}
+                tabIndex={0}
+                {...rest}
+              >
+                {children}
+              </div>
+            ) : null,
+            panelRef
+          )
+        : null}
+    </>
+  );
 }
 
 export function Spacer() {
