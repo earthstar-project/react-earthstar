@@ -89,7 +89,6 @@ export function Earthbar({
             }}
           >
             <EarthbarTabs>{children}</EarthbarTabs>
-            <hr />
             <div
               data-react-earthstar-earthbar-panel
               ref={inst => {
@@ -216,7 +215,8 @@ export function EarthbarTabLabel({
       aria-selected={isSelected}
       aria-controls={`panel-${id}`}
       id={`tab-${id}`}
-      data-react-earthstar-earthbar-button
+      data-react-earthstar-earthbar-tab-label
+      data-selected={isSelected}
       onClick={() => {
         setActiveIndex(prevIndex => (prevIndex === index ? -1 : index));
       }}

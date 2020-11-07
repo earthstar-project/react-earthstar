@@ -108,23 +108,26 @@
 
 /* ***** EARTHBAR ***** */
 
-/* AuthorTab */
-
-[data-react-earthstar-earthbar-author-tab] {
-  
-}
-
 /* Earthbar */
-
-[data-react-earthstar-earthbar] {
- 
-}
 
 [data-react-earthstar-earthbar-tabs] {
   display: flex;
+  align-content: flex-end;
+  margin-bottom: 8px;
 }
 
-/* EarthbarButton */
+/* EarthbarTabLabel */
+
+[data-react-earthstar-earthbar-tab-label] {
+  margin: 0;
+  padding: 8px;
+  border: none;
+  border-bottom: 1px solid transparent;
+}
+
+[data-react-earthstar-earthbar-tab-label][data-selected="true"] {
+  border-bottom-color: black;
+}
 
 /* EarthbarSpacer */
 
@@ -140,8 +143,6 @@
   align-items: center;
   justify-content: space-between
 }
-
-
 
 /* WorkspaceList*/
 
