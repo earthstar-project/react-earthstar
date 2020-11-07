@@ -28,33 +28,40 @@ export default function AuthorKeypairForm() {
     >
       <label
         data-react-earthstar-author-form-address-label
+        data-react-earthstar-label
         htmlFor="author-address"
       >
         {'Address'}
       </label>
       <input
         data-react-earthstar-author-form-address-input
+        data-react-earthstar-input
         name="author-address"
         type="text"
         value={address}
         onChange={e => setAddress(e.target.value)}
       />
-
       <label
         data-react-earthstar-author-form-secret-label
+        data-react-earthstar-label
         htmlFor={'author-secret'}
       >
         {'Secret'}
       </label>
       <input
         data-react-earthstar-author-form-secret-input
+        data-react-earthstar-input
         name={'author-secret'}
         type="password"
         value={secret}
         onChange={e => setSecret(e.target.value)}
       />
 
-      <button data-react-earthstar-author-form-button type={'submit'}>
+      <button
+        data-react-earthstar-author-form-button
+        data-react-earthstar-button
+        type={'submit'}
+      >
         {'Sign in'}
       </button>
     </form>

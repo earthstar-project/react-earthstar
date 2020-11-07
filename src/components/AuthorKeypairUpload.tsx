@@ -52,9 +52,12 @@ export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
       <label
         ref={labelRef}
         data-react-earthstar-keypair-upload-label
+        data-react-earthstar-label
         htmlFor={'keypair-upload-button'}
       >
         <button
+          data-react-earthstar-keypair-upload-button
+          data-react-earthstar-button
           onClick={() => {
             if (labelRef.current) {
               labelRef.current.click();

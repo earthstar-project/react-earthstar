@@ -50,19 +50,25 @@ export default function PubEditor({ workspace }: { workspace: string }) {
       >
         <label
           data-react-earthstar-pubeditor-newpub-label
+          data-react-earthstar-label
           htmlFor={'pub-to-add'}
         >
           {'Pub URL'}
         </label>
         <input
           data-react-earthstar-pubeditor-newpub-input
+          data-react-earthstar-input
           type="url"
           name={'pub-to-add'}
           value={pubToAdd}
           onChange={e => setPubToAdd(e.target.value)}
           placeholder={'https://my.pub/'}
         />
-        <button data-react-earthstar-pubeditor-add-button type={'submit'}>
+        <button
+          data-react-earthstar-pubeditor-add-button
+          data-react-earthstar-button
+          type={'submit'}
+        >
           {'Add new pub'}
         </button>
       </form>

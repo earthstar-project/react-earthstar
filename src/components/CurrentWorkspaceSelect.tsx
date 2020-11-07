@@ -11,12 +11,14 @@ export default function WorkspaceSelect() {
     <div data-react-earthstar-current-workspace-select-form>
       <label
         data-react-earthstar-current-workspace-select-label
+        data-react-earthstar-label
         htmlFor={'react-earthstar-current-workspace-select'}
       >
         {'Current Workspace'}
       </label>
       <select
         data-react-earthstar-current-workspace-select-input
+        data-react-earthstar-select
         id={'react-earthstar-current-workspace-select'}
         value={selectValue}
         onChange={e =>

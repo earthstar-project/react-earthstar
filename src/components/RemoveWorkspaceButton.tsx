@@ -11,6 +11,7 @@ export default function RemoveWorkspaceButton({
   return (
     <button
       data-react-earthstar-remove-workspace-button
+      data-react-earthstar-button
       {...props}
       onClick={() => {
         const isSure = window.confirm(

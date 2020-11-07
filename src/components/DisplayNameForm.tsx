@@ -30,12 +30,14 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
     >
       <label
         data-react-earthstar-display-name-label
+        data-react-earthstar-label
         htmlFor={`author-display-name-${workspace}`}
       >
         {'Display name'}
       </label>
       <input
         data-react-earthstar-display-name-input
+        data-react-earthstar-input
         value={newDisplayName}
         onChange={e => setNewDisplayName(e.target.value)}
         placeholder={
@@ -43,7 +45,11 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
           getAuthorShortName(currentAuthor?.address || '')
         }
       />
-      <button data-react-earthstar-display-name-button type={'submit'}>
+      <button
+        data-react-earthstar-display-name-button
+        data-react-earthstar-button
+        type={'submit'}
+      >
         {'Set display name'}
       </button>
     </form>
