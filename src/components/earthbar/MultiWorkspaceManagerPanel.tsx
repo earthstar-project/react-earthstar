@@ -41,11 +41,18 @@ function WorkspaceRow({
           data-react-earthstar-workspace-row-address
           address={address}
         />
-        <button onClick={navToWorkspace}>{'Settings'}</button>
+        <button
+          data-react-earthstar-multiworkspace-settings-button
+          data-react-earthstar-button
+          onClick={navToWorkspace}
+        >
+          {'Settings'}
+        </button>
       </div>
       {/* TODO: Replace this with a checkbox which toggles live syncing individually */}
       <button
         data-react-earthstar-workspace-row-sync
+        data-react-earthstar-button
         onClick={() => sync(address)}
       >
         {'Sync'}
@@ -102,7 +109,10 @@ export default function MultiWorkspaceManagerPanel() {
       ) : (
         <div>
           <nav data-react-earthstar-workpace-options-header>
-            <button onClick={() => dispatch({ type: 'nav-list' })}>
+            <button
+              data-react-earthstar-button
+              onClick={() => dispatch({ type: 'nav-list' })}
+            >
               {'← Back'}
             </button>
             <WorkspaceLabel address={state.address} />

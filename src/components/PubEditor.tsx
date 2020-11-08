@@ -30,6 +30,7 @@ export default function PubEditor({ workspace }: { workspace: string }) {
                 <a href={'pubUrl'}>{pubUrl}</a>
                 <button
                   data-react-earthstar-pubeditor-list-item-delete-button
+                  data-react-earthstar-button
                   onClick={() => removePub(pubUrl)}
                 >
                   {'Remove pub'}
