@@ -3349,10 +3349,10 @@ duplexer2@~0.1.4:
   dependencies:
     readable-stream "^2.0.2"
 
-earthstar@^5.4.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/earthstar/-/earthstar-5.4.0.tgz#6c72f0da090ffaf433203ff497edc2e4788a1518"
-  integrity sha512-+zNQiuU9ye/LuP3ejK78loMxwXza1PLkJReQ7yp1EaDuuSIbNLzi4oBajxCuCvWSnO0LfcmDOD2BiBLoIKMv+A==
+earthstar@^5.7.4:
+  version "5.7.4"
+  resolved "https://registry.yarnpkg.com/earthstar/-/earthstar-5.7.4.tgz#c986ef545774fd5a6f27a98b8aaaf0de4fa3f42c"
+  integrity sha512-bJvn4Z3RwV0MAPAq4OCpaJrFlpmvL8XctV56kR/j0nhlvt7gPvULJluVW2IBpW/XEdgD3qY/jT7Wh+lonqSaXw==
   dependencies:
     "@types/isomorphic-fetch" "0.0.35"
     bencode "^2.0.1"

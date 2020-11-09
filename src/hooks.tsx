@@ -119,7 +119,7 @@ export function useAddWorkspace() {
 }
 
 export function useRemoveWorkspace() {
-  const [, setStorages] = useStorages();
+  const [storages, setStorages] = useStorages();
   const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
 
   return React.useCallback(
@@ -135,8 +135,10 @@ export function useRemoveWorkspace() {
 
         return prevCopy;
       });
+
+      storages[address]?.deleteAndClose();
     },
-    [setStorages, currentWorkspace, setCurrentWorkspace]
+    [setStorages, currentWorkspace, setCurrentWorkspace, storages]
   );
 }
 
