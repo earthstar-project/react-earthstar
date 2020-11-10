@@ -67,6 +67,34 @@
   grid-area: button;
 }
 
+/* InvitationRedemptionForm */
+
+[data-react-earthstar-invitatiton-redemption-form] {
+  display: grid;
+  grid-template-areas: 'label' 'input' 'error' 'description' 'button';
+  grid-template-columns: 1fr
+}
+
+[data-react-earthstar-invitation-code-label] {
+  grid-area: label
+}
+
+[data-react-earthstar-invitation-code-input] {
+  grid-area: input
+}
+
+[data-react-earthstar-invitation-code-alert] {
+  grid-area: error
+}
+
+[data-react-earthstar-invitation-description] {
+  grid-area: description;
+}
+
+[data-react-earthstar-invitation-redemption-button] {
+  grid-area: button
+}
+
 /* NewKeypairForm */
 
 [data-react-earthstar-keypair-form-shortname-label] {

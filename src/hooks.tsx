@@ -478,7 +478,7 @@ export function useSubscribeToStorages(options: {
 
 export function useInvitation(invitationCode: string) {
   const add = useAddWorkspace();
-  const [, setPubs] = usePubs();
+  const [existingPubs, setPubs] = usePubs();
 
   try {
     const url = new URL(invitationCode);
@@ -523,9 +523,24 @@ export function useInvitation(invitationCode: string) {
       return new EarthstarError('Malformed Pub URL found');
     }
 
-    const redeem = () => {
+    const redeem = (excludedPubs: string[] = []) => {
       add(plussedWorkspace);
-      setPubs(prevPubs => ({ ...prevPubs, [plussedWorkspace]: pubs }));
+
+      // In case the workspace in the invitation already has known pubs
+      // We want to keep those around.
+      const existingWorkspacePubs = existingPubs[plussedWorkspace] || [];
+
+      const nextPubs = Array.from(
+        new Set([
+          ...existingWorkspacePubs,
+          ...pubs.filter(pubUrl => !excludedPubs.includes(pubUrl)),
+        ])
+      );
+
+      setPubs(prevPubs => ({
+        ...prevPubs,
+        [plussedWorkspace]: nextPubs,
+      }));
     };
 
     return { redeem, workspace: plussedWorkspace, pubs };

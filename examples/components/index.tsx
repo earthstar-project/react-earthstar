@@ -11,6 +11,7 @@ import {
   CurrentWorkspaceSelect,
   DisplayNameForm,
   DownloadKeypairButton,
+  InvitationRedemptionForm,
   NewKeypairForm,
   PubEditor,
   RemoveWorkspaceButton,
@@ -97,6 +98,12 @@ function Examples() {
           notes="Add a new workspace to the list of possible workspaces"
         >
           <AddWorkspaceForm />
+        </Example>
+        <Example
+          title={'InvitationRedemptionForm'}
+          notes={'Add a workspace using an Earthstar invitation code'}
+        >
+          <InvitationRedemptionForm />
         </Example>
         <Example
           title={'RemoveWorkspaceButton'}
