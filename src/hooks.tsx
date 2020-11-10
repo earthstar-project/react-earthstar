@@ -193,7 +193,6 @@ export function useCurrentWorkspace(): [
 
   const set = React.useCallback(
     (address: React.SetStateAction<string | null>) => {
-      console.log(address);
       const addressToSet =
         typeof address === 'function' ? address(currentWorkspace) : address;
 
@@ -475,4 +474,62 @@ export function useSubscribeToStorages(options: {
       unsubscribes.forEach(unsubscribe => unsubscribe());
     };
   }, [storages, options]);
+}
+
+export function useInvitation(invitationCode: string) {
+  const add = useAddWorkspace();
+  const [, setPubs] = usePubs();
+
+  try {
+    const url = new URL(invitationCode);
+
+    const isEarthstarURL = url.protocol === 'earthstar:';
+
+    if (!isEarthstarURL) {
+      return new EarthstarError('Invitation not a valid Earthstar URL');
+    }
+
+    const version = url.searchParams.get('v');
+
+    if (version !== '1') {
+      return new EarthstarError(
+        'Unrecognised Earthstar invitation format version'
+      );
+    }
+
+    const workspace = url.searchParams.get('workspace');
+
+    if (workspace === null) {
+      return new EarthstarError(
+        'No workspace found in Earthstar invitation URL'
+      );
+    }
+
+    const plussedWorkspace = workspace.replace(' ', '+');
+
+    const workspaceIsValid = ValidatorEs4._checkWorkspaceIsValid(
+      plussedWorkspace
+    );
+
+    if (isErr(workspaceIsValid)) {
+      return workspaceIsValid;
+    }
+
+    const pubs = url.searchParams.getAll('pub');
+
+    try {
+      pubs.forEach(pubUrl => new URL(pubUrl));
+    } catch {
+      return new EarthstarError('Malformed Pub URL found');
+    }
+
+    const redeem = () => {
+      add(plussedWorkspace);
+      setPubs(prevPubs => ({ ...prevPubs, [plussedWorkspace]: pubs }));
+    };
+
+    return { redeem, workspace: plussedWorkspace, pubs };
+  } catch {
+    return new EarthstarError('Not a valid Earthstar URL');
+  }
 }

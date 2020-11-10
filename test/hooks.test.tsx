@@ -6,6 +6,8 @@ import {
   generateAuthorKeypair,
   AuthorKeypair,
   WriteEvent,
+  isErr,
+  EarthstarError,
 } from 'earthstar';
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
@@ -20,6 +22,7 @@ import {
   useStorages,
   useSubscribeToStorages,
   useCurrentWorkspace,
+  useInvitation,
 } from '../src';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
@@ -405,5 +408,63 @@ test('useSubscribeToStorages', () => {
   );
   expect(historyResult.current.event?.document.timestamp).toEqual(
     publishDate - 10000
+  );
+});
+
+test('useInvitation', () => {
+  const VALID_URL =
+    'earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=1';
+
+  const useTest = () => {
+    const [code, setCode] = React.useState(VALID_URL);
+    const invitationResult = useInvitation(code);
+
+    return { invitationResult, setCode };
+  };
+
+  const { result } = renderHook(() => useTest(), { wrapper });
+
+  expect(isErr(result.current.invitationResult)).toBeFalsy();
+
+  act(() => result.current.setCode('http://dogs.com'));
+
+  expect((result.current.invitationResult as EarthstarError).message).toEqual(
+    'Invitation not a valid Earthstar URL'
+  );
+
+  act(() =>
+    result.current.setCode(
+      'earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=46'
+    )
+  );
+
+  expect((result.current.invitationResult as EarthstarError).message).toEqual(
+    'Unrecognised Earthstar invitation format version'
+  );
+
+  act(() =>
+    result.current.setCode(
+      'earthstar:///?pub=http://pub1.org&pub=https://pub2.org&v=1'
+    )
+  );
+
+  expect((result.current.invitationResult as EarthstarError).message).toEqual(
+    'No workspace found in Earthstar invitation URL'
+  );
+
+  act(() =>
+    result.current.setCode(
+      'earthstar:///?workspace=+gardening.abc&pub=blorp&v=1'
+    )
+  );
+
+  expect((result.current.invitationResult as EarthstarError).message).toEqual(
+    'Malformed Pub URL found'
+  );
+
+  act(() => result.current.setCode('bong'));
+
+  expect((result.current.invitationResult as EarthstarError).message).toEqual(
+    'Not a valid Earthstar URL'
   );
 });
