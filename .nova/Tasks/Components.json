@@ -1,0 +1,11 @@
+{
+  "actions" : {
+    "run" : {
+      "enabled" : true,
+      "script" : "yarn components-example"
+    }
+  },
+  "identifier" : "CFA6925D-70A4-4F92-A7DC-F2F597B3254F",
+  "openLogOnRun" : "fail",
+  "persistent" : true
+}

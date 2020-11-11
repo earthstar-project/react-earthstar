@@ -20,13 +20,24 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
   }
 
   return (
-    <>
+    <form
+      data-react-earthstar-keypair-form
+      onSubmit={e => {
+        e.preventDefault();
+        setNewDisplayName('');
+        setDisplayNameDoc(newDisplayName);
+      }}
+    >
       <label
-        react-earthstar-display-name-label
+        data-react-earthstar-display-name-label
+        data-react-earthstar-label
         htmlFor={`author-display-name-${workspace}`}
-      ></label>
+      >
+        {'Display name'}
+      </label>
       <input
-        react-earthstar-display-name-input
+        data-react-earthstar-display-name-input
+        data-react-earthstar-input
         value={newDisplayName}
         onChange={e => setNewDisplayName(e.target.value)}
         placeholder={
@@ -35,14 +46,12 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
         }
       />
       <button
-        react-earthstar-display-name-button
-        onClick={() => {
-          setNewDisplayName('');
-          setDisplayNameDoc(newDisplayName);
-        }}
+        data-react-earthstar-display-name-button
+        data-react-earthstar-button
+        type={'submit'}
       >
         {'Set display name'}
       </button>
-    </>
+    </form>
   );
 }

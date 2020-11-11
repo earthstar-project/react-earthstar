@@ -27,9 +27,10 @@ export default function PubEditor({ workspace }: { workspace: string }) {
           {pubs.map(pubUrl => {
             return (
               <li data-react-earthstar-pubeditor-list-item key={`${pubUrl}`}>
-                {pubUrl}
+                <a href={'pubUrl'}>{pubUrl}</a>
                 <button
                   data-react-earthstar-pubeditor-list-item-delete-button
+                  data-react-earthstar-button
                   onClick={() => removePub(pubUrl)}
                 >
                   {'Remove pub'}
@@ -39,27 +40,39 @@ export default function PubEditor({ workspace }: { workspace: string }) {
           })}
         </ul>
       ) : null}
-      <label data-react-earthstar-pubeditor-newpub-label htmlFor={'pub-to-add'}>
-        {'Pub URL'}
-      </label>
-      <input
-        data-react-earthstar-pubeditor-newpub-input
-        type="url"
-        name={'pub-to-add'}
-        value={pubToAdd}
-        onChange={e => setPubToAdd(e.target.value)}
-        placeholder={'https://my.pub/'}
-      />
-      <button
-        data-react-earthstar-pubeditor-add-button
-        onClick={() => {
+      <form
+        data-react-earthstar-pubeditor-add-form
+        onSubmit={e => {
+          e.preventDefault();
           if (pubToAdd.length > 0) {
             addPub(pubToAdd);
           }
         }}
       >
-        {'Add new pub'}
-      </button>
+        <label
+          data-react-earthstar-pubeditor-newpub-label
+          data-react-earthstar-label
+          htmlFor={'pub-to-add'}
+        >
+          {'Pub URL'}
+        </label>
+        <input
+          data-react-earthstar-pubeditor-newpub-input
+          data-react-earthstar-input
+          type="url"
+          name={'pub-to-add'}
+          value={pubToAdd}
+          onChange={e => setPubToAdd(e.target.value)}
+          placeholder={'https://my.pub/'}
+        />
+        <button
+          data-react-earthstar-pubeditor-add-button
+          data-react-earthstar-button
+          type={'submit'}
+        >
+          {'Add new pub'}
+        </button>
+      </form>
     </>
   );
 }

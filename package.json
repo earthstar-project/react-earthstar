@@ -16,7 +16,8 @@
     "test": "tsdx test",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
-    "components-example": "parcel examples/components/index.html"
+    "components-example": "parcel examples/components/index.html",
+    "earthbar-example": "parcel examples/earthbar/index.html --port 2345"
   },
   "peerDependencies": {
     "react": "~16.13.1"
@@ -55,6 +56,9 @@
     "**/@typescript-eslint/parser": "^4.1.1"
   },
   "dependencies": {
+    "@reach/auto-id": "^0.11.2",
+    "@reach/descendants": "0.11.2",
+    "@reach/utils": "^0.11.2",
     "@testing-library/react-hooks": "^3.4.2",
     "earthstar": "^5.4.0",
     "use-deep-compare-effect": "^1.4.0"

@@ -3,13 +3,12 @@ import { render } from 'react-dom';
 import { StorageMemory, ValidatorEs4 } from 'earthstar';
 import {
   EarthstarPeer,
-} from '../../src/index';
-import {
   AddWorkspaceForm,
   AuthorKeypairForm,
   AuthorKeypairUpload,
   AuthorLabel,
   CurrentAuthor,
+  CurrentWorkspaceSelect,
   DisplayNameForm,
   DownloadKeypairButton,
   NewKeypairForm,
@@ -18,7 +17,8 @@ import {
   SignOutButton,
   WorkspaceLabel,
   WorkspaceList,
-} from '../../src/components/index';
+} from '../../src/index';
+import '../../src/styles.css';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
@@ -86,6 +86,12 @@ function Examples() {
       >
         <hr />
         <h2>Adding, removing and editing workspaces</h2>
+        <Example
+          title={'CurrentWorkspaceSelect'}
+          notes={'Select the currently active workspace'}
+        >
+          <CurrentWorkspaceSelect />
+        </Example>
         <Example
           title={'AddWorkspaceForm'}
           notes="Add a new workspace to the list of possible workspaces"

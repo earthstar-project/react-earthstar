@@ -7,9 +7,9 @@ export default function WorkspaceChooser() {
   const workspaces = useWorkspaces();
 
   return (
-    <ul>
+    <ul data-react-earthstar-workspace-list>
       {workspaces.map(ws => (
-        <li key={ws}>
+        <li data-react-earthstar-workspace-list-item key={ws}>
           <WorkspaceLabel address={ws} />
         </li>
       ))}

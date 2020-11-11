@@ -1,0 +1,157 @@
+/* ***** COMMON ***** */
+
+/* A grid layout for a single text input with label and button*/
+
+[data-react-earthstar-pubeditor-add-form],
+[data-react-earthstar-keypair-form],
+[data-react-earthstar-display-name-form] {
+  display: grid;
+  grid-template-areas: 'label label label label' 'input input input button';
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+/* ***** COMPONENTS ***** */
+
+/* AddWorkspaceForm */
+
+[data-react-earthstar-add-workspace-form] {
+  display: grid;
+  grid-template-areas: 'workspace-label pub-label .' 'workspace-input pub-input add-workspace-button';
+  grid-template-columns: 1.5fr 1.5fr 1fr
+}
+
+[data-react-earthstar-add-workspace-address-label] {
+  grid-area: workspace-label
+}
+
+[data-react-earthstar-add-workspace-address-input] {
+  grid-area: workspace-input
+}
+
+[data-react-earthstar-add-workspace-pub-label] {
+  grid-area: pub-label
+}
+
+[data-react-earthstar-add-workspace-pub-input] {
+  grid-area: pub-input
+}
+
+[data-react-earthstar-add-workspace-button] {
+  grid-area: add-workspace-button;
+}
+
+/* AuthorKeypairUpload */
+
+[data-react-earthstar-keypair-upload-input] {
+  visibility: hidden;
+  position: absolute;
+}
+
+/* CurrentWorkspaceSelect */
+
+[data-react-earthstar-current-workspace-select-form] {
+  display: flex;
+  flex-direction: column
+}
+
+/* DisplayNameForm */
+[data-react-earthstar-display-name-label] {
+  grid-area: label;
+}
+
+[data-react-earthstar-display-name-input] {
+  grid-area: input;
+}
+
+[data-react-earthstar-display-name-button] {
+  grid-area: button;
+}
+
+/* NewKeypairForm */
+
+[data-react-earthstar-keypair-form-shortname-label] {
+  grid-area: label;
+}
+
+[data-react-earthstar-keypair-form-shortname-input] {
+  grid-area: input;
+}
+
+[data-react-earthstar-keypair-form-button] {
+  grid-area: button;
+}
+
+/* PubEditor */
+
+[data-react-earthstar-pubeditor-list] {
+  padding: 0;
+  list-style: none
+}
+
+[data-react-earthstar-pubeditor-list-item] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between
+}
+
+[data-react-earthstar-pubeditor-newpub-label] {
+  grid-area: label;
+}
+
+[data-react-earthstar-pubeditor-newpub-input] {
+  grid-area: input;
+}
+
+[data-react-earthstar-pubeditor-add-button] {
+  grid-area: button;
+}
+
+/* ***** EARTHBAR ***** */
+
+/* Earthbar */
+
+[data-react-earthstar-earthbar-tabs] {
+  display: flex;
+  align-content: flex-end;
+}
+
+/* EarthbarTabLabel */
+
+[data-react-earthstar-earthbar-tab-label] {
+  margin: 0;
+}
+
+/* EarthbarSpacer */
+
+[data-react-earthstar-earthbar-spacer] {
+  flex: 1
+}
+
+
+/* WorkspaceRow */
+
+[data-react-earthstar-workspace-row] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between
+}
+
+/* WorkspaceList*/
+
+[data-react-earthstar-workspace-list-workspaces] {
+  padding: 0;
+  list-style: none
+}
+
+/* WorkspaceOptions */
+
+[data-react-earthstar-workpace-options-header] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between
+}
+
+
+
+
+
