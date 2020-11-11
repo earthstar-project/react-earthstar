@@ -548,3 +548,15 @@ export function useInvitation(invitationCode: string) {
     return new EarthstarError('Not a valid Earthstar URL');
   }
 }
+
+export function useMakeInvitation(
+  workspace: string,
+  excludedPubs: string[] = []
+) {
+  const [pubs] = useWorkspacePubs(workspace);
+
+  const pubsToUse = pubs.filter(pubUrl => !excludedPubs.includes(pubUrl));
+  const pubsString = pubsToUse.map(pubUrl => `&pub=${pubUrl}`).join('');
+
+  return `earthstar:///?workspace=${workspace}${pubsString}&v=1`;
+}

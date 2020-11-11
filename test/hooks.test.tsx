@@ -23,6 +23,7 @@ import {
   useSubscribeToStorages,
   useCurrentWorkspace,
   useInvitation,
+  useMakeInvitation,
 } from '../src';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
@@ -466,5 +467,29 @@ test('useInvitation', () => {
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
     'Not a valid Earthstar URL'
+  );
+});
+
+test('useMakeInvitation', () => {
+  const useTest = () => {
+    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
+    const [excludedPubs, setExcludedPubs] = React.useState<string[]>([]);
+    const invitationCode = useMakeInvitation(workspace, excludedPubs);
+
+    return { setWorkspace, setExcludedPubs, invitationCode };
+  };
+
+  const { result } = renderHook(() => useTest(), { wrapper });
+
+  expect(result.current.invitationCode).toEqual(
+    'earthstar:///?workspace=+testa.a123&pub=https://a.pub&v=1'
+  );
+
+  act(() => {
+    result.current.setExcludedPubs([PUB_A]);
+  });
+
+  expect(result.current.invitationCode).toEqual(
+    'earthstar:///?workspace=+testa.a123&v=1'
   );
 });
