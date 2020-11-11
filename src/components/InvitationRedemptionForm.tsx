@@ -70,7 +70,7 @@ export default function InvitationRedemptionForm() {
         data-react-earthstar-invitation-code-label
         data-react-earthstar-label
       >
-        {'Invitation code'}
+        {'Redeem invitation code'}
       </label>
       <input
         data-react-earthstar-invitation-code-input
@@ -88,7 +88,7 @@ export default function InvitationRedemptionForm() {
         <dl data-react-earthstar-invitation-description>
           <dt data-react-earthstar-dt>{'Workspace'}</dt>
           <dd data-react-earthstar-dl>
-            <WorkspaceLabel address={result.workspace} />
+            {result.workspace}
             {workspaces.includes(result.workspace) ? ' (already added)' : null}
           </dd>
           <dt data-react-earthstar-dt>{'Pubs'}</dt>
@@ -135,14 +135,16 @@ export default function InvitationRedemptionForm() {
           </dd>
         </dl>
       ) : null}
-      <button
-        data-react-earthstar-invitation-redemption-button
-        data-react-earthstar-button
-        type={'submit'}
-        disabled={isThereAnythingToAdd === false}
-      >
-        {getButtonLabel()}
-      </button>
+      {code.length > 0 ? (
+        <button
+          data-react-earthstar-invitation-redemption-button
+          data-react-earthstar-button
+          type={'submit'}
+          disabled={isThereAnythingToAdd === false}
+        >
+          {getButtonLabel()}
+        </button>
+      ) : null}
     </form>
   );
 }
