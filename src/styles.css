@@ -67,6 +67,26 @@
   grid-area: button;
 }
 
+/* InvitationCreatorForm */
+
+[data-react-earthstar-invitation-creator-form] {
+  display: grid;
+  grid-template-areas: 'input input input button' 'pub-options pub-options pub-options pub-options';
+  grid-template-columns: 1fr 1fr 1fr 1fr
+}
+
+[data-react-earthstar-invitation-creator-input] {
+  grid-area: input;
+}
+
+[data-react-earthstar-invitation-creator-button] {
+  grid-area: button;
+}
+
+[data-react-earthstar-invitation-creator-pub-options] {
+  grid-area: pub-options
+}
+
 /* InvitationRedemptionForm */
 
 [data-react-earthstar-invitatiton-redemption-form] {

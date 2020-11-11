@@ -11,6 +11,7 @@ import {
   CurrentWorkspaceSelect,
   DisplayNameForm,
   DownloadKeypairButton,
+  InvitationCreatorForm,
   InvitationRedemptionForm,
   NewKeypairForm,
   PubEditor,
@@ -84,6 +85,11 @@ function Examples() {
           new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR2),
           new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
         ]}
+        initPubs={{
+          [EXAMPLE_WORKSPACE_ADDR1]: ['https://a.pub/', 'https://z.pub/'],
+          [EXAMPLE_WORKSPACE_ADDR2]: ['https://b.pub/'],
+          [EXAMPLE_WORKSPACE_ADDR3]: ['https://c.pub/'],
+        }}
       >
         <hr />
         <h2>Adding, removing and editing workspaces</h2>
@@ -104,6 +110,12 @@ function Examples() {
           notes={'Add a workspace using an Earthstar invitation code'}
         >
           <InvitationRedemptionForm />
+        </Example>
+        <Example
+          title={'InvitationCreatorForm'}
+          notes={'Create Earthstar invitation code from a workspace'}
+        >
+          <InvitationCreatorForm workspace={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
         <Example
           title={'RemoveWorkspaceButton'}
