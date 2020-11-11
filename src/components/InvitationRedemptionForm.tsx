@@ -33,14 +33,16 @@ export default function InvitationRedemptionForm() {
     if (workspaces.includes(result.workspace)) {
       return (
         <>
-          {`Add ${pubCount} pub${pubCount !== 1 ? 's' : ''} to `}
+          {`Add ${pubCount <= 0 ? 'no' : pubCount} pub${
+            pubCount !== 1 ? 's' : ''
+          } to `}
           <WorkspaceLabel address={result.workspace} />
         </>
       );
     }
 
     const pubsSuffix =
-      pubCount === 0
+      pubCount <= 0
         ? ' with no pubs'
         : ` and ${pubCount} pub${pubCount > 1 ? 's' : ''}`;
 
@@ -87,12 +89,12 @@ export default function InvitationRedemptionForm() {
       {!isErr(result) ? (
         <dl data-react-earthstar-invitation-description>
           <dt data-react-earthstar-dt>{'Workspace'}</dt>
-          <dd data-react-earthstar-dl>
+          <dd data-react-earthstar-dd>
             {result.workspace}
             {workspaces.includes(result.workspace) ? ' (already added)' : null}
           </dd>
           <dt data-react-earthstar-dt>{'Pubs'}</dt>
-          <dd data-react-earthstar-dl>
+          <dd data-react-earthstar-dd>
             {result.pubs.length > 0
               ? result.pubs.map(pubUrl => (
                   <div key={pubUrl}>

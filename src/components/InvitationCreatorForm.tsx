@@ -43,13 +43,8 @@ export default function InvitationCreatorForm({
       </button>
       {pubs.length > 0 ? (
         <dl data-react-earthstar-invitation-creator-pub-options>
-          <dt
-            data-react-earthstar-invitation-creator-pubs-label
-            data-react-earthstar-label
-          >
-            {'Included pubs'}
-          </dt>
-          <dd>
+          <dt data-react-earthstar-dt>{'Included pubs'}</dt>
+          <dd data-react-earthstar-dd>
             {pubs.map(pubUrl => (
               <div key={pubUrl}>
                 <input

@@ -1,7 +1,7 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
 import { WorkspaceOptions } from './WorkspaceOptions';
-import { CurrentWorkspaceSelect } from '..';
+import { CurrentWorkspaceSelect, InvitationRedemptionForm } from '..';
 import { useCurrentWorkspace } from '../..';
 
 export default function WorkspaceManager() {
@@ -14,7 +14,10 @@ export default function WorkspaceManager() {
       {currentWorkspace ? (
         <WorkspaceOptions address={currentWorkspace} />
       ) : (
-        'Select a workspace above to change that workspaces identity settings, pubs, and more.'
+        <>
+          <h2>{'Join a workspace'}</h2>
+          <InvitationRedemptionForm />
+        </>
       )}
     </EarthbarTabPanel>
   );

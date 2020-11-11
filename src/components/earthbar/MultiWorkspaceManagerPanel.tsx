@@ -1,6 +1,6 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
-import { AddWorkspaceForm, WorkspaceLabel } from '..';
+import { InvitationRedemptionForm, WorkspaceLabel } from '..';
 import { useWorkspaces, useSync } from '../..';
 import { WorkspaceOptions } from './WorkspaceOptions';
 
@@ -86,8 +86,8 @@ function WorkspaceList({
       </section>
       <hr />
       <section>
-        <h2>{'Add a workspace'}</h2>
-        <AddWorkspaceForm />
+        <h2>{'Join a workspace'}</h2>
+        <InvitationRedemptionForm />
       </section>
     </div>
   );
