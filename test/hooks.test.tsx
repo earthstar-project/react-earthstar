@@ -101,17 +101,24 @@ test('useAddWorkspace ', () => {
 
 test('useRemoveWorkspace', () => {
   const useTest = () => {
+    const [storages] = useStorages();
     const remove = useRemoveWorkspace();
     const workspaces = useWorkspaces();
 
-    return { remove, workspaces };
+    return { remove, workspaces, storages };
   };
 
   const { result } = renderHook(() => useTest(), { wrapper });
 
+  const storage = result.current.storages[WORKSPACE_ADDR_C];
+
+  expect(storage.isClosed()).toBeFalsy();
+
   act(() => {
     result.current.remove(WORKSPACE_ADDR_C);
   });
+
+  expect(storage.isClosed()).toBeTruthy();
 
   expect(result.current.workspaces).toEqual([
     WORKSPACE_ADDR_A,
