@@ -86,6 +86,15 @@
   background: var(--ac2);
 }
 
+[data-react-earthstar-button]:disabled {
+  opacity: 0.5;
+}
+
+[data-react-earthstar-button]:disabled:hover {
+  background: var(--ac2);
+}
+
+
 [data-react-earthstar-input] {
   font-family: 'Gill Sans';
   font-size: 14px;

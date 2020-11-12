@@ -5,6 +5,8 @@ export { default as AuthorLabel } from './AuthorLabel';
 export { default as CurrentAuthor } from './CurrentAuthor';
 export { default as DisplayNameForm } from './DisplayNameForm';
 export { default as DownloadKeypairButton } from './DownloadKeypairButton';
+export { default as InvitationRedemptionForm } from './InvitationRedemptionForm';
+export { default as InvitationCreatorForm } from './InvitationCreatorForm';
 export { default as NewKeypairForm } from './NewKeypairForm';
 export { default as PubEditor } from './PubEditor';
 export { default as RemoveWorkspaceButton } from './RemoveWorkspaceButton';

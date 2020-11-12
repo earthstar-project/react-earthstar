@@ -1,5 +1,10 @@
 import React from 'react';
-import { PubEditor, DisplayNameForm, RemoveWorkspaceButton } from '..';
+import {
+  PubEditor,
+  DisplayNameForm,
+  RemoveWorkspaceButton,
+  InvitationCreatorForm,
+} from '..';
 
 export function WorkspaceOptions({ address }: { address: string }) {
   return (
@@ -14,6 +19,11 @@ export function WorkspaceOptions({ address }: { address: string }) {
         <h2>{'Pubs'}</h2>
         <p>{'Control where this workspace syncs its data to and from.'}</p>
         <PubEditor workspace={address} />
+      </section>
+      <hr />
+      <section>
+        <h2>{'Invite others'}</h2>
+        <InvitationCreatorForm workspace={address} />
       </section>
       <hr />
       <section>
