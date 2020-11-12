@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-preview.3",
+  "version": "1.0.0-preview.4",
   "license": "AGPL-3.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -63,7 +63,6 @@
     "@reach/descendants": "0.11.2",
     "@reach/utils": "^0.11.2",
     "@testing-library/react-hooks": "^3.4.2",
-    
     "use-deep-compare-effect": "^1.4.0"
   }
 }
