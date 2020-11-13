@@ -6,7 +6,7 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
   const [currentAuthor] = useCurrentAuthor();
   const [displayNameDoc, setDisplayNameDoc] = useDocument(
     workspace,
-    `/about/${currentAuthor?.address}/name`
+    `/about/~${currentAuthor?.address}/displayName.txt`
   );
 
   const [newDisplayName, setNewDisplayName] = React.useState(
