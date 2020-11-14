@@ -160,8 +160,10 @@ test('usePubs', () => {
 
 test.todo('useSync');
 
-test('useCurrentWorkspace', () => {
-  const { result } = renderHook(() => useCurrentWorkspace(), { wrapper });
+test('useCurrentWorkspace', async () => {
+  const { result } = renderHook(() => useCurrentWorkspace(), {
+    wrapper,
+  });
 
   expect(result.current[0]).toBeNull();
 
@@ -175,7 +177,7 @@ test('useCurrentWorkspace', () => {
     result.current[1]('+somethingunknown.a123');
   });
 
-  expect(result.current[0]).toEqual(WORKSPACE_ADDR_A);
+  expect(result.current[0]).toEqual(null);
 });
 
 test('usePaths', () => {
