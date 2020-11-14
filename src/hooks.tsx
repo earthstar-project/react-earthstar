@@ -62,7 +62,9 @@ export function EarthstarPeer({
   const [currentAuthor, setCurrentAuthor] = React.useState(initCurrentAuthor);
 
   const [currentWorkspace, setCurrentWorkspace] = React.useState(
-    initCurrentWorkspace
+    initCurrentWorkspace && storages[initCurrentWorkspace]
+      ? initCurrentWorkspace
+      : null
   );
 
   return (
