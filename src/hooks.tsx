@@ -233,7 +233,9 @@ export function useSync() {
 
         Promise.all(
           workspacePubs.map(pubUrl => syncLocalAndHttp(storage, pubUrl))
-        ).finally(resolve);
+        )
+          .then(resolve)
+          .catch(reject);
       });
     },
     [pubs, storages]
