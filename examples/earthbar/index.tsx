@@ -9,8 +9,8 @@ import {
   Spacer,
   MultiWorkspaceTab,
 } from '../../src/index';
-import '../../src/styles.css';
-import '../../src/warp.css';
+import '../../styles/layout.css';
+import '../../styles/warp.css';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';

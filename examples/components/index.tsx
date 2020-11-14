@@ -20,7 +20,7 @@ import {
   WorkspaceLabel,
   WorkspaceList,
 } from '../../src/index';
-import '../../src/styles.css';
+import '../../styles/layout.css';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';

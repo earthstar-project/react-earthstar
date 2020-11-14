@@ -258,6 +258,10 @@ export function EarthbarTabPanel({
                 id={`panel-${id}`}
                 role={'tabpanel'}
                 tabIndex={0}
+                onKeyDown={e => {
+                  // We don't want keyboard events to propagate beyond the panel and into the the listener for tab navigation
+                  e.stopPropagation();
+                }}
                 {...rest}
               >
                 {children}
