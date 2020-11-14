@@ -195,21 +195,16 @@ export function useCurrentWorkspace(): [
     CurrentWorkspaceContext
   );
 
-  const set = React.useCallback(
-    (address: React.SetStateAction<string | null>) => {
-      const addressToSet =
-        typeof address === 'function' ? address(currentWorkspace) : address;
+  React.useEffect(() => {
+    if (currentWorkspace && workspaces.includes(currentWorkspace) === false) {
+      console.warn(
+        `Tried to set current workspace to ${currentWorkspace}, which is not a known workspace.`
+      );
+      setCurrentWorkspace(null);
+    }
+  }, [currentWorkspace, workspaces, setCurrentWorkspace]);
 
-      if (addressToSet && workspaces.includes(addressToSet) === false) {
-        return;
-      }
-
-      setCurrentWorkspace(address);
-    },
-    [currentWorkspace, setCurrentWorkspace, workspaces]
-  );
-
-  return [currentWorkspace, set];
+  return [currentWorkspace, setCurrentWorkspace];
 }
 
 export function useSync() {

@@ -4,7 +4,11 @@ import Alert from '@reach/alert';
 import { useInvitation, useWorkspaces, usePubs } from '../hooks';
 import { WorkspaceLabel } from '../components';
 
-export default function InvitationRedemptionForm() {
+export default function InvitationRedemptionForm({
+  onRedeem,
+}: {
+  onRedeem?: (workspace: string, pubs: string[]) => void;
+}) {
   const workspaces = useWorkspaces();
   const [pubs] = usePubs();
   const [code, setCode] = React.useState('');
@@ -62,7 +66,14 @@ export default function InvitationRedemptionForm() {
         e.preventDefault();
 
         if (!isErr(result)) {
+          const { workspace, pubs } = result;
           result.redeem(excludedPubs);
+          if (onRedeem) {
+            onRedeem(
+              workspace,
+              pubs.filter(pubUrl => !excludedPubs.includes(pubUrl))
+            );
+          }
           setCode('');
           setUncheckedPubs([]);
         }
