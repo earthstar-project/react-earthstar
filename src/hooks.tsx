@@ -424,6 +424,28 @@ export function useDocument(
   return [localDocument, set, deleteDoc];
 }
 
+export function useDocuments(workspace: string, query: QueryOpts) {
+  const initialPaths = usePaths(workspace, query);
+  const [storages] = useStorages();
+  const fetchedDocs = initialPaths.map(
+    path => storages[workspace].getDocument(path) as Document
+  );
+  const [docs, setDocs] = React.useState(fetchedDocs);
+
+  useSubscribeToStorages({
+    workspaces: [workspace],
+    onWrite: () => {
+      const paths = storages[workspace].paths(query);
+      const fetchedDocs = paths.map(
+        path => storages[workspace].getDocument(path) as Document
+      );
+      setDocs(fetchedDocs);
+    },
+  });
+
+  return docs;
+}
+
 export function useStorages(): [
   Record<string, IStorage>,
   React.Dispatch<React.SetStateAction<Record<string, IStorage>>>

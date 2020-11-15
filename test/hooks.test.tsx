@@ -24,6 +24,7 @@ import {
   useCurrentWorkspace,
   useInvitation,
   useMakeInvitation,
+  useDocuments,
 } from '../src';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
@@ -261,6 +262,51 @@ test('useDocument', () => {
   });
 
   expect(result.current.doc?.content).toEqual('Switched!');
+});
+
+test('useDocuments', async () => {
+  const useTest = (q: QueryOpts) => {
+    const [query, setQuery] = React.useState(q);
+    const docs = useDocuments(WORKSPACE_ADDR_A, query);
+    const [storages] = useStorages();
+
+    return { docs, storage: storages[WORKSPACE_ADDR_A], setQuery };
+  };
+
+  const { result } = renderHook(
+    () =>
+      useTest({
+        pathPrefix: '/docs-test',
+      }),
+    { wrapper }
+  );
+
+  expect(result.current.docs).toEqual([]);
+
+  act(() => {
+    result.current.storage.set(keypair, {
+      format: 'es.4',
+      path: '/docs-test/1',
+      content: 'A!',
+    });
+    result.current.storage.set(keypair, {
+      format: 'es.4',
+      path: '/docs-test/2',
+      content: 'B!',
+    });
+    result.current.storage.set(keypair, {
+      format: 'es.4',
+      path: '/docs-test/3',
+      content: 'C!',
+    });
+  });
+
+  expect(result.current.docs.length).toEqual(3);
+  expect(result.current.docs.map(doc => doc.content)).toEqual([
+    'A!',
+    'B!',
+    'C!',
+  ]);
 });
 
 test('useSubscribeToStorages', () => {
