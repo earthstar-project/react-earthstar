@@ -425,8 +425,8 @@ export function useDocument(
 }
 
 export function useDocuments(workspace: string, query: QueryOpts) {
-  const initialPaths = usePaths(workspace, query);
   const [storages] = useStorages();
+  const initialPaths = storages[workspace].paths(query);
   const fetchedDocs = initialPaths.map(
     path => storages[workspace].getDocument(path) as Document
   );
@@ -434,12 +434,14 @@ export function useDocuments(workspace: string, query: QueryOpts) {
 
   useSubscribeToStorages({
     workspaces: [workspace],
-    onWrite: () => {
+    onWrite: event => {
       const paths = storages[workspace].paths(query);
       const fetchedDocs = paths.map(
         path => storages[workspace].getDocument(path) as Document
       );
-      setDocs(fetchedDocs);
+      if (paths.includes(event.document.path)) {
+        setDocs(fetchedDocs);
+      }
     },
   });
 
