@@ -1,6 +1,6 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
-import { InvitationRedemptionForm, WorkspaceLabel } from '..';
+import { WorkspaceLabel } from '..';
 import { useWorkspaces, useSync } from '../..';
 import { WorkspaceOptions } from './WorkspaceOptions';
 
@@ -84,11 +84,6 @@ function WorkspaceList({
           ))}
         </ul>
       </section>
-      <hr />
-      <section>
-        <h2>{'Join a workspace'}</h2>
-        <InvitationRedemptionForm />
-      </section>
     </div>
   );
 }
@@ -115,7 +110,7 @@ export default function MultiWorkspaceManagerPanel() {
             >
               {'← Back'}
             </button>
-            <WorkspaceLabel address={state.address} />
+            {state.address}
           </nav>
           <hr />
           <WorkspaceOptions address={state.address} />

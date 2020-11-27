@@ -10,18 +10,7 @@ Given a workspace address, returns an element which:
 */
 
 import React from 'react';
-
-const WORKSPACE_NAME_REGEX = /\+(.*)\./;
-
-function getWorkspaceName(address: string) {
-  const result = WORKSPACE_NAME_REGEX.exec(address);
-
-  if (result) {
-    return result[1];
-  }
-
-  return address;
-}
+import { getWorkspaceName } from '../util';
 
 export default function WorkspaceLabel({
   address,

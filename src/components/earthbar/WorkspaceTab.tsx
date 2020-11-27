@@ -1,61 +1,42 @@
 import React from 'react';
 import WorkspaceManagerPanel from './WorkspaceManagerPanel';
-import { useSync, WorkspaceLabel } from '../..';
+import { useWorkspaces } from '../..';
 import { useCurrentWorkspace } from '../../index';
 import { EarthbarTabLabel, EarthbarTab } from './Earthbar';
-
-type SyncStatus = 'syncing' | 'synced' | 'idle';
+import { getWorkspaceName } from '../../util';
+import AddWorkspaceTab from './AddWorkspaceTab';
 
 export default function WorkspaceTab() {
-  const [currentWorkspace] = useCurrentWorkspace();
-  const sync = useSync();
-
-  const [syncState, setSyncState] = React.useState<SyncStatus>('idle');
+  const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
+  const workspaces = useWorkspaces();
 
   React.useEffect(() => {
-    let id = setTimeout(() => {
-      if (syncState === 'synced') {
-        setSyncState('idle');
-      }
-    }, 2000);
-    return () => clearTimeout(id);
-  }, [syncState]);
+    if (currentWorkspace === null && workspaces.length > 0) {
+      setCurrentWorkspace(workspaces[0]);
+    }
+  }, [currentWorkspace, workspaces, setCurrentWorkspace]);
 
   return (
-    <EarthbarTab>
-      <EarthbarTabLabel data-react-earthstar-earthbar-author-tab>
-        {currentWorkspace ? (
-          <WorkspaceLabel address={currentWorkspace} />
-        ) : (
-          'Workspace'
-        )}
-      </EarthbarTabLabel>
-      {currentWorkspace ? (
-        <button
-          data-react-earthstar-button
-          disabled={syncState === 'syncing'}
-          onClick={() => {
-            setSyncState('syncing');
-            sync(currentWorkspace)
-              .then(() => {
-                setSyncState('synced');
-              })
-              // Sync doesn't reject yet, this won't fire
-              .catch(() => {
-                setSyncState('idle');
-                alert('Syncing current workspace failed!');
-              });
-          }}
-        >
-          {syncState === 'syncing'
-            ? 'Syncing...'
-            : syncState === 'synced'
-            ? 'Synced!'
-            : 'Sync'}
-        </button>
-      ) : null}
-
-      <WorkspaceManagerPanel />
-    </EarthbarTab>
+    <div data-react-earthstar-earthbar-workspace-tab-zone>
+      <EarthbarTab data-react-earthstar-earthbar-workspace-select-tab>
+        {workspaces.length > 0 ? (
+          <select
+            value={currentWorkspace || 'NONE'}
+            onChange={e => {
+              setCurrentWorkspace(e.target.value);
+            }}
+          >
+            {workspaces.map(address => (
+              <option key={address} value={address}>
+                {`+${getWorkspaceName(address)}`}
+              </option>
+            ))}
+          </select>
+        ) : null}
+        <EarthbarTabLabel>{'Settings'}</EarthbarTabLabel>
+        <WorkspaceManagerPanel />
+      </EarthbarTab>
+      <AddWorkspaceTab />
+    </div>
   );
 }

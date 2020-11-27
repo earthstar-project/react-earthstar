@@ -12,6 +12,18 @@ export function getAuthorShortName(address: string): string {
   return address;
 }
 
+const WORKSPACE_NAME_REGEX = /\+(.*)\./;
+
+export function getWorkspaceName(address: string) {
+  const result = WORKSPACE_NAME_REGEX.exec(address);
+
+  if (result) {
+    return result[1];
+  }
+
+  return address;
+}
+
 export function useDownload() {
   return React.useCallback((data: any) => {
     const blob = new Blob([JSON.stringify(data)], {

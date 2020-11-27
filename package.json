@@ -40,6 +40,7 @@
   "author": "Sam Gwilym",
   "module": "dist/react-earthstar.esm.js",
   "devDependencies": {
+    "@testing-library/react-hooks": "^3.4.2",
     "@types/jest": "^26.0.14",
     "@types/react-dom": "^16.9.8",
     "babel-jest": "^26.5.2",
@@ -53,14 +54,14 @@
     "ts-jest": "^26.4.1",
     "tsdx": "^0.14.0",
     "tslib": "^2.0.1",
-    "typescript": "4.0.3",
-    "@testing-library/react-hooks": "^3.4.2"
+    "typescript": "4.0.3"
   },
   "resolutions": {
     "**/@typescript-eslint/eslint-plugin": "^4.1.1",
     "**/@typescript-eslint/parser": "^4.1.1"
   },
   "dependencies": {
+    "@reach/accordion": "^0.12.0",
     "@reach/alert": "^0.11.2",
     "@reach/auto-id": "^0.11.2",
     "@reach/descendants": "0.11.2",

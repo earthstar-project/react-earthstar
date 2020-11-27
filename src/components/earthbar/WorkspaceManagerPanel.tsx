@@ -1,7 +1,7 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
 import { WorkspaceOptions } from './WorkspaceOptions';
-import { CurrentWorkspaceSelect, InvitationRedemptionForm } from '..';
+import { InvitationRedemptionForm } from '..';
 import { useCurrentWorkspace } from '../..';
 
 export default function WorkspaceManager() {
@@ -9,10 +9,12 @@ export default function WorkspaceManager() {
 
   return (
     <EarthbarTabPanel data-react-earthstar-workspace-manager-panel>
-      <CurrentWorkspaceSelect />
-      <hr />
       {currentWorkspace ? (
-        <WorkspaceOptions address={currentWorkspace} />
+        <>
+          <h2>{currentWorkspace}</h2>
+          <hr />
+          <WorkspaceOptions address={currentWorkspace} />
+        </>
       ) : (
         <>
           <h2>{'Join a workspace'}</h2>

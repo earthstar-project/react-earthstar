@@ -1,5 +1,5 @@
 import React from 'react';
-import { useMakeInvitation, useWorkspacePubs, WorkspaceLabel } from '..';
+import { useMakeInvitation, useWorkspacePubs } from '..';
 
 export default function InvitationCreatorForm({
   workspace,
@@ -32,14 +32,7 @@ export default function InvitationCreatorForm({
           setCopied(true);
         }}
       >
-        {copied ? (
-          'Copied!'
-        ) : (
-          <>
-            {'Copy invitation code for '}
-            <WorkspaceLabel address={workspace} />
-          </>
-        )}
+        {copied ? 'Copied!' : 'Copy'}
       </button>
       {pubs.length > 0 ? (
         <dl data-react-earthstar-invitation-creator-pub-options>

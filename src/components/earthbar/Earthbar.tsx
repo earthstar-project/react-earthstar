@@ -139,6 +139,7 @@ function EarthbarTabs({ children }: { children: React.ReactNode }) {
 
 export function EarthbarTab({
   children,
+  ...props
 }: {
   children: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) {
@@ -150,7 +151,7 @@ export function EarthbarTab({
         id,
       }}
     >
-      {children}
+      <div {...props}>{children}</div>
     </EarthbarTabContext.Provider>
   );
 }

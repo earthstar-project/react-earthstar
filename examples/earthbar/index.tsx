@@ -8,9 +8,9 @@ import {
   WorkspaceTab,
   Spacer,
   MultiWorkspaceTab,
+  NewWorkspaceTab,
 } from '../../src/index';
 import '../../styles/layout.css';
-import '../../styles/warp.css';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
@@ -86,17 +86,13 @@ function Examples() {
         initPubs={pubs}
       >
         <hr />
-        <h2>Author-related panels</h2>
-        <EarthbarExample
-          title={'Earthbar with Workspace Selection, Auth Upload'}
-        >
-          <WorkspaceTab />
+        <EarthbarExample title={'Default Earthbar'}>
+          <NewWorkspaceTab />
           <Spacer />
           <AuthorTab />
         </EarthbarExample>
-        <EarthbarExample
-          title={'Earthbar with Multi-Workspace Selection, Auth Upload'}
-        >
+
+        <EarthbarExample title={'Earthbar for all-workspaces-at-once app'}>
           <MultiWorkspaceTab />
           <Spacer />
           <AuthorTab />

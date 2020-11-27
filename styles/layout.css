@@ -175,6 +175,22 @@
   flex: 1
 }
 
+[data-react-earthstar-accordion-button] {
+  appearance: none;
+  background: none;
+  border: none;
+  display: block;
+  padding: 0;
+  display: flex;
+  width: 100%;
+}
+
+/* WorkspaceTab */
+
+[data-react-earthstar-earthbar-workspace-tab-zone] {
+  display: flex;
+  align-items: baseline;
+}
 
 /* WorkspaceRow */
 
