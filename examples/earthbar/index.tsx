@@ -5,10 +5,8 @@ import {
   EarthstarPeer,
   Earthbar,
   AuthorTab,
-  WorkspaceTab,
   Spacer,
   MultiWorkspaceTab,
-  NewWorkspaceTab,
 } from '../../src/index';
 import '../../styles/layout.css';
 
@@ -87,9 +85,7 @@ function Examples() {
       >
         <hr />
         <EarthbarExample title={'Default Earthbar'}>
-          <NewWorkspaceTab />
-          <Spacer />
-          <AuthorTab />
+          <Earthbar />
         </EarthbarExample>
 
         <EarthbarExample title={'Earthbar for all-workspaces-at-once app'}>
