@@ -1,4 +1,5 @@
 import React from 'react';
+import { WorkspaceLabel } from '.';
 import { useDocument, useCurrentAuthor } from '../hooks';
 import { getAuthorShortName } from '../util';
 
@@ -33,7 +34,8 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
         data-react-earthstar-label
         htmlFor={`author-display-name-${workspace}`}
       >
-        {'Display name'}
+        {'Your display name in '}
+        <WorkspaceLabel address={workspace} />
       </label>
       <input
         data-react-earthstar-display-name-input
