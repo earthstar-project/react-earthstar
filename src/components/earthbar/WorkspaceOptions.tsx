@@ -6,7 +6,6 @@ import {
   AccordionButton,
   AccordionPanel,
 } from '@reach/accordion';
-import '@reach/accordion/styles.css';
 
 export function WorkspaceOptions({ address }: { address: string }) {
   return (
