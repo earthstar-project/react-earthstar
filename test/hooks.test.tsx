@@ -54,6 +54,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
       initWorkspaces={storages}
       initPubs={pubs}
       initCurrentAuthor={keypair}
+      initIsLive={false}
     >
       {children}
     </EarthstarPeer>
