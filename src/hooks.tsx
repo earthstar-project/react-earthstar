@@ -12,6 +12,7 @@ import {
   WriteResult,
   ValidationError,
   WriteEvent,
+  OnePubOneWorkspaceSyncer,
 } from 'earthstar';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 
@@ -38,17 +39,27 @@ const CurrentWorkspaceContext = React.createContext<{
   setCurrentWorkspace: () => {},
 });
 
+const IsLiveContext = React.createContext<{
+  isLive: boolean;
+  setIsLive: React.Dispatch<React.SetStateAction<boolean>>;
+}>({
+  isLive: true,
+  setIsLive: () => {},
+});
+
 export function EarthstarPeer({
   initWorkspaces = [],
   initPubs = {},
   initCurrentAuthor = null,
   initCurrentWorkspace = null,
+  initIsLive = true,
   children,
 }: {
   initWorkspaces?: IStorage[];
   initPubs?: Record<string, string[]>;
   initCurrentAuthor?: AuthorKeypair | null;
   initCurrentWorkspace?: string | null;
+  initIsLive?: boolean;
   children: React.ReactNode;
 }) {
   const [storages, setStorages] = React.useState(
@@ -66,6 +77,7 @@ export function EarthstarPeer({
       ? initCurrentWorkspace
       : null
   );
+  const [isLive, setIsLive] = React.useState(initIsLive);
 
   return (
     <StorageContext.Provider value={{ storages, setStorages }}>
@@ -76,12 +88,54 @@ export function EarthstarPeer({
           <CurrentWorkspaceContext.Provider
             value={{ currentWorkspace, setCurrentWorkspace }}
           >
-            {children}
+            <IsLiveContext.Provider value={{ isLive, setIsLive }}>
+              {children}
+              {Object.keys(storages).map(workspaceAddress => (
+                <LiveSyncer
+                  key={workspaceAddress}
+                  workspaceAddress={workspaceAddress}
+                />
+              ))}
+            </IsLiveContext.Provider>
           </CurrentWorkspaceContext.Provider>
         </CurrentAuthorContext.Provider>
       </PubsContext.Provider>
     </StorageContext.Provider>
   );
+}
+
+function LiveSyncer({ workspaceAddress }: { workspaceAddress: string }) {
+  const [isLive] = useIsLive();
+  const [storages] = useStorages();
+  const [pubs] = useWorkspacePubs(workspaceAddress);
+
+  React.useEffect(() => {
+    const syncers = pubs.map(
+      pubUrl => new OnePubOneWorkspaceSyncer(storages[workspaceAddress], pubUrl)
+    );
+
+    if (!isLive) {
+      syncers.forEach(syncer => {
+        syncer.stopPushStream();
+        syncer.stopPullStream();
+      });
+    } else {
+      // Start streaming when isLive changes to true
+      syncers.forEach(syncer => {
+        syncer.syncOnceAndContinueLive();
+      });
+    }
+
+    // On cleanup (unmount, value of syncers changes) stop all syncers from pulling and pushing
+    return () => {
+      syncers.forEach(syncer => {
+        syncer.stopPullStream();
+        syncer.stopPushStream();
+      });
+    };
+  }, [pubs, isLive, workspaceAddress, storages]);
+
+  return null;
 }
 
 export function useWorkspaces() {
@@ -584,4 +638,13 @@ export function useMakeInvitation(
   const pubsString = pubsToUse.map(pubUrl => `&pub=${pubUrl}`).join('');
 
   return `earthstar:///?workspace=${workspace}${pubsString}&v=1`;
+}
+
+export function useIsLive(): [
+  boolean,
+  React.Dispatch<React.SetStateAction<boolean>>
+] {
+  const { isLive, setIsLive } = React.useContext(IsLiveContext);
+
+  return [isLive, setIsLive];
 }

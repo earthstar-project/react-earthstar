@@ -27,7 +27,7 @@ function EarthbarExample({
   title,
   notes,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   title: string;
   notes?: string;
 }) {
@@ -84,9 +84,7 @@ function Examples() {
         initPubs={pubs}
       >
         <hr />
-        <EarthbarExample title={'Default Earthbar'}>
-          <Earthbar />
-        </EarthbarExample>
+        <EarthbarExample title={'Default Earthbar'}></EarthbarExample>
 
         <EarthbarExample title={'Earthbar for all-workspaces-at-once app'}>
           <MultiWorkspaceTab />
