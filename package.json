@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-preview.8",
+  "version": "1.0.0-preview.9",
   "license": "AGPL-3.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
