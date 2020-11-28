@@ -82,6 +82,7 @@ function Examples() {
           new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
         ]}
         initPubs={pubs}
+        initIsLive={false}
       >
         <hr />
         <EarthbarExample title={'Default Earthbar'}></EarthbarExample>

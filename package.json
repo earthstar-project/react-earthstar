@@ -61,7 +61,6 @@
     "**/@typescript-eslint/parser": "^4.1.1"
   },
   "dependencies": {
-    "@reach/accordion": "^0.12.0",
     "@reach/alert": "^0.11.2",
     "@reach/auto-id": "^0.11.2",
     "@reach/descendants": "0.11.2",
