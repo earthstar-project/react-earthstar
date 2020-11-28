@@ -1,6 +1,6 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
-import { WorkspaceLabel } from '..';
+import { WorkspaceLabel, SyncingCheckbox } from '..';
 import { useWorkspaces, useSync } from '../..';
 import { WorkspaceOptions } from './WorkspaceOptions';
 
@@ -72,8 +72,7 @@ function WorkspaceList({
     <div>
       <section>
         <h2>{'Your workspaces'}</h2>
-        {/* TODO: Add syncing checkbox to the right of title */}
-        {/* Which toggles live syncing for all workspaces*/}
+        <SyncingCheckbox />
         <ul data-react-earthstar-workspace-list-workspaces>
           {workspaces.map(address => (
             <WorkspaceRow

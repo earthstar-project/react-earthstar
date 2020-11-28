@@ -1,7 +1,7 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
 import { WorkspaceOptions } from './WorkspaceOptions';
-import { InvitationRedemptionForm } from '..';
+import { InvitationRedemptionForm, SyncingCheckbox } from '..';
 import { useCurrentWorkspace } from '../..';
 
 export default function WorkspaceManager() {
@@ -12,6 +12,7 @@ export default function WorkspaceManager() {
       {currentWorkspace ? (
         <>
           <h2>{currentWorkspace}</h2>
+          <SyncingCheckbox />
           <hr />
           <WorkspaceOptions address={currentWorkspace} />
         </>
