@@ -83,7 +83,7 @@ export default function InvitationRedemptionForm({
         data-react-earthstar-invitation-code-label
         data-react-earthstar-label
       >
-        {'Redeem invitation code'}
+        {'Paste invitation code'}
       </label>
       <input
         data-react-earthstar-invitation-code-input

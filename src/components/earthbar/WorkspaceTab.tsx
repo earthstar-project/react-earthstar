@@ -32,7 +32,9 @@ export default function WorkspaceTab() {
               </option>
             ))}
           </select>
-        ) : null}
+        ) : (
+          <span>{'Workspaces'}</span>
+        )}
         <EarthbarTabLabel>{'Settings'}</EarthbarTabLabel>
         <WorkspaceManagerPanel />
       </EarthbarTab>
