@@ -27,7 +27,7 @@ export default function PubEditor({ workspace }: { workspace: string }) {
           {pubs.map(pubUrl => {
             return (
               <li data-react-earthstar-pubeditor-list-item key={`${pubUrl}`}>
-                <a href={'pubUrl'}>{pubUrl}</a>
+                <a href={pubUrl}>{pubUrl}</a>
                 <button
                   data-react-earthstar-pubeditor-list-item-delete-button
                   data-react-earthstar-button
