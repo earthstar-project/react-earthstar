@@ -7,7 +7,8 @@ export default function InvitationCreatorForm({
   workspace: string;
 }) {
   const [pubs] = useWorkspacePubs(workspace);
-  const [excludedPubs, setExcludedPubs] = React.useState(pubs);
+  // include all pubs by default (exclude none)
+  const [excludedPubs, setExcludedPubs] = React.useState<string[]>([]);
   const [copied, setCopied] = React.useState(false);
   const invitationCode = useMakeInvitation(workspace, excludedPubs);
 
