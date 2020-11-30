@@ -20,23 +20,25 @@ export default function WorkspaceTab() {
     <div data-react-earthstar-earthbar-workspace-tab-zone>
       <EarthbarTab data-react-earthstar-earthbar-workspace-select-tab>
         {workspaces.length > 0 ? (
-          <select
-            value={currentWorkspace || 'NONE'}
-            onChange={e => {
-              setCurrentWorkspace(e.target.value);
-            }}
-          >
-            {workspaces.map(address => (
-              <option key={address} value={address}>
-                {`+${getWorkspaceName(address)}`}
-              </option>
-            ))}
-          </select>
+          <>
+            <select
+              value={currentWorkspace || 'NONE'}
+              onChange={e => {
+                setCurrentWorkspace(e.target.value);
+              }}
+            >
+              {workspaces.map(address => (
+                <option key={address} value={address}>
+                  {`+${getWorkspaceName(address)}`}
+                </option>
+              ))}
+            </select>
+            <EarthbarTabLabel>{'Settings'}</EarthbarTabLabel>
+            <WorkspaceManagerPanel />
+          </>
         ) : (
           <span>{'Workspaces'}</span>
         )}
-        <EarthbarTabLabel>{'Settings'}</EarthbarTabLabel>
-        <WorkspaceManagerPanel />
       </EarthbarTab>
       <AddWorkspaceTab />
     </div>
