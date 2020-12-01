@@ -14,14 +14,13 @@ export default function WorkspaceManager() {
           <h2>{currentWorkspace}</h2>
           <SyncingCheckbox />
           <hr />
-          <WorkspaceOptions address={currentWorkspace} />
+          <WorkspaceOptions />
         </>
       ) : (
         <>
           <h2>{'Join a workspace'}</h2>
           <InvitationRedemptionForm
             onRedeem={workspace => {
-              console.log(workspace);
               setTimeout(() => {
                 setCurrentWorkspace(workspace);
               });

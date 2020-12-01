@@ -185,7 +185,7 @@ test('useCurrentWorkspace', async () => {
 test('usePaths', () => {
   const useTest = (q: QueryOpts) => {
     const [query, setQuery] = React.useState(q);
-    const paths = usePaths(WORKSPACE_ADDR_A, query);
+    const paths = usePaths(query, WORKSPACE_ADDR_A);
     const [storages] = useStorages();
 
     return { paths, storage: storages[WORKSPACE_ADDR_A], setQuery };
@@ -223,7 +223,7 @@ test('useDocument', () => {
     const [storages] = useStorages();
     const [path, setPath] = React.useState('/test/test.txt');
     const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
-    const [doc, setDoc, deleteDoc] = useDocument(workspace, path);
+    const [doc, setDoc, deleteDoc] = useDocument(path, workspace);
 
     return { setWorkspace, setPath, doc, setDoc, deleteDoc, storages };
   };
@@ -268,7 +268,7 @@ test('useDocument', () => {
 test('useDocuments', async () => {
   const useTest = (q: QueryOpts) => {
     const [query, setQuery] = React.useState(q);
-    const docs = useDocuments(WORKSPACE_ADDR_A, query);
+    const docs = useDocuments(query, WORKSPACE_ADDR_A);
     const [storages] = useStorages();
 
     return { docs, storage: storages[WORKSPACE_ADDR_A], setQuery };
@@ -530,7 +530,7 @@ test('useMakeInvitation', () => {
   const useTest = () => {
     const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
     const [excludedPubs, setExcludedPubs] = React.useState<string[]>([]);
-    const invitationCode = useMakeInvitation(workspace, excludedPubs);
+    const invitationCode = useMakeInvitation(excludedPubs, workspace);
 
     return { setWorkspace, setExcludedPubs, invitationCode };
   };

@@ -115,7 +115,7 @@ function Examples() {
           title={'InvitationCreatorForm'}
           notes={'Create Earthstar invitation code from a workspace'}
         >
-          <InvitationCreatorForm workspace={EXAMPLE_WORKSPACE_ADDR1} />
+          <InvitationCreatorForm workspaceAddress={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
         <Example
           title={'RemoveWorkspaceButton'}
@@ -129,7 +129,7 @@ function Examples() {
           title={'PubEditor'}
           notes="Add or remove pubs from a given workspace."
         >
-          <PubEditor workspace={EXAMPLE_WORKSPACE_ADDR1} />
+          <PubEditor workspaceAddress={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
         <Example title={'WorkspaceList'} notes="List the known workspaces">
           <WorkspaceList />
@@ -174,7 +174,7 @@ function Examples() {
           title={'DisplayNameForm'}
           notes="Change the display name of the currently signed in author, in a given workspace"
         >
-          <DisplayNameForm workspace={EXAMPLE_WORKSPACE_ADDR1} />
+          <DisplayNameForm workspaceAddress={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>
         <hr />
         <h2>Stateless helpers</h2>

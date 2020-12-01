@@ -1,12 +1,15 @@
 import React from 'react';
-import { useRemoveWorkspace } from '../hooks';
+import { useCurrentWorkspace, useRemoveWorkspace } from '../hooks';
 
 export default function RemoveWorkspaceButton({
   workspaceAddress,
   children,
   ...props
-}: { workspaceAddress: string } & React.HTMLAttributes<HTMLButtonElement>) {
+}: { workspaceAddress?: string } & React.HTMLAttributes<HTMLButtonElement>) {
   const remove = useRemoveWorkspace();
+  const [currentWorkspace] = useCurrentWorkspace();
+
+  const address = workspaceAddress || currentWorkspace;
 
   return (
     <button
@@ -14,16 +17,20 @@ export default function RemoveWorkspaceButton({
       data-react-earthstar-button
       {...props}
       onClick={() => {
+        if (!address) {
+          return;
+        }
+
         const isSure = window.confirm(
-          `Are you sure you want to remove ${workspaceAddress} from your workspaces?`
+          `Are you sure you want to remove ${address} from your workspaces?`
         );
 
         if (isSure) {
-          remove(workspaceAddress);
+          remove(address);
         }
       }}
     >
-      {children || `Remove ${workspaceAddress}`}
+      {children || `Remove ${address}`}
     </button>
   );
 }

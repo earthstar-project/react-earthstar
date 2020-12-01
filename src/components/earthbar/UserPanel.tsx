@@ -26,7 +26,7 @@ export default function UserPanel() {
         <>
           <hr />
           <section>
-            <DisplayNameForm workspace={currentWorkspace} />
+            <DisplayNameForm workspaceAddress={currentWorkspace} />
           </section>
         </>
       ) : null}

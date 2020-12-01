@@ -1,9 +1,13 @@
 import React from 'react';
 import { useWorkspacePubs } from '../hooks';
 
-export default function PubEditor({ workspace }: { workspace: string }) {
+export default function PubEditor({
+  workspaceAddress,
+}: {
+  workspaceAddress?: string;
+}) {
   const [pubToAdd, setPubToAdd] = React.useState('');
-  const [pubs, setPubs] = useWorkspacePubs(workspace);
+  const [pubs, setPubs] = useWorkspacePubs(workspaceAddress);
 
   const removePub = React.useCallback(
     (pubToRemove: string) => {
