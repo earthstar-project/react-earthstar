@@ -12,6 +12,7 @@ export { default as PubEditor } from './PubEditor';
 export { default as RemoveWorkspaceButton } from './RemoveWorkspaceButton';
 export { default as SignOutButton } from './SignOutButton';
 export { default as SyncingCheckbox } from './SyncingCheckbox';
+export { default as WorkspaceCreatorForm } from './WorkspaceCreatorForm';
 export { default as WorkspaceLabel } from './WorkspaceLabel';
 export { default as WorkspaceList } from './WorkspaceList';
 export { default as CurrentWorkspaceSelect } from './CurrentWorkspaceSelect';
