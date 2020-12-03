@@ -636,11 +636,17 @@ export function useMakeInvitation(
   workspaceAddress?: string
 ) {
   const [pubs] = useWorkspacePubs(workspaceAddress);
+  const [currentWorkspace] = useCurrentWorkspace();
+  const address = workspaceAddress || currentWorkspace;
 
   const pubsToUse = pubs.filter(pubUrl => !excludedPubs.includes(pubUrl));
   const pubsString = pubsToUse.map(pubUrl => `&pub=${pubUrl}`).join('');
 
-  return `earthstar:///?workspace=${workspaceAddress}${pubsString}&v=1`;
+  if (!address) {
+    return "Couldn't create invitation code!";
+  }
+
+  return `earthstar:///?workspace=${address}${pubsString}&v=1`;
 }
 
 export function useIsLive(): [
