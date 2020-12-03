@@ -199,22 +199,30 @@ export function useRemoveWorkspace() {
 }
 
 export function useWorkspacePubs(
-  workspaceAddress: string
+  workspaceAddress?: string
 ): [string[], (pubs: React.SetStateAction<string[]>) => void] {
   const [existingPubs, setPubs] = usePubs();
+  const [currentWorkspace] = useCurrentWorkspace();
 
-  const workspacePubs = existingPubs[workspaceAddress] || [];
+  const address = workspaceAddress || currentWorkspace;
+  const workspacePubs = address ? existingPubs[address] || [] : [];
+
   const setWorkspacePubs = React.useCallback(
     (pubs: React.SetStateAction<string[]>) => {
-      setPubs(({ [workspaceAddress]: prevWorkspacePubs, ...rest }) => {
+      if (!address) {
+        console.warn('Tried to set pubs on an unknown workspace');
+        return;
+      }
+
+      setPubs(({ [address]: prevWorkspacePubs, ...rest }) => {
         if (Array.isArray(pubs)) {
-          return { ...rest, [workspaceAddress]: Array.from(new Set(pubs)) };
+          return { ...rest, [address]: Array.from(new Set(pubs)) };
         }
         const next = pubs(prevWorkspacePubs || []);
-        return { ...rest, [workspaceAddress]: Array.from(new Set(next)) };
+        return { ...rest, [address]: Array.from(new Set(next)) };
       });
     },
-    [setPubs, workspaceAddress]
+    [setPubs, address]
   );
 
   return [workspacePubs, setWorkspacePubs];
@@ -291,7 +299,7 @@ export function useSync() {
   );
 }
 
-export function usePaths(workspaceAddress: string, query: QueryOpts) {
+export function usePaths(query: QueryOpts, workspaceAddress?: string) {
   const {
     pathPrefix,
     lowPath,
@@ -305,12 +313,7 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
     limit,
   } = query;
 
-  const [storages] = useStorages();
-
-  const storage = React.useMemo(() => storages[workspaceAddress], [
-    storages,
-    workspaceAddress,
-  ]);
+  const storage = useStorage(workspaceAddress);
 
   if (!storage) {
     console.warn(`Couldn't find workspace with address ${workspaceAddress}`);
@@ -343,7 +346,7 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
     ]
   );
 
-  const paths = React.useMemo(() => (storage ? storage.paths(queryMemo) : []), [
+  const paths = React.useMemo(() => storage?.paths(queryMemo) || [], [
     queryMemo,
     storage,
   ]);
@@ -351,9 +354,9 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
   const [localPaths, setLocalPaths] = React.useState(paths);
 
   useDeepCompareEffect(() => {
-    const paths = storage ? storage.paths(query) : [];
+    const paths = storage?.paths(query) || [];
     setLocalPaths(paths);
-  }, [query]);
+  }, [query, setLocalPaths]);
 
   const onWrite = React.useCallback(
     event => {
@@ -396,7 +399,7 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
   );
 
   useSubscribeToStorages({
-    workspaces: [workspaceAddress],
+    workspaces: storage ? [storage.workspace] : undefined,
     includeHistory: query.includeHistory,
     onWrite,
   });
@@ -405,8 +408,8 @@ export function usePaths(workspaceAddress: string, query: QueryOpts) {
 }
 
 export function useDocument(
-  workspaceAddress: string,
-  path: string
+  path: string,
+  workspaceAddress?: string
 ): [
   Document | undefined,
   (
@@ -418,18 +421,14 @@ export function useDocument(
   const [storages] = useStorages();
   const [currentAuthor] = useCurrentAuthor();
 
+  const storage = useStorage(workspaceAddress);
+
   const [localDocument, setLocalDocument] = React.useState(
-    storages[workspaceAddress]
-      ? storages[workspaceAddress].getDocument(path)
-      : undefined
+    storage?.getDocument(path)
   );
 
   React.useEffect(() => {
-    setLocalDocument(
-      storages[workspaceAddress]
-        ? storages[workspaceAddress].getDocument(path)
-        : undefined
-    );
+    setLocalDocument(storage?.getDocument(path));
   }, [workspaceAddress, path, storages]);
 
   const onWrite = React.useCallback(
@@ -440,14 +439,13 @@ export function useDocument(
   );
 
   useSubscribeToStorages({
-    workspaces: [workspaceAddress],
+    workspaces: storage ? [storage.workspace] : undefined,
     paths: [path],
     onWrite,
   });
 
   const set = React.useCallback(
     (content: string, deleteAfter?: number | null | undefined) => {
-      const storage = storages[workspaceAddress];
       if (!storage) {
         return new ValidationError(
           `useDocument couldn't get the workspace ${workspaceAddress}`
@@ -468,7 +466,7 @@ export function useDocument(
         deleteAfter,
       });
     },
-    [path, currentAuthor, storages, workspaceAddress]
+    [path, currentAuthor, workspaceAddress, storage]
   );
 
   const deleteDoc = () => {
@@ -478,22 +476,20 @@ export function useDocument(
   return [localDocument, set, deleteDoc];
 }
 
-export function useDocuments(workspace: string, query: QueryOpts) {
-  const [storages] = useStorages();
-  const initialPaths = storages[workspace].paths(query);
-  const fetchedDocs = initialPaths.map(
-    path => storages[workspace].getDocument(path) as Document
-  );
+export function useDocuments(query: QueryOpts, workspaceAddress?: string) {
+  const storage = useStorage(workspaceAddress);
+  const fetchedDocs =
+    storage?.paths(query).map(path => storage?.getDocument(path) as Document) ||
+    [];
   const [docs, setDocs] = React.useState(fetchedDocs);
 
   useSubscribeToStorages({
-    workspaces: [workspace],
+    workspaces: storage ? [storage.workspace] : undefined,
     onWrite: event => {
-      const paths = storages[workspace].paths(query);
-      const fetchedDocs = paths.map(
-        path => storages[workspace].getDocument(path) as Document
-      );
-      if (paths.includes(event.document.path)) {
+      const paths = storage?.paths(query);
+      if (paths?.includes(event.document.path)) {
+        const fetchedDocs =
+          paths?.map(path => storage?.getDocument(path) as Document) || [];
         setDocs(fetchedDocs);
       }
     },
@@ -629,15 +625,15 @@ export function useInvitation(invitationCode: string) {
 }
 
 export function useMakeInvitation(
-  workspace: string,
-  excludedPubs: string[] = []
+  excludedPubs: string[] = [],
+  workspaceAddress?: string
 ) {
-  const [pubs] = useWorkspacePubs(workspace);
+  const [pubs] = useWorkspacePubs(workspaceAddress);
 
   const pubsToUse = pubs.filter(pubUrl => !excludedPubs.includes(pubUrl));
   const pubsString = pubsToUse.map(pubUrl => `&pub=${pubUrl}`).join('');
 
-  return `earthstar:///?workspace=${workspace}${pubsString}&v=1`;
+  return `earthstar:///?workspace=${workspaceAddress}${pubsString}&v=1`;
 }
 
 export function useIsLive(): [
@@ -647,4 +643,13 @@ export function useIsLive(): [
   const { isLive, setIsLive } = React.useContext(IsLiveContext);
 
   return [isLive, setIsLive];
+}
+
+export function useStorage(workspaceAddress?: string) {
+  const [currentWorkspace] = useCurrentWorkspace();
+  const [storages] = useStorages();
+
+  const address = workspaceAddress || currentWorkspace;
+
+  return address ? storages[address] : null;
 }

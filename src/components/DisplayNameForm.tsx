@@ -3,11 +3,15 @@ import { WorkspaceLabel } from '.';
 import { useDocument, useCurrentAuthor } from '../hooks';
 import { getAuthorShortName } from '../util';
 
-export default function DisplayNameForm({ workspace }: { workspace: string }) {
+export default function DisplayNameForm({
+  workspaceAddress,
+}: {
+  workspaceAddress?: string;
+}) {
   const [currentAuthor] = useCurrentAuthor();
   const [displayNameDoc, setDisplayNameDoc] = useDocument(
-    workspace,
-    `/about/~${currentAuthor?.address}/displayName.txt`
+    `/about/~${currentAuthor?.address}/displayName.txt`,
+    workspaceAddress
   );
 
   const [newDisplayName, setNewDisplayName] = React.useState(
@@ -32,10 +36,10 @@ export default function DisplayNameForm({ workspace }: { workspace: string }) {
       <label
         data-react-earthstar-display-name-label
         data-react-earthstar-label
-        htmlFor={`author-display-name-${workspace}`}
+        htmlFor={`author-display-name-${workspaceAddress}`}
       >
         {'Your display name in '}
-        <WorkspaceLabel address={workspace} />
+        <WorkspaceLabel address={workspaceAddress || 'nowhere'} />
       </label>
       <input
         data-react-earthstar-display-name-input

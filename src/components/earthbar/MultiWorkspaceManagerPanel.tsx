@@ -1,7 +1,7 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
 import { WorkspaceLabel, SyncingCheckbox } from '..';
-import { useWorkspaces, useSync } from '../..';
+import { useWorkspaces } from '../..';
 import { WorkspaceOptions } from './WorkspaceOptions';
 
 type WorkspaceManagerState =
@@ -32,8 +32,6 @@ function WorkspaceRow({
   address: string;
   navToWorkspace: () => void;
 }) {
-  const sync = useSync();
-
   return (
     <li data-react-earthstar-workspace-row>
       <div>
@@ -41,21 +39,13 @@ function WorkspaceRow({
           data-react-earthstar-workspace-row-address
           address={address}
         />
-        <button
-          data-react-earthstar-multiworkspace-settings-button
-          data-react-earthstar-button
-          onClick={navToWorkspace}
-        >
-          {'Settings'}
-        </button>
       </div>
-      {/* TODO: Replace this with a checkbox which toggles live syncing individually */}
       <button
-        data-react-earthstar-workspace-row-sync
+        data-react-earthstar-multiworkspace-settings-button
         data-react-earthstar-button
-        onClick={() => sync(address)}
+        onClick={navToWorkspace}
       >
-        {'Sync'}
+        {'Settings'}
       </button>
     </li>
   );
@@ -112,7 +102,7 @@ export default function MultiWorkspaceManagerPanel() {
             {state.address}
           </nav>
           <hr />
-          <WorkspaceOptions address={state.address} />
+          <WorkspaceOptions workspaceAddress={state.address} />
         </div>
       )}
     </EarthbarTabPanel>

@@ -2,15 +2,15 @@ import React from 'react';
 import { useMakeInvitation, useWorkspacePubs } from '..';
 
 export default function InvitationCreatorForm({
-  workspace,
+  workspaceAddress,
 }: {
-  workspace: string;
+  workspaceAddress?: string;
 }) {
-  const [pubs] = useWorkspacePubs(workspace);
+  const [pubs] = useWorkspacePubs(workspaceAddress);
   // include all pubs by default (exclude none)
   const [excludedPubs, setExcludedPubs] = React.useState<string[]>([]);
   const [copied, setCopied] = React.useState(false);
-  const invitationCode = useMakeInvitation(workspace, excludedPubs);
+  const invitationCode = useMakeInvitation(excludedPubs, workspaceAddress);
 
   React.useEffect(() => {
     let id = setTimeout(() => setCopied(false), 2000);
