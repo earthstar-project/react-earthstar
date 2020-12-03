@@ -150,6 +150,10 @@
   grid-area: input;
 }
 
+[data-react-earthstar-pubeditor-newpub-input] input {
+  width: 100%;
+}
+
 [data-react-earthstar-pubeditor-add-button] {
   grid-area: button;
 }
