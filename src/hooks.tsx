@@ -482,7 +482,7 @@ export function useDocuments(query: QueryOpts, workspaceAddress?: string) {
     [];
   const [docs, setDocs] = React.useState(fetchedDocs);
 
-  React.useEffect(() => {
+  useDeepCompareEffect(() => {
     setDocs(
       storage
         ?.paths(query)
