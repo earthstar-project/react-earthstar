@@ -62,16 +62,18 @@ export default function WorkspaceCreatorForm() {
     >
       <fieldset data-react-earthstar-fieldset>
         <legend data-react-earthstar-legend>{'Address'}</legend>
-        <span>{'+'}</span>
+        <span data-react-earthstar-workspace-sigil>{'+'}</span>
         <input
-          react-earthstar-input
+          data-react-earthstar-input
+          data-react-earthstar-workspace-name-input
           value={workspaceName}
           onChange={e => setWorkspaceName(e.target.value)}
           placeholder={'myworkspace'}
         />
-        <span>{'.'}</span>
+        <span data-react-earthstar-workspace-separator-dot>{'.'}</span>
         <input
-          react-earthstar-input
+          data-react-earthstar-input
+          data-react-earthstar-workspace-suffix-input
           value={workspaceSuffix}
           onChange={e => setWorkspaceSuffix(e.target.value)}
         />
@@ -96,20 +98,22 @@ export default function WorkspaceCreatorForm() {
           </li>
         ))}
         <Combobox
+          data-react-earthstar-combobox
           openOnFocus
           onSelect={item => setAddedPubs(prev => [...prev, item])}
         >
           <ComboboxInput
+            data-react-earthstar-combobox-input
             selectOnClick
             value={pubToAdd}
             onChange={e => setPubToAdd(e.target.value)}
           />
           {selectablePubs.length > 0 ? (
-            <ComboboxPopover>
-              <ComboboxList>
+            <ComboboxPopover data-react-earthstar-combobox-popover>
+              <ComboboxList data-react-earthstar-combobox-list>
                 {selectablePubs.map(pubUrl => (
                   <ComboboxOption
-                    data-react-earthstar-option
+                    data-react-earthstar-combobox-option
                     key={pubUrl}
                     value={pubUrl}
                   >
@@ -120,6 +124,7 @@ export default function WorkspaceCreatorForm() {
             </ComboboxPopover>
           ) : null}
           <button
+            data-react-earthstar-button
             onClick={e => {
               e.preventDefault();
               setPubToAdd('');
@@ -130,7 +135,6 @@ export default function WorkspaceCreatorForm() {
           </button>
         </Combobox>
       </fieldset>
-
       <button react-earthstar-button disabled={!isValid} type={'submit'}>
         {!isValid ? 'Add workspace' : `Add ${address}`}
       </button>
