@@ -26,7 +26,11 @@ function generateSuffix() {
   return `${firstLetter}${rest}`;
 }
 
-export default function WorkspaceCreatorForm() {
+export default function WorkspaceCreatorForm({
+  onCreate,
+}: {
+  onCreate?: (workspace: string) => void;
+}) {
   const [pubs, setPubs] = usePubs();
   const add = useAddWorkspace();
 
@@ -58,6 +62,10 @@ export default function WorkspaceCreatorForm() {
         }));
 
         setAddedPubs([]);
+
+        if (onCreate) {
+          onCreate(address);
+        }
       }}
     >
       <fieldset data-react-earthstar-fieldset>
