@@ -418,7 +418,6 @@ export function useDocument(
   ) => WriteResult | ValidationError,
   () => void
 ] {
-  const [storages] = useStorages();
   const [currentAuthor] = useCurrentAuthor();
 
   const storage = useStorage(workspaceAddress);
@@ -429,7 +428,7 @@ export function useDocument(
 
   React.useEffect(() => {
     setLocalDocument(storage?.getDocument(path));
-  }, [workspaceAddress, path, storages]);
+  }, [workspaceAddress, path, storage]);
 
   const onWrite = React.useCallback(
     event => {
@@ -482,6 +481,14 @@ export function useDocuments(query: QueryOpts, workspaceAddress?: string) {
     storage?.paths(query).map(path => storage?.getDocument(path) as Document) ||
     [];
   const [docs, setDocs] = React.useState(fetchedDocs);
+
+  React.useEffect(() => {
+    setDocs(
+      storage
+        ?.paths(query)
+        .map(path => storage?.getDocument(path) as Document) || []
+    );
+  }, [storage, query, setDocs]);
 
   useSubscribeToStorages({
     workspaces: storage ? [storage.workspace] : undefined,

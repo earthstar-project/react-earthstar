@@ -25,6 +25,7 @@ import {
   useInvitation,
   useMakeInvitation,
   useDocuments,
+  useStorage,
 } from '../src';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
@@ -268,10 +269,11 @@ test('useDocument', () => {
 test('useDocuments', async () => {
   const useTest = (q: QueryOpts) => {
     const [query, setQuery] = React.useState(q);
-    const docs = useDocuments(query, WORKSPACE_ADDR_A);
-    const [storages] = useStorages();
+    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
+    const docs = useDocuments(query, workspace);
+    const storage = useStorage(workspace);
 
-    return { docs, storage: storages[WORKSPACE_ADDR_A], setQuery };
+    return { docs, storage, setQuery, setWorkspace };
   };
 
   const { result } = renderHook(
@@ -285,17 +287,17 @@ test('useDocuments', async () => {
   expect(result.current.docs).toEqual([]);
 
   act(() => {
-    result.current.storage.set(keypair, {
+    result.current.storage?.set(keypair, {
       format: 'es.4',
       path: '/docs-test/1',
       content: 'A!',
     });
-    result.current.storage.set(keypair, {
+    result.current.storage?.set(keypair, {
       format: 'es.4',
       path: '/docs-test/2',
       content: 'B!',
     });
-    result.current.storage.set(keypair, {
+    result.current.storage?.set(keypair, {
       format: 'es.4',
       path: '/docs-test/3',
       content: 'C!',
@@ -308,6 +310,12 @@ test('useDocuments', async () => {
     'B!',
     'C!',
   ]);
+
+  act(() => {
+    result.current.setWorkspace(WORKSPACE_ADDR_B);
+  });
+
+  expect(result.current.docs.length).toEqual(0);
 });
 
 test('useSubscribeToStorages', () => {
