@@ -14,7 +14,7 @@ export default function WorkspaceManager() {
           <h2>{currentWorkspace}</h2>
           <SyncingCheckbox />
           <hr />
-          <WorkspaceOptions />
+          <WorkspaceOptions workspaceAddress={currentWorkspace}/>
         </>
       ) : (
         <>
