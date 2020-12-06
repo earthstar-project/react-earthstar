@@ -32,7 +32,7 @@ const TabPanelDescendantContext = createDescendantContext<TabPanelDescendant>(
   'TabButtonDescendantContext'
 );
 
-const EarthbarContext = React.createContext<{
+export const EarthbarContext = React.createContext<{
   panelRef: HTMLDivElement | undefined;
   activeIndex: number;
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>;

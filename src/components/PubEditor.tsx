@@ -1,5 +1,12 @@
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxList,
+  ComboboxOption,
+  ComboboxPopover,
+} from '@reach/combobox';
 import React from 'react';
-import { useWorkspacePubs } from '../hooks';
+import { usePubs, useWorkspacePubs } from '../hooks';
 
 export default function PubEditor({
   workspaceAddress,
@@ -23,6 +30,10 @@ export default function PubEditor({
     },
     [setPubs, setPubToAdd]
   );
+
+  const [totalPubs] = usePubs();
+  const allPubs = Array.from(new Set(Object.values(totalPubs).flat()));
+  const selectablePubs = allPubs.filter(pubUrl => !pubs.includes(pubUrl));
 
   return (
     <>
@@ -60,21 +71,39 @@ export default function PubEditor({
         >
           {'Pub URL'}
         </label>
-        <input
+        <Combobox
+          openOnFocus
+          onSelect={item => addPub(item)}
           data-react-earthstar-pubeditor-newpub-input
           data-react-earthstar-input
-          type="url"
-          name={'pub-to-add'}
-          value={pubToAdd}
-          onChange={e => setPubToAdd(e.target.value)}
-          placeholder={'https://my.pub/'}
-        />
+        >
+          <ComboboxInput
+            selectOnClick
+            value={pubToAdd}
+            onChange={e => setPubToAdd(e.target.value)}
+          />
+          {selectablePubs.length > 0 ? (
+            <ComboboxPopover>
+              <ComboboxList>
+                {selectablePubs.map(pubUrl => (
+                  <ComboboxOption
+                    data-react-earthstar-option
+                    key={pubUrl}
+                    value={pubUrl}
+                  >
+                    {pubUrl}
+                  </ComboboxOption>
+                ))}
+              </ComboboxList>
+            </ComboboxPopover>
+          ) : null}
+        </Combobox>
         <button
           data-react-earthstar-pubeditor-add-button
           data-react-earthstar-button
           type={'submit'}
         >
-          {'Add new pub'}
+          {'Add pub'}
         </button>
       </form>
     </>

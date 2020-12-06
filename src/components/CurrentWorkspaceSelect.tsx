@@ -32,7 +32,6 @@ export default function WorkspaceSelect() {
         >
           {'No workspace'}
         </option>
-
         {workspaces.map(address => (
           <option
             data-react-earthstar-current-workspace-select-option

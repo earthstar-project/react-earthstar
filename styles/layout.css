@@ -17,23 +17,23 @@
 [data-react-earthstar-add-workspace-form] {
   display: grid;
   grid-template-areas: 'workspace-label pub-label .' 'workspace-input pub-input add-workspace-button';
-  grid-template-columns: 1.5fr 1.5fr 1fr
+  grid-template-columns: 1.5fr 1.5fr 1fr;
 }
 
 [data-react-earthstar-add-workspace-address-label] {
-  grid-area: workspace-label
+  grid-area: workspace-label;
 }
 
 [data-react-earthstar-add-workspace-address-input] {
-  grid-area: workspace-input
+  grid-area: workspace-input;
 }
 
 [data-react-earthstar-add-workspace-pub-label] {
-  grid-area: pub-label
+  grid-area: pub-label;
 }
 
 [data-react-earthstar-add-workspace-pub-input] {
-  grid-area: pub-input
+  grid-area: pub-input;
 }
 
 [data-react-earthstar-add-workspace-button] {
@@ -51,7 +51,7 @@
 
 [data-react-earthstar-current-workspace-select-form] {
   display: flex;
-  flex-direction: column
+  flex-direction: column;
 }
 
 /* DisplayNameForm */
@@ -72,7 +72,7 @@
 [data-react-earthstar-invitation-creator-form] {
   display: grid;
   grid-template-areas: 'input input input button' 'pub-options pub-options pub-options pub-options';
-  grid-template-columns: 1fr 1fr 1fr 1fr
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 [data-react-earthstar-invitation-creator-input] {
@@ -84,7 +84,7 @@
 }
 
 [data-react-earthstar-invitation-creator-pub-options] {
-  grid-area: pub-options
+  grid-area: pub-options;
 }
 
 /* InvitationRedemptionForm */
@@ -92,19 +92,19 @@
 [data-react-earthstar-invitatiton-redemption-form] {
   display: grid;
   grid-template-areas: 'label' 'input' 'error' 'description' 'button';
-  grid-template-columns: 1fr
+  grid-template-columns: 1fr;
 }
 
 [data-react-earthstar-invitation-code-label] {
-  grid-area: label
+  grid-area: label;
 }
 
 [data-react-earthstar-invitation-code-input] {
-  grid-area: input
+  grid-area: input;
 }
 
 [data-react-earthstar-invitation-code-alert] {
-  grid-area: error
+  grid-area: error;
 }
 
 [data-react-earthstar-invitation-description] {
@@ -112,7 +112,7 @@
 }
 
 [data-react-earthstar-invitation-redemption-button] {
-  grid-area: button
+  grid-area: button;
 }
 
 /* NewKeypairForm */
@@ -133,13 +133,13 @@
 
 [data-react-earthstar-pubeditor-list] {
   padding: 0;
-  list-style: none
+  list-style: none;
 }
 
 [data-react-earthstar-pubeditor-list-item] {
   display: flex;
   align-items: baseline;
-  justify-content: space-between
+  justify-content: space-between;
 }
 
 [data-react-earthstar-pubeditor-newpub-label] {
@@ -148,6 +148,10 @@
 
 [data-react-earthstar-pubeditor-newpub-input] {
   grid-area: input;
+}
+
+[data-react-earthstar-pubeditor-newpub-input] input {
+  width: 100%;
 }
 
 [data-react-earthstar-pubeditor-add-button] {
@@ -172,7 +176,7 @@
 /* EarthbarSpacer */
 
 [data-react-earthstar-earthbar-spacer] {
-  flex: 1
+  flex: 1;
 }
 
 [data-react-earthstar-accordion-button] {
@@ -197,14 +201,14 @@
 [data-react-earthstar-workspace-row] {
   display: flex;
   align-items: center;
-  justify-content: space-between
+  justify-content: space-between;
 }
 
 /* WorkspaceList*/
 
 [data-react-earthstar-workspace-list-workspaces] {
   padding: 0;
-  list-style: none
+  list-style: none;
 }
 
 /* WorkspaceOptions */
@@ -212,10 +216,46 @@
 [data-react-earthstar-workpace-options-header] {
   display: flex;
   align-items: baseline;
-  justify-content: space-between
+  justify-content: space-between;
 }
 
+/* @reach */
 
+:root {
+  --reach-combobox: 1;
+}
 
+[data-reach-combobox-popover] {
+  border: solid 1px hsla(0, 0%, 0%, 0.25);
+  background: hsla(0, 100%, 100%, 0.99);
+  font-size: 85%;
+}
 
+[data-reach-combobox-list] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
 
+[data-reach-combobox-option] {
+  cursor: pointer;
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+}
+
+[data-reach-combobox-option][aria-selected='true'] {
+  background: hsl(211, 10%, 95%);
+}
+
+[data-reach-combobox-option]:hover {
+  background: hsl(211, 10%, 92%);
+}
+
+[data-reach-combobox-option][aria-selected='true']:hover {
+  background: hsl(211, 10%, 90%);
+}
+
+[data-suggested-value] {
+  font-weight: bold;
+}

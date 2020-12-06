@@ -21,6 +21,7 @@ import {
   WorkspaceList,
 } from '../../src/index';
 import '../../styles/layout.css';
+import WorkspaceCreatorForm from '../../src/components/WorkspaceCreatorForm';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
@@ -90,6 +91,7 @@ function Examples() {
           [EXAMPLE_WORKSPACE_ADDR2]: ['https://b.pub/'],
           [EXAMPLE_WORKSPACE_ADDR3]: ['https://c.pub/'],
         }}
+        initIsLive={false}
       >
         <hr />
         <h2>Adding, removing and editing workspaces</h2>
@@ -104,6 +106,9 @@ function Examples() {
           notes="Add a new workspace to the list of possible workspaces"
         >
           <AddWorkspaceForm />
+        </Example>
+        <Example title={'WorkspaceCreatorForm'}>
+          <WorkspaceCreatorForm />
         </Example>
         <Example
           title={'InvitationRedemptionForm'}
