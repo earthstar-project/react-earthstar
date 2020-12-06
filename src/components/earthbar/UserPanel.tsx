@@ -2,10 +2,12 @@ import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
 
 import {
-  SignOutButton,
-  DownloadKeypairButton,
   AuthorLabel,
+  CopyAuthorAddressButton,
+  CopyAuthorSecretButton,
   DisplayNameForm,
+  DownloadKeypairButton,
+  SignOutButton,
 } from '../';
 import { useCurrentAuthor, useCurrentWorkspace } from '../..';
 
@@ -25,14 +27,22 @@ export default function UserPanel() {
       {currentWorkspace ? (
         <>
           <hr />
-          <section>
+          <section data-react-earthstar-user-panel-display-name-section>
             <DisplayNameForm workspaceAddress={currentWorkspace} />
           </section>
         </>
       ) : null}
       <hr />
-      <section data-react-earthstar-user-panel-actions-section>
+      <section data-react-earthstar-user-panel-save-identity-section>
+        <h1 data-react-earthstar-user-panel-save-identity-title>
+          {'Save your identity'}
+        </h1>
         <DownloadKeypairButton />
+        <CopyAuthorAddressButton />
+        <CopyAuthorSecretButton />
+      </section>
+      <hr />
+      <section data-react-earthstar-user-panel-sign-out-section>
         <SignOutButton />
       </section>
     </EarthbarTabPanel>

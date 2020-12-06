@@ -7,6 +7,8 @@ import {
   AuthorKeypairForm,
   AuthorKeypairUpload,
   AuthorLabel,
+  CopyAuthorAddressButton,
+  CopyAuthorSecretButton,
   CurrentAuthor,
   CurrentWorkspaceSelect,
   DisplayNameForm,
@@ -17,11 +19,11 @@ import {
   PubEditor,
   RemoveWorkspaceButton,
   SignOutButton,
+  WorkspaceCreatorForm,
   WorkspaceLabel,
   WorkspaceList,
 } from '../../src/index';
 import '../../styles/layout.css';
-import WorkspaceCreatorForm from '../../src/components/WorkspaceCreatorForm';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
@@ -168,7 +170,7 @@ function Examples() {
           <SignOutButton />
         </Example>
         <hr />
-        <h2>Current author: etc</h2>
+        <h2>Current author: other actions</h2>
         <Example
           title={'CurrentAuthor'}
           notes="Display an <AuthorLabel> which abbreviates the currenly signed in author's address"
@@ -176,8 +178,20 @@ function Examples() {
           <CurrentAuthor />
         </Example>
         <Example
+          title={'CopyAuthorAddressButton'}
+          notes="A button which copies the current author's address to the clipboard"
+        >
+          <CopyAuthorAddressButton />
+        </Example>
+        <Example
+          title={'CopyAuthorSecretButton'}
+          notes="A button which copies the current author's secret to the clipboard"
+        >
+          <CopyAuthorSecretButton />
+        </Example>
+        <Example
           title={'DisplayNameForm'}
-          notes="Change the display name of the currently signed in author, in a given workspace"
+          notes="Change the display name of the currently signed in author, in a given workspace, by writing a document to /about/~@zzzz.bbbbbb/displayName.txt"
         >
           <DisplayNameForm workspaceAddress={EXAMPLE_WORKSPACE_ADDR1} />
         </Example>

@@ -31,7 +31,7 @@ export default function AuthorKeypairForm() {
         data-react-earthstar-label
         htmlFor="author-address"
       >
-        {'Address'}
+        {'Author Address'}
       </label>
       <input
         data-react-earthstar-author-form-address-input
