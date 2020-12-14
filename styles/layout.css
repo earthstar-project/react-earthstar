@@ -40,6 +40,35 @@
   grid-area: add-workspace-button;
 }
 
+/* AuthorKeypairForm */
+
+[data-react-earthstar-author-keypair-form] {
+  display: grid;
+  grid-template-areas: 'address-label secret-label .' 'address-input secret-input button';
+  grid-template-columns: 1.5fr 1.5fr 1fr;
+}
+
+[data-react-earthstar-author-form-address-label] {
+  grid-area: address-label;
+}
+
+[data-react-earthstar-author-form-secret-label] {
+  grid-area: secret-label;
+}
+
+[data-react-earthstar-author-form-address-input] {
+  grid-area: address-input;
+}
+
+[data-react-earthstar-author-form-secret-input] {
+  grid-area: secret-input;
+}
+
+[data-react-earthstar-author-form-button] {
+  grid-area: button;
+}
+
+
 /* AuthorKeypairUpload */
 
 [data-react-earthstar-keypair-upload-input] {
