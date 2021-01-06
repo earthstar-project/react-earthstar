@@ -458,12 +458,21 @@ export function useDocument(
         );
       }
 
-      return storage.set(currentAuthor, {
+      const result = storage.set(currentAuthor, {
         format: 'es.4',
         path,
         content,
         deleteAfter,
       });
+
+      if (isErr(result)) {
+        console.group();
+        console.warn(`There was a problem setting the document at ${path}:`);
+        console.warn(result.message);
+        console.groupEnd();
+      }
+
+      return result;
     },
     [path, currentAuthor, workspaceAddress, storage]
   );
