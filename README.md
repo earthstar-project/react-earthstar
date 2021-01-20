@@ -38,7 +38,7 @@ While peers _could_ sync data directly to one another, with small groups there's
 
 ## So what's react-earthstar again?
 
-This package offers several layers of convenience around Earthstar: React hooks for writing and reading data from workspaces, pre-made components for common tasks, and even a full-blown control centre that does all the table-stakes stuff for you
+This package offers several layers of convenience around Earthstar: React hooks for writing and reading data from workspaces, pre-made components for common tasks, and even a full-blown control centre that does all the table-stakes stuff for you.
 
 ## Getting started
 
@@ -75,7 +75,7 @@ With `EarthstarPeer` wrapped around your app, you're ready to go.
 
 Click below for learning about these with their own docs
 
-- [EarthstarPeer](docs/earthstarpeer.md) - Diving deeper into configuring EarthstarPeer
-- [Hooks](docs/hooks.md) - Accessing and writing data with hooks, API docs basically
-- Earthbar - Pre-made, customisable control center for common earthstar tasks — learn how to customise and style it here
-- Components - Pre-made UIs to make your life easy! - learn what's available and how to style here
+- [EarthstarPeer](docs/earthstarpeer.md) - Learn more about configuring <EarthstarPeer>
+- [Hooks](docs/hooks.md) - Learn how to access and write data and app state with hooks
+- [Earthbar](docs/earthbar.md) - Pre-made, customisable control center for common earthstar tasks — learn how to customise and style it here
+- [Components](docs/components.md) - Pre-made UIs to make your life easy! - learn what's available and how to style here
