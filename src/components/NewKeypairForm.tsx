@@ -38,7 +38,7 @@ export default function NewKeypairForm({ onSuccess }: NewKeypairFormProps) {
 
   return (
     <form
-      data-react-earthstar-keypair-form
+      data-re-keypair-form
       onSubmit={e => {
         e.preventDefault();
 
@@ -46,23 +46,23 @@ export default function NewKeypairForm({ onSuccess }: NewKeypairFormProps) {
       }}
     >
       <label
-        data-react-earthstar-keypair-form-shortname-label
-        data-react-earthstar-label
+        data-re-keypair-form-shortname-label
+        data-re-label
         htmlFor={'short-name-input'}
       >
         Short name
       </label>
       <input
-        data-react-earthstar-keypair-form-shortname-input
-        data-react-earthstar-input
+        data-re-keypair-form-shortname-input
+        data-re-input
         name={'short-name-input'}
         placeholder={'4-letter nickname'}
         value={shortName}
         onChange={e => setShortName(e.target.value)}
       />
       <button
-        data-react-earthstar-keypair-form-button
-        data-react-earthstar-button
+        data-re-keypair-form-button
+        data-re-button
         type={'submit'}
       >
         {'Create'}

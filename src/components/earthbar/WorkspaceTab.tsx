@@ -17,8 +17,8 @@ export default function WorkspaceTab() {
   }, [currentWorkspace, workspaces, setCurrentWorkspace]);
 
   return (
-    <div data-react-earthstar-earthbar-workspace-tab-zone>
-      <EarthbarTab data-react-earthstar-earthbar-workspace-select-tab>
+    <div data-re-earthbar-workspace-tab-zone>
+      <EarthbarTab data-re-earthbar-workspace-select-tab>
         {workspaces.length > 0 ? (
           <>
             <select

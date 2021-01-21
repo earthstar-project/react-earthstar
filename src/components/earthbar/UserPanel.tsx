@@ -16,8 +16,8 @@ export default function UserPanel() {
   const [currentWorkspace] = useCurrentWorkspace();
 
   return (
-    <EarthbarTabPanel data-react-earthstar-user-panel>
-      <h1 data-react-earthstar-user-panel-author-address>
+    <EarthbarTabPanel data-re-user-panel>
+      <h1 data-re-user-panel-author-address>
         {currentAuthor ? (
           <AuthorLabel address={currentAuthor.address} />
         ) : (
@@ -27,14 +27,14 @@ export default function UserPanel() {
       {currentWorkspace ? (
         <>
           <hr />
-          <section data-react-earthstar-user-panel-display-name-section>
+          <section data-re-user-panel-display-name-section>
             <DisplayNameForm workspaceAddress={currentWorkspace} />
           </section>
         </>
       ) : null}
       <hr />
-      <section data-react-earthstar-user-panel-save-identity-section>
-        <h1 data-react-earthstar-user-panel-save-identity-title>
+      <section data-re-user-panel-save-identity-section>
+        <h1 data-re-user-panel-save-identity-title>
           {'Save your identity'}
         </h1>
         <DownloadKeypairButton />
@@ -42,7 +42,7 @@ export default function UserPanel() {
         <CopyAuthorSecretButton />
       </section>
       <hr />
-      <section data-react-earthstar-user-panel-sign-out-section>
+      <section data-re-user-panel-sign-out-section>
         <SignOutButton />
       </section>
     </EarthbarTabPanel>

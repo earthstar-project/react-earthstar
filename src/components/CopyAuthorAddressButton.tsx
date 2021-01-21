@@ -9,8 +9,8 @@ export default function CopyAuthorAddressButton(
   return (
     <button
       {...props}
-      data-react-earthstar-copy-author-address-button
-      data-react-earthstar-button
+      data-re-copy-author-address-button
+      data-re-button
       onClick={() =>
         navigator.clipboard.writeText(currentAuthor?.address || '')
       }

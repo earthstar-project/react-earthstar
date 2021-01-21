@@ -9,8 +9,8 @@ export default function SignOutButton(
   return (
     <button
       {...props}
-      data-react-earthstar-sign-out-button
-      data-react-earthstar-button
+      data-re-sign-out-button
+      data-re-button
       onClick={() => setCurrentAuthor(null)}
       disabled={currentAuthor === null}
     >

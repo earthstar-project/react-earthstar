@@ -14,7 +14,7 @@ export default function AddWorkspaceTab() {
   const [, setCurrentWorkspace] = useCurrentWorkspace();
 
   return (
-    <EarthbarTab data-react-earthstar-earthbar-workspace-add-tab>
+    <EarthbarTab data-re-earthbar-workspace-add-tab>
       <EarthbarTabLabel>{'Add'}</EarthbarTabLabel>
       <EarthbarTabPanel>
         <h2>{'Join a workspace'}</h2>

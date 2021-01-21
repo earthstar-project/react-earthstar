@@ -38,14 +38,14 @@ export default function PubEditor({
   return (
     <>
       {pubs.length > 0 ? (
-        <ul data-react-earthstar-pubeditor-list>
+        <ul data-re-pubeditor-list>
           {pubs.map(pubUrl => {
             return (
-              <li data-react-earthstar-pubeditor-list-item key={`${pubUrl}`}>
+              <li data-re-pubeditor-list-item key={`${pubUrl}`}>
                 <a href={pubUrl}>{pubUrl}</a>
                 <button
-                  data-react-earthstar-pubeditor-list-item-delete-button
-                  data-react-earthstar-button
+                  data-re-pubeditor-list-item-delete-button
+                  data-re-button
                   onClick={() => removePub(pubUrl)}
                 >
                   {'Remove pub'}
@@ -56,7 +56,7 @@ export default function PubEditor({
         </ul>
       ) : null}
       <form
-        data-react-earthstar-pubeditor-add-form
+        data-re-pubeditor-add-form
         onSubmit={e => {
           e.preventDefault();
           if (pubToAdd.length > 0) {
@@ -65,8 +65,8 @@ export default function PubEditor({
         }}
       >
         <label
-          data-react-earthstar-pubeditor-newpub-label
-          data-react-earthstar-label
+          data-re-pubeditor-newpub-label
+          data-re-label
           htmlFor={'pub-to-add'}
         >
           {'Pub URL'}
@@ -74,8 +74,8 @@ export default function PubEditor({
         <Combobox
           openOnFocus
           onSelect={item => addPub(item)}
-          data-react-earthstar-pubeditor-newpub-input
-          data-react-earthstar-input
+          data-re-pubeditor-newpub-input
+          data-re-input
         >
           <ComboboxInput
             selectOnClick
@@ -87,7 +87,7 @@ export default function PubEditor({
               <ComboboxList>
                 {selectablePubs.map(pubUrl => (
                   <ComboboxOption
-                    data-react-earthstar-option
+                    data-re-option
                     key={pubUrl}
                     value={pubUrl}
                   >
@@ -99,8 +99,8 @@ export default function PubEditor({
           ) : null}
         </Combobox>
         <button
-          data-react-earthstar-pubeditor-add-button
-          data-react-earthstar-button
+          data-re-pubeditor-add-button
+          data-re-button
           type={'submit'}
         >
           {'Add pub'}

@@ -2,9 +2,9 @@
 
 /* A grid layout for a single text input with label and button*/
 
-[data-react-earthstar-pubeditor-add-form],
-[data-react-earthstar-keypair-form],
-[data-react-earthstar-display-name-form] {
+[data-re-pubeditor-add-form],
+[data-re-keypair-form],
+[data-re-display-name-form] {
   display: grid;
   grid-template-areas: 'label label label label' 'input input input button';
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -14,176 +14,176 @@
 
 /* AddWorkspaceForm */
 
-[data-react-earthstar-add-workspace-form] {
+[data-re-add-workspace-form] {
   display: grid;
   grid-template-areas: 'workspace-label pub-label .' 'workspace-input pub-input add-workspace-button';
   grid-template-columns: 1.5fr 1.5fr 1fr;
 }
 
-[data-react-earthstar-add-workspace-address-label] {
+[data-re-add-workspace-address-label] {
   grid-area: workspace-label;
 }
 
-[data-react-earthstar-add-workspace-address-input] {
+[data-re-add-workspace-address-input] {
   grid-area: workspace-input;
 }
 
-[data-react-earthstar-add-workspace-pub-label] {
+[data-re-add-workspace-pub-label] {
   grid-area: pub-label;
 }
 
-[data-react-earthstar-add-workspace-pub-input] {
+[data-re-add-workspace-pub-input] {
   grid-area: pub-input;
 }
 
-[data-react-earthstar-add-workspace-button] {
+[data-re-add-workspace-button] {
   grid-area: add-workspace-button;
 }
 
 /* AuthorKeypairForm */
 
-[data-react-earthstar-author-keypair-form] {
+[data-re-author-keypair-form] {
   display: grid;
   grid-template-areas: 'address-label secret-label .' 'address-input secret-input button';
   grid-template-columns: 1.5fr 1.5fr 1fr;
 }
 
-[data-react-earthstar-author-form-address-label] {
+[data-re-author-form-address-label] {
   grid-area: address-label;
 }
 
-[data-react-earthstar-author-form-secret-label] {
+[data-re-author-form-secret-label] {
   grid-area: secret-label;
 }
 
-[data-react-earthstar-author-form-address-input] {
+[data-re-author-form-address-input] {
   grid-area: address-input;
 }
 
-[data-react-earthstar-author-form-secret-input] {
+[data-re-author-form-secret-input] {
   grid-area: secret-input;
 }
 
-[data-react-earthstar-author-form-button] {
+[data-re-author-form-button] {
   grid-area: button;
 }
 
 
 /* AuthorKeypairUpload */
 
-[data-react-earthstar-keypair-upload-input] {
+[data-re-keypair-upload-input] {
   visibility: hidden;
   position: absolute;
 }
 
 /* CurrentWorkspaceSelect */
 
-[data-react-earthstar-current-workspace-select-form] {
+[data-re-current-workspace-select-form] {
   display: flex;
   flex-direction: column;
 }
 
 /* DisplayNameForm */
-[data-react-earthstar-display-name-label] {
+[data-re-display-name-label] {
   grid-area: label;
 }
 
-[data-react-earthstar-display-name-input] {
+[data-re-display-name-input] {
   grid-area: input;
 }
 
-[data-react-earthstar-display-name-button] {
+[data-re-display-name-button] {
   grid-area: button;
 }
 
 /* InvitationCreatorForm */
 
-[data-react-earthstar-invitation-creator-form] {
+[data-re-invitation-creator-form] {
   display: grid;
   grid-template-areas: 'input input input button' 'pub-options pub-options pub-options pub-options';
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
-[data-react-earthstar-invitation-creator-input] {
+[data-re-invitation-creator-input] {
   grid-area: input;
 }
 
-[data-react-earthstar-invitation-creator-button] {
+[data-re-invitation-creator-button] {
   grid-area: button;
 }
 
-[data-react-earthstar-invitation-creator-pub-options] {
+[data-re-invitation-creator-pub-options] {
   grid-area: pub-options;
 }
 
 /* InvitationRedemptionForm */
 
-[data-react-earthstar-invitatiton-redemption-form] {
+[data-re-invitatiton-redemption-form] {
   display: grid;
   grid-template-areas: 'label' 'input' 'error' 'description' 'button';
   grid-template-columns: 1fr;
 }
 
-[data-react-earthstar-invitation-code-label] {
+[data-re-invitation-code-label] {
   grid-area: label;
 }
 
-[data-react-earthstar-invitation-code-input] {
+[data-re-invitation-code-input] {
   grid-area: input;
 }
 
-[data-react-earthstar-invitation-code-alert] {
+[data-re-invitation-code-alert] {
   grid-area: error;
 }
 
-[data-react-earthstar-invitation-description] {
+[data-re-invitation-description] {
   grid-area: description;
 }
 
-[data-react-earthstar-invitation-redemption-button] {
+[data-re-invitation-redemption-button] {
   grid-area: button;
 }
 
 /* NewKeypairForm */
 
-[data-react-earthstar-keypair-form-shortname-label] {
+[data-re-keypair-form-shortname-label] {
   grid-area: label;
 }
 
-[data-react-earthstar-keypair-form-shortname-input] {
+[data-re-keypair-form-shortname-input] {
   grid-area: input;
 }
 
-[data-react-earthstar-keypair-form-button] {
+[data-re-keypair-form-button] {
   grid-area: button;
 }
 
 /* PubEditor */
 
-[data-react-earthstar-pubeditor-list] {
+[data-re-pubeditor-list] {
   padding: 0;
   list-style: none;
 }
 
-[data-react-earthstar-pubeditor-list-item] {
+[data-re-pubeditor-list-item] {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
 }
 
-[data-react-earthstar-pubeditor-newpub-label] {
+[data-re-pubeditor-newpub-label] {
   grid-area: label;
 }
 
-[data-react-earthstar-pubeditor-newpub-input] {
+[data-re-pubeditor-newpub-input] {
   grid-area: input;
 }
 
-[data-react-earthstar-pubeditor-newpub-input] input {
+[data-re-pubeditor-newpub-input] input {
   width: 100%;
 }
 
-[data-react-earthstar-pubeditor-add-button] {
+[data-re-pubeditor-add-button] {
   grid-area: button;
 }
 
@@ -191,24 +191,24 @@
 
 /* Earthbar */
 
-[data-react-earthstar-earthbar-tabs] {
+[data-re-earthbar-tabs] {
   display: flex;
   align-content: flex-end;
 }
 
 /* EarthbarTabLabel */
 
-[data-react-earthstar-earthbar-tab-label] {
+[data-re-earthbar-tab-label] {
   margin: 0;
 }
 
 /* EarthbarSpacer */
 
-[data-react-earthstar-earthbar-spacer] {
+[data-re-earthbar-spacer] {
   flex: 1;
 }
 
-[data-react-earthstar-accordion-button] {
+[data-re-accordion-button] {
   appearance: none;
   background: none;
   border: none;
@@ -220,14 +220,14 @@
 
 /* WorkspaceTab */
 
-[data-react-earthstar-earthbar-workspace-tab-zone] {
+[data-re-earthbar-workspace-tab-zone] {
   display: flex;
   align-items: baseline;
 }
 
 /* WorkspaceRow */
 
-[data-react-earthstar-workspace-row] {
+[data-re-workspace-row] {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -235,14 +235,14 @@
 
 /* WorkspaceList*/
 
-[data-react-earthstar-workspace-list-workspaces] {
+[data-re-workspace-list-workspaces] {
   padding: 0;
   list-style: none;
 }
 
 /* WorkspaceOptions */
 
-[data-react-earthstar-workpace-options-header] {
+[data-re-workpace-options-header] {
   display: flex;
   align-items: baseline;
   justify-content: space-between;

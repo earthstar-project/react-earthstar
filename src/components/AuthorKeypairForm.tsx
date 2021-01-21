@@ -10,7 +10,7 @@ export default function AuthorKeypairForm() {
 
   return (
     <form
-      data-react-earthstar-author-keypair-form
+      data-re-author-keypair-form
       onSubmit={e => {
         e.preventDefault();
 
@@ -27,30 +27,30 @@ export default function AuthorKeypairForm() {
       }}
     >
       <label
-        data-react-earthstar-author-form-address-label
-        data-react-earthstar-label
+        data-re-author-form-address-label
+        data-re-label
         htmlFor="author-address"
       >
         {'Author Address'}
       </label>
       <input
-        data-react-earthstar-author-form-address-input
-        data-react-earthstar-input
+        data-re-author-form-address-input
+        data-re-input
         name="author-address"
         type="text"
         value={address}
         onChange={e => setAddress(e.target.value)}
       />
       <label
-        data-react-earthstar-author-form-secret-label
-        data-react-earthstar-label
+        data-re-author-form-secret-label
+        data-re-label
         htmlFor={'author-secret'}
       >
         {'Secret'}
       </label>
       <input
-        data-react-earthstar-author-form-secret-input
-        data-react-earthstar-input
+        data-re-author-form-secret-input
+        data-re-input
         name={'author-secret'}
         type="password"
         value={secret}
@@ -58,8 +58,8 @@ export default function AuthorKeypairForm() {
       />
 
       <button
-        data-react-earthstar-author-form-button
-        data-react-earthstar-button
+        data-re-author-form-button
+        data-re-button
         type={'submit'}
       >
         {'Sign in'}

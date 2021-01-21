@@ -12,8 +12,8 @@ export default function DownloadKeypairButton(
   return (
     <button
       {...props}
-      data-react-earthstar-download-keypair-button
-      data-react-earthstar-button
+      data-re-download-keypair-button
+      data-re-button
       onClick={() => download(currentAuthor)}
       disabled={currentAuthor === null}
     >

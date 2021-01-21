@@ -7,7 +7,7 @@ export default function MultiWorkspaceTab() {
   return (
     <>
       <EarthbarTab>
-        <EarthbarTabLabel data-react-earthstar-earthbar-author-tab>
+        <EarthbarTabLabel data-re-earthbar-author-tab>
           {'Workspaces'}
         </EarthbarTabLabel>
         <MultiWorkspaceManagerPanel />

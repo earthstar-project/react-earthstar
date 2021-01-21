@@ -13,7 +13,7 @@ export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
     <>
       <input
         {...props}
-        data-react-earthstar-keypair-upload-input
+        data-re-keypair-upload-input
         type="file"
         accept={'application/json,.keypair.json'}
         id={'keypair-upload-button'}
@@ -51,13 +51,13 @@ export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
       />
       <label
         ref={labelRef}
-        data-react-earthstar-keypair-upload-label
-        data-react-earthstar-label
+        data-re-keypair-upload-label
+        data-re-label
         htmlFor={'keypair-upload-button'}
       >
         <button
-          data-react-earthstar-keypair-upload-button
-          data-react-earthstar-button
+          data-re-keypair-upload-button
+          data-re-button
           onClick={() => {
             if (labelRef.current) {
               labelRef.current.click();

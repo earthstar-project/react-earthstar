@@ -12,7 +12,7 @@ export default function AddWorkspaceForm() {
 
   return (
     <form
-      data-react-earthstar-add-workspace-form
+      data-re-add-workspace-form
       onSubmit={e => {
         e.preventDefault();
         const result = add(workspaceAddress);
@@ -25,15 +25,15 @@ export default function AddWorkspaceForm() {
       }}
     >
       <label
-        data-react-earthstar-add-workspace-address-label
-        data-react-earthstar-label
+        data-re-add-workspace-address-label
+        data-re-label
         htmlFor={'new-workspace-address'}
       >
         {'Workspace address'}
       </label>
       <input
-        data-react-earthstar-add-workspace-address-input
-        data-react-earthstar-input
+        data-re-add-workspace-address-input
+        data-re-input
         name={'new-workspace-address'}
         placeholder={'+workspace.a123'}
         value={workspaceAddress}
@@ -41,15 +41,15 @@ export default function AddWorkspaceForm() {
       />
 
       <label
-        data-react-earthstar-add-workspace-pub-label
-        data-react-earthstar-label
+        data-re-add-workspace-pub-label
+        data-re-label
         htmlFor={'initial-pub-address'}
       >
         {'Pub address'}
       </label>
       <input
-        data-react-earthstar-add-workspace-pub-input
-        data-react-earthstar-input
+        data-re-add-workspace-pub-input
+        data-re-input
         name={'initial-pub-address'}
         placeholder={'https://my.pub/'}
         value={initialPub}
@@ -57,8 +57,8 @@ export default function AddWorkspaceForm() {
         onChange={e => setInitialPub(e.target.value)}
       />
       <button
-        data-react-earthstar-add-workspace-button
-        data-react-earthstar-button
+        data-re-add-workspace-button
+        data-re-button
         type="submit"
       >
         {'Add workspace'}

@@ -61,7 +61,7 @@ export default function InvitationRedemptionForm({
 
   return (
     <form
-      data-react-earthstar-invitatiton-redemption-form
+      data-re-invitatiton-redemption-form
       onSubmit={e => {
         e.preventDefault();
 
@@ -80,37 +80,37 @@ export default function InvitationRedemptionForm({
       }}
     >
       <label
-        data-react-earthstar-invitation-code-label
-        data-react-earthstar-label
+        data-re-invitation-code-label
+        data-re-label
       >
         {'Paste invitation code'}
       </label>
       <input
-        data-react-earthstar-invitation-code-input
-        data-react-earthstar-input
+        data-re-invitation-code-input
+        data-re-input
         value={code}
         onChange={e => setCode(e.target.value)}
         placeholder={'earthstar:///?workspace=...'}
       />
       {isErr(result) && code.length > 0 ? (
-        <Alert data-react-earthstar-invitation-code-alert>
+        <Alert data-re-invitation-code-alert>
           {result.message}
         </Alert>
       ) : null}
       {!isErr(result) ? (
-        <dl data-react-earthstar-invitation-description>
-          <dt data-react-earthstar-dt>{'Workspace'}</dt>
-          <dd data-react-earthstar-dd>
+        <dl data-re-invitation-description>
+          <dt data-re-dt>{'Workspace'}</dt>
+          <dd data-re-dd>
             {result.workspace}
             {workspaces.includes(result.workspace) ? ' (already added)' : null}
           </dd>
-          <dt data-react-earthstar-dt>{'Pubs'}</dt>
-          <dd data-react-earthstar-dd>
+          <dt data-re-dt>{'Pubs'}</dt>
+          <dd data-re-dd>
             {result.pubs.length > 0
               ? result.pubs.map(pubUrl => (
                   <div key={pubUrl}>
                     <input
-                      data-react-earthstar-checkbox
+                      data-re-checkbox
                       id={`react-earthstar-invitation-${pubUrl}-option`}
                       type="checkbox"
                       disabled={preexistingPubs.includes(pubUrl)}
@@ -150,8 +150,8 @@ export default function InvitationRedemptionForm({
       ) : null}
       {code.length > 0 ? (
         <button
-          data-react-earthstar-invitation-redemption-button
-          data-react-earthstar-button
+          data-re-invitation-redemption-button
+          data-re-button
           type={'submit'}
           disabled={isThereAnythingToAdd === false}
         >

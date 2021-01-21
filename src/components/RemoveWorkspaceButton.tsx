@@ -13,8 +13,8 @@ export default function RemoveWorkspaceButton({
 
   return (
     <button
-      data-react-earthstar-remove-workspace-button
-      data-react-earthstar-button
+      data-re-remove-workspace-button
+      data-re-button
       {...props}
       onClick={() => {
         if (!address) {

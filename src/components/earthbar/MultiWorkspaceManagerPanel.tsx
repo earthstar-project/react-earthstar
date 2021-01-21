@@ -33,16 +33,16 @@ function WorkspaceRow({
   navToWorkspace: () => void;
 }) {
   return (
-    <li data-react-earthstar-workspace-row>
+    <li data-re-workspace-row>
       <div>
         <WorkspaceLabel
-          data-react-earthstar-workspace-row-address
+          data-re-workspace-row-address
           address={address}
         />
       </div>
       <button
-        data-react-earthstar-multiworkspace-settings-button
-        data-react-earthstar-button
+        data-re-multiworkspace-settings-button
+        data-re-button
         onClick={navToWorkspace}
       >
         {'Settings'}
@@ -63,7 +63,7 @@ function WorkspaceList({
       <section>
         <h2>{'Your workspaces'}</h2>
         <SyncingCheckbox />
-        <ul data-react-earthstar-workspace-list-workspaces>
+        <ul data-re-workspace-list-workspaces>
           {workspaces.map(address => (
             <WorkspaceRow
               key={address}
@@ -92,9 +92,9 @@ export default function MultiWorkspaceManagerPanel() {
         />
       ) : (
         <div>
-          <nav data-react-earthstar-workpace-options-header>
+          <nav data-re-workpace-options-header>
             <button
-              data-react-earthstar-button
+              data-re-button
               onClick={() => dispatch({ type: 'nav-list' })}
             >
               {'← Back'}

@@ -8,7 +8,7 @@ export default function WorkspaceManager() {
   const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
 
   return (
-    <EarthbarTabPanel data-react-earthstar-workspace-manager-panel>
+    <EarthbarTabPanel data-re-workspace-manager-panel>
       {currentWorkspace ? (
         <>
           <h2>{currentWorkspace}</h2>

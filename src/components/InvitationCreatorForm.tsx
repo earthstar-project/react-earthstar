@@ -18,16 +18,16 @@ export default function InvitationCreatorForm({
   }, [copied]);
 
   return (
-    <div data-react-earthstar-invitation-creator-form>
+    <div data-re-invitation-creator-form>
       <input
-        data-react-earthstar-invitation-creator-input
-        data-react-earthstar-input
+        data-re-invitation-creator-input
+        data-re-input
         value={invitationCode}
         disabled={true}
       />
       <button
-        data-react-earthstar-invitation-creator-button
-        data-react-earthstar-button
+        data-re-invitation-creator-button
+        data-re-button
         onClick={() => {
           navigator.clipboard.writeText(invitationCode);
           setCopied(true);
@@ -36,13 +36,13 @@ export default function InvitationCreatorForm({
         {copied ? 'Copied!' : 'Copy'}
       </button>
       {pubs.length > 0 ? (
-        <dl data-react-earthstar-invitation-creator-pub-options>
-          <dt data-react-earthstar-dt>{'Included pubs'}</dt>
-          <dd data-react-earthstar-dd>
+        <dl data-re-invitation-creator-pub-options>
+          <dt data-re-dt>{'Included pubs'}</dt>
+          <dd data-re-dd>
             {pubs.map(pubUrl => (
               <div key={pubUrl}>
                 <input
-                  data-react-earthstar-checkbox
+                  data-re-checkbox
                   id={`react-earthstar-invitation-${pubUrl}-option`}
                   type="checkbox"
                   checked={!excludedPubs.includes(pubUrl)}

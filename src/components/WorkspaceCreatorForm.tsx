@@ -68,30 +68,30 @@ export default function WorkspaceCreatorForm({
         }
       }}
     >
-      <fieldset data-react-earthstar-fieldset>
-        <legend data-react-earthstar-legend>{'Address'}</legend>
-        <span data-react-earthstar-workspace-sigil>{'+'}</span>
+      <fieldset data-re-fieldset>
+        <legend data-re-legend>{'Address'}</legend>
+        <span data-re-workspace-sigil>{'+'}</span>
         <input
-          data-react-earthstar-input
-          data-react-earthstar-workspace-name-input
+          data-re-input
+          data-re-workspace-name-input
           value={workspaceName}
           onChange={e => setWorkspaceName(e.target.value)}
           placeholder={'myworkspace'}
         />
-        <span data-react-earthstar-workspace-separator-dot>{'.'}</span>
+        <span data-re-workspace-separator-dot>{'.'}</span>
         <input
-          data-react-earthstar-input
-          data-react-earthstar-workspace-suffix-input
+          data-re-input
+          data-re-workspace-suffix-input
           value={workspaceSuffix}
           onChange={e => setWorkspaceSuffix(e.target.value)}
         />
         {isErr(validResult) && workspaceName.length > 0 ? (
-          <Alert data-react-earthstar->{validResult.message}</Alert>
+          <Alert data-re->{validResult.message}</Alert>
         ) : null}
       </fieldset>
 
-      <fieldset data-react-earthstar-fieldset>
-        <legend data-react-earthstar-legend>{'Initial Pubs'}</legend>
+      <fieldset data-re-fieldset>
+        <legend data-re-legend>{'Initial Pubs'}</legend>
         {addedPubs.map(pubUrl => (
           <li key={pubUrl}>
             <a href={pubUrl}>{pubUrl}</a>
@@ -106,22 +106,22 @@ export default function WorkspaceCreatorForm({
           </li>
         ))}
         <Combobox
-          data-react-earthstar-combobox
+          data-re-combobox
           openOnFocus
           onSelect={item => setAddedPubs(prev => [...prev, item])}
         >
           <ComboboxInput
-            data-react-earthstar-combobox-input
+            data-re-combobox-input
             selectOnClick
             value={pubToAdd}
             onChange={e => setPubToAdd(e.target.value)}
           />
           {selectablePubs.length > 0 ? (
-            <ComboboxPopover data-react-earthstar-combobox-popover>
-              <ComboboxList data-react-earthstar-combobox-list>
+            <ComboboxPopover data-re-combobox-popover>
+              <ComboboxList data-re-combobox-list>
                 {selectablePubs.map(pubUrl => (
                   <ComboboxOption
-                    data-react-earthstar-combobox-option
+                    data-re-combobox-option
                     key={pubUrl}
                     value={pubUrl}
                   >
@@ -132,7 +132,7 @@ export default function WorkspaceCreatorForm({
             </ComboboxPopover>
           ) : null}
           <button
-            data-react-earthstar-button
+            data-re-button
             onClick={e => {
               e.preventDefault();
               setPubToAdd('');

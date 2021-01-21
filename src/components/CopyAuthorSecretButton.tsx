@@ -9,8 +9,8 @@ export default function CopyAuthorSecretButton(
   return (
     <button
       {...props}
-      data-react-earthstar-copy-author-secret-button
-      data-react-earthstar-button
+      data-re-copy-author-secret-button
+      data-re-button
       onClick={() => navigator.clipboard.writeText(currentAuthor?.secret || '')}
       disabled={currentAuthor === null}
     >
