@@ -1,15 +1,13 @@
 import React from 'react';
-
-const AUTHOR_NAME_REGEX = /@(.*)\./;
+import { isErr, ValidatorEs4 } from 'earthstar';
 
 export function getAuthorShortName(address: string): string {
-  const result = AUTHOR_NAME_REGEX.exec(address);
-
-  if (result) {
-    return result[1];
+  const parsedAuthor = ValidatorEs4.parseAuthorAddress(address);
+  if (isErr(parsedAuthor)) {
+    return address;
   }
 
-  return address;
+  return parsedAuthor.shortname;
 }
 
 const WORKSPACE_NAME_REGEX = /\+(.*)\./;
