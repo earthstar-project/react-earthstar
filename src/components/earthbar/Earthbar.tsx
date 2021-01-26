@@ -90,7 +90,7 @@ export function Earthbar({
           >
             <EarthbarTabs>{children}</EarthbarTabs>
             <div
-              data-re-earthbar-panel
+              data-re-earthbar-panel-portal
               ref={inst => {
                 if (inst) {
                   setPanelRef(inst);

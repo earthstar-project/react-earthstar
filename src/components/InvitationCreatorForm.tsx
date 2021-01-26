@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMakeInvitation, useWorkspacePubs } from '..';
+import CopyButton from './_CopyButton';
 
 export default function InvitationCreatorForm({
   workspaceAddress,
@@ -18,29 +19,17 @@ export default function InvitationCreatorForm({
   }, [copied]);
 
   return (
-    <div data-re-invitation-creator-form>
-      <input
-        data-re-invitation-creator-input
-        data-re-input
-        value={invitationCode}
-        disabled={true}
-      />
-      <button
-        data-re-invitation-creator-button
-        data-re-button
-        onClick={() => {
-          navigator.clipboard.writeText(invitationCode);
-          setCopied(true);
-        }}
-      >
-        {copied ? 'Copied!' : 'Copy'}
-      </button>
+    <>
       {pubs.length > 0 ? (
         <dl data-re-invitation-creator-pub-options>
           <dt data-re-dt>{'Included pubs'}</dt>
           <dd data-re-dd>
             {pubs.map(pubUrl => (
-              <div key={pubUrl}>
+              <div
+                data-re-invitation-creator-pub-option
+                data-re-pub-item
+                key={pubUrl}
+              >
                 <input
                   data-re-checkbox
                   id={`react-earthstar-invitation-${pubUrl}-option`}
@@ -66,6 +55,15 @@ export default function InvitationCreatorForm({
           </dd>
         </dl>
       ) : null}
-    </div>
+      <div data-re-invitation-creator-form>
+        <input
+          data-re-invitation-creator-input
+          data-re-input
+          value={invitationCode}
+          disabled={true}
+        />
+        <CopyButton copyValue={invitationCode} />
+      </div>
+    </>
   );
 }

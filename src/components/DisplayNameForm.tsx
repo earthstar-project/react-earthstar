@@ -51,11 +51,7 @@ export default function DisplayNameForm({
           getAuthorShortName(currentAuthor?.address || '')
         }
       />
-      <button
-        data-re-display-name-button
-        data-re-button
-        type={'submit'}
-      >
+      <button data-re-display-name-button data-re-button type={'submit'}>
         {'Set display name'}
       </button>
     </form>

@@ -1,5 +1,25 @@
 /* ***** COMMON ***** */
 
+[data-re-input] {
+  margin: 0;
+}
+
+[data-re-button] {
+  margin: 0;
+}
+
+[data-re-earthbar-panel] h1 {
+  margin: 0;
+}
+
+[data-re-earthbar-panel] p {
+  margin: 0;
+}
+
+[data-re-earthbar-panel] dd {
+  margin: 0;
+}
+
 /* A grid layout for a single text input with label and button*/
 
 [data-re-pubeditor-add-form],
@@ -8,6 +28,7 @@
   display: grid;
   grid-template-areas: 'label label label label' 'input input input button';
   grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-column-gap: 6px;
 }
 
 /* ***** COMPONENTS ***** */
@@ -46,6 +67,7 @@
   display: grid;
   grid-template-areas: 'address-label secret-label .' 'address-input secret-input button';
   grid-template-columns: 1.5fr 1.5fr 1fr;
+  grid-column-gap: 6px;
 }
 
 [data-re-author-form-address-label] {
@@ -67,7 +89,6 @@
 [data-re-author-form-button] {
   grid-area: button;
 }
-
 
 /* AuthorKeypairUpload */
 
@@ -102,6 +123,7 @@
   display: grid;
   grid-template-areas: 'input input input button' 'pub-options pub-options pub-options pub-options';
   grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-column-gap: 6px;
 }
 
 [data-re-invitation-creator-input] {
@@ -168,24 +190,55 @@
 [data-re-pubeditor-list-item] {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
 }
 
 [data-re-pubeditor-newpub-label] {
   grid-area: label;
 }
 
-[data-re-pubeditor-newpub-input] {
+[data-re-pubeditor-newpub-combobox] {
   grid-area: input;
 }
 
-[data-re-pubeditor-newpub-input] input {
+[data-re-combobox-input] {
   width: 100%;
 }
 
 [data-re-pubeditor-add-button] {
   grid-area: button;
 }
+
+/* WorkspaceCreatorForm */
+
+[data-re-workspace-creator-form] {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-re-workspace-creator-initial-pubs-fieldset] {
+  display: grid; 
+  grid-template-areas: 'pubs pubs pubs pubs' 'pub-input pub-input pub-input pub-button';
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-column-gap: 6px;
+}
+
+[data-re-pubs-list] {
+  grid-area: pubs;
+}
+
+[data-re-workspace-creator-pub-input] {
+  grid-area: pub-input;
+}
+
+[data-re-workspace-creator-pub-add-button] {
+  grid-area: pub-button
+}
+
+[data-re-pubs-list] {
+  padding: 0;
+  margin: 0;
+}
+
 
 /* ***** EARTHBAR ***** */
 
@@ -223,14 +276,14 @@
 [data-re-earthbar-workspace-tab-zone] {
   display: flex;
   align-items: baseline;
+  flex-wrap: nowrap;
 }
 
 /* WorkspaceRow */
 
 [data-re-workspace-row] {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: baseline;
 }
 
 /* WorkspaceList*/

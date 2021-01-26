@@ -2,7 +2,7 @@ import React from 'react';
 import { useCurrentAuthor } from '../hooks';
 
 export default function SignOutButton(
-  props: React.HTMLAttributes<HTMLButtonElement>
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
 ) {
   const [currentAuthor, setCurrentAuthor] = useCurrentAuthor();
 

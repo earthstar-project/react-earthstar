@@ -1,33 +1,11 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
 import { WorkspaceOptions } from './WorkspaceOptions';
-import { InvitationRedemptionForm, SyncingCheckbox } from '..';
-import { useCurrentWorkspace } from '../..';
 
-export default function WorkspaceManager() {
-  const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
-
+export default function WorkspaceManagerPanel() {
   return (
     <EarthbarTabPanel data-re-workspace-manager-panel>
-      {currentWorkspace ? (
-        <>
-          <h2>{currentWorkspace}</h2>
-          <SyncingCheckbox />
-          <hr />
-          <WorkspaceOptions workspaceAddress={currentWorkspace} />
-        </>
-      ) : (
-        <>
-          <h2>{'Join a workspace'}</h2>
-          <InvitationRedemptionForm
-            onRedeem={workspace => {
-              setTimeout(() => {
-                setCurrentWorkspace(workspace);
-              });
-            }}
-          />
-        </>
-      )}
+      <WorkspaceOptions />
     </EarthbarTabPanel>
   );
 }

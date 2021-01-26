@@ -41,7 +41,6 @@ export default function NewKeypairForm({ onSuccess }: NewKeypairFormProps) {
       data-re-keypair-form
       onSubmit={e => {
         e.preventDefault();
-
         onCreate();
       }}
     >
@@ -50,7 +49,7 @@ export default function NewKeypairForm({ onSuccess }: NewKeypairFormProps) {
         data-re-label
         htmlFor={'short-name-input'}
       >
-        Short name
+        {'A short name, used as a permanent part of your address'}
       </label>
       <input
         data-re-keypair-form-shortname-input
@@ -60,12 +59,8 @@ export default function NewKeypairForm({ onSuccess }: NewKeypairFormProps) {
         value={shortName}
         onChange={e => setShortName(e.target.value)}
       />
-      <button
-        data-re-keypair-form-button
-        data-re-button
-        type={'submit'}
-      >
-        {'Create'}
+      <button data-re-keypair-form-button data-re-button type={'submit'}>
+        {'Create identity'}
       </button>
     </form>
   );

@@ -3,7 +3,7 @@ import { useCurrentAuthor } from '../hooks';
 import { useDownload } from '../util';
 
 export default function DownloadKeypairButton(
-  props: React.HTMLAttributes<HTMLButtonElement>
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
 ) {
   const [currentAuthor] = useCurrentAuthor();
 

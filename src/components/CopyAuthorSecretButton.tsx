@@ -1,20 +1,20 @@
 import React from 'react';
 import { useCurrentAuthor } from '../hooks';
+import CopyButton from './_CopyButton';
 
 export default function CopyAuthorSecretButton(
-  props: React.HTMLAttributes<HTMLButtonElement>
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
 ) {
   const [currentAuthor] = useCurrentAuthor();
 
   return (
-    <button
+    <CopyButton
       {...props}
       data-re-copy-author-secret-button
-      data-re-button
-      onClick={() => navigator.clipboard.writeText(currentAuthor?.secret || '')}
       disabled={currentAuthor === null}
+      copyValue={currentAuthor?.secret}
     >
       {'Copy author secret'}
-    </button>
+    </CopyButton>
   );
 }

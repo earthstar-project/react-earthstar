@@ -40,6 +40,7 @@ export default function AuthorKeypairForm() {
         type="text"
         value={address}
         onChange={e => setAddress(e.target.value)}
+        placeholder={'@name.xxxxxx'}
       />
       <label
         data-re-author-form-secret-label
@@ -56,12 +57,7 @@ export default function AuthorKeypairForm() {
         value={secret}
         onChange={e => setSecret(e.target.value)}
       />
-
-      <button
-        data-re-author-form-button
-        data-re-button
-        type={'submit'}
-      >
+      <button data-re-author-form-button data-re-button type={'submit'}>
         {'Sign in'}
       </button>
     </form>

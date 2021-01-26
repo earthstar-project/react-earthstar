@@ -64,7 +64,7 @@ export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
             }
           }}
         >
-          Upload keypair.json
+          {'Sign in with keypair.json'}
         </button>
       </label>
     </>

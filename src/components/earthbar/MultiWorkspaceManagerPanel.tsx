@@ -1,6 +1,11 @@
 import React from 'react';
 import { EarthbarTabPanel } from './Earthbar';
-import { WorkspaceLabel, SyncingCheckbox } from '..';
+import {
+  WorkspaceLabel,
+  SyncingCheckbox,
+  InvitationRedemptionForm,
+  WorkspaceCreatorForm,
+} from '..';
 import { useWorkspaces } from '../..';
 import { WorkspaceOptions } from './WorkspaceOptions';
 
@@ -34,11 +39,8 @@ function WorkspaceRow({
 }) {
   return (
     <li data-re-workspace-row>
-      <div>
-        <WorkspaceLabel
-          data-re-workspace-row-address
-          address={address}
-        />
+      <div data-re-workspace-item>
+        <WorkspaceLabel data-re-workspace-row-address address={address} />
       </div>
       <button
         data-re-multiworkspace-settings-button
@@ -61,17 +63,23 @@ function WorkspaceList({
   return (
     <div>
       <section>
-        <h2>{'Your workspaces'}</h2>
-        <SyncingCheckbox />
-        <ul data-re-workspace-list-workspaces>
-          {workspaces.map(address => (
-            <WorkspaceRow
-              key={address}
-              navToWorkspace={() => navToWorkspace(address)}
-              address={address}
-            />
-          ))}
-        </ul>
+        <h1>{'Your workspaces'}</h1>
+        {workspaces.length > 0 ? (
+          <>
+            <SyncingCheckbox />
+            <ul data-re-workspace-list-workspaces>
+              {workspaces.map(address => (
+                <WorkspaceRow
+                  key={address}
+                  navToWorkspace={() => navToWorkspace(address)}
+                  address={address}
+                />
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p>{'You have no workspaces. Add one.'}</p>
+        )}
       </section>
     </div>
   );
@@ -85,25 +93,43 @@ export default function MultiWorkspaceManagerPanel() {
   return (
     <EarthbarTabPanel>
       {state.screen === 'list' ? (
-        <WorkspaceList
-          navToWorkspace={address =>
-            dispatch({ type: 'nav-workspace', address })
-          }
-        />
-      ) : (
-        <div>
-          <nav data-re-workpace-options-header>
-            <button
-              data-re-button
-              onClick={() => dispatch({ type: 'nav-list' })}
-            >
-              {'← Back'}
-            </button>
-            {state.address}
-          </nav>
+        <>
+          <WorkspaceList
+            navToWorkspace={address =>
+              dispatch({ type: 'nav-workspace', address })
+            }
+          />
           <hr />
-          <WorkspaceOptions workspaceAddress={state.address} />
-        </div>
+          <section>
+            <h1>{'Join a workspace'}</h1>
+            <InvitationRedemptionForm />
+          </section>
+          <hr />
+          <section>
+            <h1>{'Make a workspace'}</h1>
+            <WorkspaceCreatorForm />
+          </section>
+        </>
+      ) : (
+        <>
+          <section>
+            <nav data-re-workpace-options-header>
+              <button
+                data-re-button
+                data-re-back-button
+                onClick={() => dispatch({ type: 'nav-list' })}
+              >
+                {'Return to all workspaces'}
+              </button>
+              {state.address}
+            </nav>
+          </section>
+          <hr />
+          <WorkspaceOptions
+            workspaceAddress={state.address}
+            onRemove={() => dispatch({ type: 'nav-list' })}
+          />
+        </>
       )}
     </EarthbarTabPanel>
   );

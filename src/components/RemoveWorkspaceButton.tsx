@@ -16,7 +16,7 @@ export default function RemoveWorkspaceButton({
       data-re-remove-workspace-button
       data-re-button
       {...props}
-      onClick={() => {
+      onClick={event => {
         if (!address) {
           return;
         }
@@ -24,6 +24,10 @@ export default function RemoveWorkspaceButton({
         const isSure = window.confirm(
           `Are you sure you want to remove ${address} from your workspaces?`
         );
+
+        if (isSure && props.onClick) {
+          props.onClick(event);
+        }
 
         if (isSure) {
           remove(address);

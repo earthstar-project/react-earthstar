@@ -56,11 +56,7 @@ export default function AddWorkspaceForm() {
         type="url"
         onChange={e => setInitialPub(e.target.value)}
       />
-      <button
-        data-re-add-workspace-button
-        data-re-button
-        type="submit"
-      >
+      <button data-re-add-workspace-button data-re-button type="submit">
         {'Add workspace'}
       </button>
     </form>

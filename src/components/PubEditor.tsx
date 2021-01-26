@@ -42,14 +42,16 @@ export default function PubEditor({
           {pubs.map(pubUrl => {
             return (
               <li data-re-pubeditor-list-item key={`${pubUrl}`}>
-                <a href={pubUrl}>{pubUrl}</a>
-                <button
-                  data-re-pubeditor-list-item-delete-button
-                  data-re-button
-                  onClick={() => removePub(pubUrl)}
-                >
-                  {'Remove pub'}
-                </button>
+                <span data-re-pub-item>
+                  {pubUrl}
+                  <button
+                    data-re-button
+                    data-re-pub-item-remove-button
+                    onClick={() => removePub(pubUrl)}
+                  >
+                    {'✕'}
+                  </button>
+                </span>
               </li>
             );
           })}
@@ -69,15 +71,16 @@ export default function PubEditor({
           data-re-label
           htmlFor={'pub-to-add'}
         >
-          {'Pub URL'}
+          {'Pub server URL'}
         </label>
         <Combobox
+          data-re-combobox
+          data-re-pubeditor-newpub-combobox
           openOnFocus
           onSelect={item => addPub(item)}
-          data-re-pubeditor-newpub-input
-          data-re-input
         >
           <ComboboxInput
+            data-re-combobox-input
             selectOnClick
             value={pubToAdd}
             onChange={e => setPubToAdd(e.target.value)}
@@ -87,22 +90,18 @@ export default function PubEditor({
               <ComboboxList>
                 {selectablePubs.map(pubUrl => (
                   <ComboboxOption
-                    data-re-option
+                    data-re-combobox-option
                     key={pubUrl}
                     value={pubUrl}
                   >
-                    {pubUrl}
+                    <span data-re-pub-item>{pubUrl}</span>
                   </ComboboxOption>
                 ))}
               </ComboboxList>
             </ComboboxPopover>
           ) : null}
         </Combobox>
-        <button
-          data-re-pubeditor-add-button
-          data-re-button
-          type={'submit'}
-        >
+        <button data-re-pubeditor-add-button data-re-button type={'submit'}>
           {'Add pub'}
         </button>
       </form>
