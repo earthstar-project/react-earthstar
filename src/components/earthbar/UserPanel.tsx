@@ -57,7 +57,7 @@ export default function UserPanel() {
             </p>
             <p>
               {
-                'We recomment storing your author address and secret, or keypair.json, in a password manager.'
+                'We recommend storing your author address and secret, or keypair.json, in a password manager.'
               }
             </p>
           </div>

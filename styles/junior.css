@@ -134,9 +134,8 @@
   background-repeat: no-repeat, repeat;
   background-position: right 6px top 50%, 0 0;
   background-size: 0.65em auto, 100%;
-  box-shadow: var(--sh)
+  box-shadow: var(--sh);
 }
-
 
 [data-re-button] {
   font-family: var(--t1);
@@ -188,7 +187,8 @@
 }
 
 [data-re-label],
-[data-re-legend], [data-re-dt] {
+[data-re-legend],
+[data-re-dt] {
   color: var(--gr3);
   margin: 0 0 2px 0;
 }
@@ -203,9 +203,13 @@
 
 [data-re-fieldset] {
   border: 0px solid var(--gr5);
-  padding: 8px;
+  padding: 0;
   margin: 0 0 1em 0;
   border-radius: 6px;
+}
+
+[data-re-legend] {
+  margin: 0 0 0.5em 0;
 }
 
 [data-re-details] {
@@ -215,7 +219,7 @@
 
 [data-re-summary] {
   color: var(--gr2);
-  /* display: inline-block; */   /* hide the triangle */
+  /* display: inline-block; */ /* hide the triangle */
   padding: 2px;
   position: relative;
   /* border-bottom: 1px solid var(--gr5); */
@@ -274,17 +278,17 @@
   border-radius: 50%;
   padding: 0 2px;
   width: 1.4em;
-  height: 1.4em
+  height: 1.4em;
 }
 
 [data-re-regenerate-suffix-button]:hover {
-  background: var(--gr4);  
+  background: var(--gr4);
 }
 
 [data-re-regenerate-suffix-button]:active {
   position: relative;
   top: 1px;
-  left: 1px; 
+  left: 1px;
 }
 
 [data-re-pub-item] {
@@ -312,7 +316,8 @@
   display: inline-block;
 }
 
-[data-re-multiworkspace-settings-button], [data-re-back-button] {
+[data-re-multiworkspace-settings-button],
+[data-re-back-button] {
   color: var(--gr3);
   background: none;
   border: none;
@@ -321,13 +326,18 @@
   text-decoration-thickness: 2px;
 }
 
+[data-re-multiworkspace-settings-button]:hover,
+[data-re-back-button]:hover {
+  border: none;
+}
+
 [data-re-pub-item-remove-button] {
   color: var(--gr6);
   background: none;
   border: none;
   box-shadow: none;
   padding: 0;
-  margin-left: 0.5em
+  margin-left: 0.5em;
 }
 
 [data-re-pub-item-remove-button]:hover {
@@ -346,7 +356,7 @@
 [data-re-invitation-creator-pub-options] {
   margin: 1em 0 0 0;
 }
- 
+
 [data-re-dd] {
   margin: 0;
 }
@@ -364,18 +374,19 @@
   background-color: black;
 }
 
-
 [data-re-workspace-row] {
-  margin: 0 0 0.5em 0
+  margin: 0 0 0.5em 0;
 }
 
-[data-re-pubs-list-item], [data-re-pubeditor-list-item], [data-re-invitation-redemption-pub-list-item] {
+[data-re-pubs-list-item],
+[data-re-pubeditor-list-item],
+[data-re-invitation-redemption-pub-list-item] {
   display: inline-block;
   margin: 0 0.5em 0.5em 0;
 }
 
 [data-re-invitation-description] dd:first-of-type {
-  margin-bottom: 0.5em
+  margin-bottom: 0.5em;
 }
 
 [data-re-invitation-description] {
