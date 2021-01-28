@@ -1,21 +1,28 @@
 :root {
-  --gr6: #fffce7;
-  --gr5: #d1cabd;
-  --gr4: #a79c97;
-  --gr3: #837676;
-  --gr2: #64555a;
-  --gr1: #45333e;
+  --gr6: #f4eed4;
+  --gr5: #c8bfae;
+  --gr4: #a0948b;
+  --gr3: #7e706e;
+  --gr2: #615155;
+  --gr1: #44313b;
   --gr0: #220d1e;
-  --ac4: #6baa9f;
+  --ac4: #68a699;
   --ac3: #29857e;
   --ac2: #276060;
+
   --t1: 'Gill Sans', sans-serif;
   --sh: 1px 1px 0 1px rgba(0, 0, 0, 0.04);
   --sh2: 2px 2px 0 0 var(--gr5);
+  --sh3: 2px 2px 0 0 var(--gr4);
 }
 
 [data-re-earthbar] {
   font-family: var(--t1);
+}
+
+[data-re-earthbar-panel] code {
+  color: var(--ac2);
+  font-weight: bold;
 }
 
 [data-re-earthbar-tabs] {
@@ -101,7 +108,6 @@
   font-size: 1.5em;
   margin: 0 0 0.5em 0;
   color: var(--gr0);
-  text-decoration: underline;
   text-decoration-thickness: 2px;
   text-decoration-color: var(--gr4);
 }
@@ -135,6 +141,7 @@
 [data-re-button] {
   font-family: var(--t1);
   font-size: 1em;
+  font-weight: 600;
   border: 2px solid var(--gr3);
   padding: 6px;
   color: var(--gr0);
@@ -145,8 +152,8 @@
 }
 
 [data-re-button]:hover {
-  color: var(--gr0);
-  background: var(--gr6);
+  color: var(--ac2);
+  border: 2px solid var(--ac2);
 }
 
 [data-re-button]:active {
@@ -195,7 +202,7 @@
 }
 
 [data-re-fieldset] {
-  border: 1px solid var(--gr5);
+  border: 0px solid var(--gr5);
   padding: 8px;
   margin: 0 0 1em 0;
   border-radius: 6px;
@@ -208,15 +215,15 @@
 
 [data-re-summary] {
   color: var(--gr2);
-  display: inline-block;
+  /* display: inline-block; */   /* hide the triangle */
   padding: 2px;
   position: relative;
-  border-bottom: 1px solid var(--gr5);
+  /* border-bottom: 1px solid var(--gr5); */
 }
 
 [data-re-summary]:hover {
-  color: var(--ac2);
-  border-color: var(--ac4);
+  color: var(--ac3);
+  /* border-color: var(--ac4); */
 }
 
 [data-re-details-content] {
@@ -247,13 +254,19 @@
 }
 
 [data-re-workspace-name-input] {
+  margin-left: 6px;
   color: var(--gr6);
   background: var(--gr1);
   border: none;
+  width: 20ch;
+}
+
+[data-re-workspace-separator-dot] {
+  margin-left: 6px;
 }
 
 [data-re-regenerate-suffix-button] {
-  margin-left: 4px;
+  margin-left: 6px;
   color: var(--gr6);
   background: var(--gr3);
   border: 1px solid var(--gr4);
@@ -341,6 +354,16 @@
 [data-re-user-panel-save-identity-section] button {
   margin-right: 6px;
 }
+
+[data-re-user-panel-secret] code {
+  color: var(--gr4) !important;
+  background-color: var(--gr4) !important;
+}
+[data-re-user-panel-secret] code::selection {
+  color: white;
+  background-color: black;
+}
+
 
 [data-re-workspace-row] {
   margin: 0 0 0.5em 0

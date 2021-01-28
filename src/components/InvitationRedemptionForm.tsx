@@ -169,9 +169,8 @@ export default function InvitationRedemptionForm({
         </summary>
         <div data-re-details-content>
           <p>
-            {
-              "If you'd like to join a workspace, ask an existing member to generate an invitation code for you."
-            }
+            Ask an existing member to make an invitation code from the workspace
+            settings page.
           </p>
         </div>
       </details>

@@ -19,7 +19,7 @@ function randomFromString(str: string) {
 
 function generateSuffix() {
   const firstLetter = randomFromString(LETTERS);
-  const rest = Array.from(Array(10), () =>
+  const rest = Array.from(Array(11), () =>
     randomFromString(LETTERS + NUMBERS)
   ).join('');
 
@@ -107,7 +107,7 @@ export default function WorkspaceCreatorForm({
           data-re-fieldset
           data-re-workspace-creator-initial-pubs-fieldset
         >
-          <legend data-re-legend>{'Initial pub servers to sync with'}</legend>
+          <legend data-re-legend>{'Pub servers to sync with'}</legend>
           {addedPubs.length > 0 ? (
             <ul data-re-pubs-list>
               {addedPubs.map(pubUrl => (
@@ -186,9 +186,58 @@ export default function WorkspaceCreatorForm({
         <summary data-re-summary>{'What will this form do?'}</summary>
         <div data-re-details-content>
           <p>
-            {
-              'A local copy of the workspace will be created, and its documents synced with any of the pub servers given above.'
-            }
+            A new workspace will be made on your device, and it will be synced
+            with the pub servers given above. If you don't add any pub servers,
+            your data will only exist on your own device. You can add pub
+            servers later.
+          </p>
+        </div>
+      </details>
+      <details data-re-details>
+        <summary data-re-summary>{'What are pub servers?'}</summary>
+        <div data-re-details-content>
+          <p>
+            Pub servers run in the cloud and hold a copy of the workspace data.
+            They help keep the data online so it can sync even when some
+            people's devices are turned off.
+          </p>
+          <p>
+            One workspace can use several pub servers; each will hold a complete
+            redundant copy of the data. You can add more pubs whenever you like.
+          </p>
+        </div>
+      </details>
+      <details data-re-details>
+        <summary data-re-summary>{'Where do I find pub servers?'}</summary>
+        <div data-re-details-content>
+          <p>
+            Ask your friends, or run your own using{' '}
+            <a href="https://github.com/earthstar-project/earthstar-pub#running-on-glitch">
+              these instructions.
+            </a>
+          </p>
+          <p>
+            Pub servers can see your data, so it's best to use ones run by
+            people you know and trust.
+          </p>
+        </div>
+      </details>
+      <details data-re-details>
+        <summary data-re-summary>
+          {'Who will be able to join my workspace?'}
+        </summary>
+        <div data-re-details-content>
+          <p>
+            Anyone who knows a workspace address, and at least one of its pubs,
+            can join it. They will be able to read and write data.
+          </p>
+          <p>
+            After creating your workspace, you can get an invitation code to
+            send to your friends from the workspace settings page.
+          </p>
+          <p>
+            Your workspace can also be joined by whoever is running the pubs it
+            syncs with.
           </p>
         </div>
       </details>

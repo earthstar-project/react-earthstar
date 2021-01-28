@@ -78,7 +78,18 @@ function WorkspaceList({
             </ul>
           </>
         ) : (
-          <p>{'You have no workspaces. Add one.'}</p>
+          <>
+            <p>You have no workspaces saved to this device.</p>
+            <p>
+              If you have used Earthstar on another device, you will need to add
+              your workspaces again to this device. The easiest way is to send
+              yourself invitation codes.
+            </p>
+            <p>
+              It's OK to use the same workspaces and author identity on multiple
+              devices at the same time.
+            </p>
+          </>
         )}
       </section>
     </div>

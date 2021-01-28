@@ -20,6 +20,12 @@
   margin: 0;
 }
 
+[data-re-earthbar-panel] code {
+  font-size: 1.2em;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 /* A grid layout for a single text input with label and button*/
 
 [data-re-pubeditor-add-form],
@@ -240,6 +246,22 @@
 }
 
 
+/* UserPanel */
+
+[data-re-user-panel-address],
+[data-re-user-panel-secret] {
+  padding-left: 10px;
+}
+
+[data-re-user-panel-secret] code {
+  color: #888 !important;
+  background-color: #888 !important;
+}
+[data-re-user-panel-secret] code::selection {
+  color: white;
+  background-color: black;
+}
+
 /* ***** EARTHBAR ***** */
 
 /* Earthbar */
@@ -286,7 +308,7 @@
   align-items: baseline;
 }
 
-/* WorkspaceList*/
+/* WorkspaceList */
 
 [data-re-workspace-list-workspaces] {
   padding: 0;
