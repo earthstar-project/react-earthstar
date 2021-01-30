@@ -9,14 +9,14 @@ export default function SyncingCheckbox() {
       <input
         type={'checkbox'}
         checked={isLive}
-        data-react-earthstar-is-live-checkbox
+        data-re-is-live-checkbox
         id={'react-earthstar-is-live-checkbox'}
         onChange={() => {
           setIsLive(prev => !prev);
         }}
       />
       <label
-        data-react-earthstar-is-live-checkbox-label
+        data-re-is-live-checkbox-label
         htmlFor={'react-earthstar-is-live-checkbox'}
       >
         {'Syncing'}

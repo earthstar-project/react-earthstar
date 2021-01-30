@@ -1,22 +1,20 @@
 import React from 'react';
 import { useCurrentAuthor } from '../hooks';
+import CopyButton from './_CopyButton';
 
 export default function CopyAuthorAddressButton(
-  props: React.HTMLAttributes<HTMLButtonElement>
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
 ) {
   const [currentAuthor] = useCurrentAuthor();
 
   return (
-    <button
+    <CopyButton
       {...props}
-      data-react-earthstar-copy-author-address-button
-      data-react-earthstar-button
-      onClick={() =>
-        navigator.clipboard.writeText(currentAuthor?.address || '')
-      }
+      data-re-copy-author-address-button
       disabled={currentAuthor === null}
+      copyValue={currentAuthor?.address}
     >
       {'Copy author address'}
-    </button>
+    </CopyButton>
   );
 }

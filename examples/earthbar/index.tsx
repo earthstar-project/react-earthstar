@@ -1,6 +1,11 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { StorageMemory, ValidatorEs4 } from 'earthstar';
+import {
+  StorageMemory,
+  ValidatorEs4,
+  generateAuthorKeypair,
+  AuthorKeypair,
+} from 'earthstar';
 import {
   EarthstarPeer,
   Earthbar,
@@ -9,10 +14,13 @@ import {
   MultiWorkspaceTab,
 } from '../../src/index';
 import '../../styles/layout.css';
+import '../../styles/junior.css';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
 const EXAMPLE_WORKSPACE_ADDR3 = '+sailing.a123';
+
+const EXAMPLE_USER = generateAuthorKeypair('test') as AuthorKeypair;
 
 const pubs = {
   [EXAMPLE_WORKSPACE_ADDR1]: [
@@ -93,6 +101,36 @@ function Examples() {
           <AuthorTab />
         </EarthbarExample>
       </EarthstarPeer>
+      <hr />
+      <EarthstarPeer
+        initWorkspaces={[
+          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR1),
+          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR2),
+          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
+        ]}
+        initPubs={pubs}
+        initIsLive={false}
+        initCurrentAuthor={EXAMPLE_USER}
+      >
+        <EarthbarExample
+          title={'Default Earthbar (signed in)'}
+        ></EarthbarExample>
+
+        <EarthbarExample
+          title={'Earthbar for all-workspaces-at-once app (signed in)'}
+        >
+          <MultiWorkspaceTab />
+          <Spacer />
+          <AuthorTab />
+        </EarthbarExample>
+      </EarthstarPeer>
+      <hr />
+      <EarthbarExample title={'No workspaces'} />
+      <EarthbarExample title={'Multi, no workspaces'}>
+        <MultiWorkspaceTab />
+        <Spacer />
+        <AuthorTab />
+      </EarthbarExample>
     </>
   );
 }

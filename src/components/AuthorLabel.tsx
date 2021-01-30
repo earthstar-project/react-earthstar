@@ -8,7 +8,7 @@ export default function AuthorLabel({
   return (
     <span
       {...props}
-      data-react-earthstar-author-label
+      data-re-author-label
       title={address}
     >{`@${getAuthorShortName(address)}`}</span>
   );

@@ -1,33 +1,52 @@
 import React from 'react';
-import { PubEditor, RemoveWorkspaceButton, InvitationCreatorForm } from '..';
+import {
+  PubEditor,
+  RemoveWorkspaceButton,
+  InvitationCreatorForm,
+  SyncingCheckbox,
+} from '..';
 
 export function WorkspaceOptions({
   workspaceAddress,
+  onRemove,
 }: {
   workspaceAddress?: string;
+  onRemove?: () => void;
 }) {
   return (
-    <div data-react-earthstar-earthbar-workspace-options>
-      <details data-react-earthstar-details>
-        <summary data-react-earthstar-summary>{'Pubs'}</summary>
-        <p>{'Control where this workspace syncs its data to and from.'}</p>
+    <div data-re-earthbar-workspace-options>
+      <section data-re-section>
+        <SyncingCheckbox />
+      </section>
+      <hr />
+      <section data-re-section>
+        <h1>{'Pub Servers'}</h1>
+        <p>{'Servers that help this workspace sync its data.'}</p>
         <PubEditor workspaceAddress={workspaceAddress} />
-      </details>
+      </section>
       <hr />
-      <details data-react-earthstar-details>
-        <summary data-react-earthstar-summary>{'Invite others'}</summary>
-        <InvitationCreatorForm workspaceAddress={workspaceAddress} />
-      </details>
-      <hr />
-      <details data-react-earthstar-details>
-        <summary data-react-earthstar-summary>{'Danger Zone'}</summary>
+      <section data-re-section>
+        <h1>{'Invite People'}</h1>
         <p>
-          {
-            'Your local copy of the workspace will be removed, but will remain with other pubs and peers it has been synced to.'
-          }
+          {'Send this code to your friends so they can join the workspace.'}
         </p>
-        <RemoveWorkspaceButton />
-      </details>
+        <InvitationCreatorForm workspaceAddress={workspaceAddress} />
+      </section>
+      <hr />
+      <section data-re-section>
+        <h1>{'Danger Zone'}</h1>
+        <p>
+          You can remove your copy of the workspace from this device, but it
+          will remain with pubs and other users it has synced with.
+        </p>
+        <p>
+          It's not possible to globally delete a workspace, but you can delete
+          your own data out of a workspace if the app allows it. If you do that,
+          make sure to give your deletions time to sync with the pubs before you
+          remove the entire workspace.
+        </p>
+        <RemoveWorkspaceButton onClick={onRemove} />
+      </section>
     </div>
   );
 }

@@ -19,7 +19,7 @@ function randomFromString(str: string) {
 
 function generateSuffix() {
   const firstLetter = randomFromString(LETTERS);
-  const rest = Array.from(Array(10), () =>
+  const rest = Array.from(Array(11), () =>
     randomFromString(LETTERS + NUMBERS)
   ).join('');
 
@@ -47,105 +47,200 @@ export default function WorkspaceCreatorForm({
   const [pubToAdd, setPubToAdd] = React.useState('');
 
   return (
-    <form
-      id={'react-earthstar-address-form'}
-      onSubmit={e => {
-        e.preventDefault();
+    <>
+      <form
+        data-re-workspace-creator-form
+        id={'react-earthstar-address-form'}
+        onSubmit={e => {
+          e.preventDefault();
 
-        add(address);
-        setWorkspaceName('');
-        setWorkspaceSuffix(generateSuffix());
+          add(address);
+          setWorkspaceName('');
+          setWorkspaceSuffix(generateSuffix());
 
-        setPubs(prev => ({
-          ...prev,
-          [address]: addedPubs,
-        }));
+          setPubs(prev => ({
+            ...prev,
+            [address]: addedPubs,
+          }));
 
-        setAddedPubs([]);
+          setAddedPubs([]);
 
-        if (onCreate) {
-          onCreate(address);
-        }
-      }}
-    >
-      <fieldset data-react-earthstar-fieldset>
-        <legend data-react-earthstar-legend>{'Address'}</legend>
-        <span data-react-earthstar-workspace-sigil>{'+'}</span>
-        <input
-          data-react-earthstar-input
-          data-react-earthstar-workspace-name-input
-          value={workspaceName}
-          onChange={e => setWorkspaceName(e.target.value)}
-          placeholder={'myworkspace'}
-        />
-        <span data-react-earthstar-workspace-separator-dot>{'.'}</span>
-        <input
-          data-react-earthstar-input
-          data-react-earthstar-workspace-suffix-input
-          value={workspaceSuffix}
-          onChange={e => setWorkspaceSuffix(e.target.value)}
-        />
-        {isErr(validResult) && workspaceName.length > 0 ? (
-          <Alert data-react-earthstar->{validResult.message}</Alert>
-        ) : null}
-      </fieldset>
-
-      <fieldset data-react-earthstar-fieldset>
-        <legend data-react-earthstar-legend>{'Initial Pubs'}</legend>
-        {addedPubs.map(pubUrl => (
-          <li key={pubUrl}>
-            <a href={pubUrl}>{pubUrl}</a>
+          if (onCreate) {
+            onCreate(address);
+          }
+        }}
+      >
+        <fieldset data-re-fieldset>
+          <legend data-re-legend>
+            {
+              'Workspace address with identifiable name and hard-to-guess suffix'
+            }
+          </legend>
+          <span data-re-workspace-address-fields>
+            <span data-re-workspace-sigil>{'+'}</span>
+            <input
+              data-re-input
+              data-re-workspace-name-input
+              value={workspaceName}
+              onChange={e => setWorkspaceName(e.target.value)}
+              placeholder={'myworkspace'}
+            />
+            <span data-re-workspace-separator-dot>{'.'}</span>
+            <span data-re-workspace-suffix>{workspaceSuffix}</span>
             <button
-              react-earthstar-button
-              onClick={() => {
-                setAddedPubs(prev => prev.filter(url => url !== pubUrl));
+              data-re-regenerate-suffix-button
+              onClick={e => {
+                e.preventDefault();
+                setWorkspaceSuffix(generateSuffix());
               }}
             >
-              {'Remove'}
+              {'↻'}
             </button>
-          </li>
-        ))}
-        <Combobox
-          data-react-earthstar-combobox
-          openOnFocus
-          onSelect={item => setAddedPubs(prev => [...prev, item])}
-        >
-          <ComboboxInput
-            data-react-earthstar-combobox-input
-            selectOnClick
-            value={pubToAdd}
-            onChange={e => setPubToAdd(e.target.value)}
-          />
-          {selectablePubs.length > 0 ? (
-            <ComboboxPopover data-react-earthstar-combobox-popover>
-              <ComboboxList data-react-earthstar-combobox-list>
-                {selectablePubs.map(pubUrl => (
-                  <ComboboxOption
-                    data-react-earthstar-combobox-option
-                    key={pubUrl}
-                    value={pubUrl}
-                  >
-                    {pubUrl}
-                  </ComboboxOption>
-                ))}
-              </ComboboxList>
-            </ComboboxPopover>
+          </span>
+
+          {isErr(validResult) && workspaceName.length > 0 ? (
+            <Alert data-re->{validResult.message}</Alert>
           ) : null}
+        </fieldset>
+
+        <fieldset
+          data-re-fieldset
+          data-re-workspace-creator-initial-pubs-fieldset
+        >
+          <legend data-re-legend>{'Pub servers to sync with'}</legend>
+          {addedPubs.length > 0 ? (
+            <ul data-re-pubs-list>
+              {addedPubs.map(pubUrl => (
+                <li data-re-pubs-list-item key={pubUrl}>
+                  <span data-re-pub-item>
+                    {pubUrl}
+                    <button
+                      data-re-button
+                      data-re-pub-item-remove-button
+                      onClick={() => {
+                        setAddedPubs(prev =>
+                          prev.filter(url => url !== pubUrl)
+                        );
+                      }}
+                    >
+                      {'✕'}
+                    </button>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <Combobox
+            data-re-combobox
+            data-re-workspace-creator-pub-input
+            openOnFocus
+            onSelect={item => setAddedPubs(prev => [...prev, item])}
+          >
+            <ComboboxInput
+              data-re-combobox-input
+              selectOnClick
+              value={pubToAdd}
+              onChange={e => setPubToAdd(e.target.value)}
+              placeholder={'https://my.pub'}
+            />
+            {selectablePubs.length > 0 ? (
+              <ComboboxPopover data-re-combobox-popover>
+                <ComboboxList data-re-combobox-list>
+                  {selectablePubs.map(pubUrl => (
+                    <ComboboxOption
+                      data-re-combobox-option
+                      key={pubUrl}
+                      value={pubUrl}
+                    >
+                      <span data-re-pub-item>{pubUrl}</span>
+                    </ComboboxOption>
+                  ))}
+                </ComboboxList>
+              </ComboboxPopover>
+            ) : null}
+          </Combobox>
           <button
-            data-react-earthstar-button
+            data-re-button
+            data-re-workspace-creator-pub-add-button
             onClick={e => {
               e.preventDefault();
               setPubToAdd('');
               setAddedPubs(prev => [...prev, pubToAdd]);
             }}
           >
-            {'Add'}
+            {'Add pub'}
           </button>
-        </Combobox>
-      </fieldset>
-      <button react-earthstar-button disabled={!isValid} type={'submit'}>
-        {!isValid ? 'Add workspace' : `Add ${address}`}
-      </button>
-    </form>
+        </fieldset>
+        {isValid ? (
+          <button
+            data-re-button
+            data-re-workspace-creator-submit
+            disabled={!isValid}
+            type={'submit'}
+          >
+            {`Create ${address}`}
+          </button>
+        ) : null}
+      </form>
+      <details data-re-details>
+        <summary data-re-summary>{'What will this form do?'}</summary>
+        <div data-re-details-content>
+          <p>
+            A new workspace will be made on your device, and it will be synced
+            with the pub servers given above. If you don't add any pub servers,
+            your data will only exist on your own device. You can add pub
+            servers later.
+          </p>
+        </div>
+      </details>
+      <details data-re-details>
+        <summary data-re-summary>{'What are pub servers?'}</summary>
+        <div data-re-details-content>
+          <p>
+            Pub servers run in the cloud and hold a copy of the workspace data.
+            They help keep the data online so it can sync even when some
+            people's devices are turned off.
+          </p>
+          <p>
+            One workspace can use several pub servers; each will hold a complete
+            redundant copy of the data. You can add more pubs whenever you like.
+          </p>
+        </div>
+      </details>
+      <details data-re-details>
+        <summary data-re-summary>{'Where do I find pub servers?'}</summary>
+        <div data-re-details-content>
+          <p>
+            Ask your friends, or run your own using{' '}
+            <a href="https://github.com/earthstar-project/earthstar-pub#running-on-glitch">
+              these instructions.
+            </a>
+          </p>
+          <p>
+            Pub servers can see your data, so it's best to use ones run by
+            people you know and trust.
+          </p>
+        </div>
+      </details>
+      <details data-re-details>
+        <summary data-re-summary>
+          {'Who will be able to join my workspace?'}
+        </summary>
+        <div data-re-details-content>
+          <p>
+            Anyone who knows a workspace address, and at least one of its pubs,
+            can join it. They will be able to read and write data.
+          </p>
+          <p>
+            After creating your workspace, you can get an invitation code to
+            send to your friends from the workspace settings page.
+          </p>
+          <p>
+            Your workspace can also be joined by whoever is running the pubs it
+            syncs with.
+          </p>
+        </div>
+      </details>
+    </>
   );
 }

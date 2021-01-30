@@ -10,7 +10,7 @@ export default function AuthorTab() {
 
   return (
     <EarthbarTab>
-      <EarthbarTabLabel data-react-earthstar-earthbar-author-tab>
+      <EarthbarTabLabel data-re-earthbar-author-tab>
         {currentAuthor ? (
           <AuthorLabel address={currentAuthor.address} />
         ) : (

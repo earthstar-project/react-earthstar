@@ -19,7 +19,7 @@ export default function WorkspaceLabel({
   return (
     <span
       {...props}
-      data-react-earthstar-workspace-label
+      data-re-workspace-label
       title={address}
     >{`+${getWorkspaceName(address)}`}</span>
   );

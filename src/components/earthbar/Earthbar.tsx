@@ -68,7 +68,7 @@ export function Earthbar({
   const [panelRef, setPanelRef] = React.useState<HTMLDivElement | undefined>();
 
   return (
-    <div data-react-earthstar-earthbar>
+    <div data-re-earthbar>
       <DescendantProvider
         context={TabButtonDescendantContext}
         items={tabs}
@@ -90,7 +90,7 @@ export function Earthbar({
           >
             <EarthbarTabs>{children}</EarthbarTabs>
             <div
-              data-react-earthstar-earthbar-panel
+              data-re-earthbar-panel-portal
               ref={inst => {
                 if (inst) {
                   setPanelRef(inst);
@@ -125,7 +125,7 @@ function EarthbarTabs({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      data-react-earthstar-earthbar-tabs
+      data-re-earthbar-tabs
       role={'tablist'}
       aria-orientation={'horizontal'}
       onKeyDown={event => {
@@ -216,7 +216,7 @@ export function EarthbarTabLabel({
       aria-selected={isSelected}
       aria-controls={`panel-${id}`}
       id={`tab-${id}`}
-      data-react-earthstar-earthbar-tab-label
+      data-re-earthbar-tab-label
       data-selected={isSelected}
       onClick={() => {
         setActiveIndex(prevIndex => (prevIndex === index ? -1 : index));
@@ -254,7 +254,7 @@ export function EarthbarTabPanel({
         ? ReactDOM.createPortal(
             activeIndex === index ? (
               <div
-                data-react-earthstar-earthbar-panel
+                data-re-earthbar-panel
                 aria-labelledby={`tab-${id}`}
                 id={`panel-${id}`}
                 role={'tabpanel'}
@@ -276,5 +276,5 @@ export function EarthbarTabPanel({
 }
 
 export function Spacer() {
-  return <div data-react-earthstar-earthbar-spacer />;
+  return <div data-re-earthbar-spacer />;
 }

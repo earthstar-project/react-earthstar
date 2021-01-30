@@ -38,25 +38,27 @@ export default function PubEditor({
   return (
     <>
       {pubs.length > 0 ? (
-        <ul data-react-earthstar-pubeditor-list>
+        <ul data-re-pubeditor-list>
           {pubs.map(pubUrl => {
             return (
-              <li data-react-earthstar-pubeditor-list-item key={`${pubUrl}`}>
-                <a href={pubUrl}>{pubUrl}</a>
-                <button
-                  data-react-earthstar-pubeditor-list-item-delete-button
-                  data-react-earthstar-button
-                  onClick={() => removePub(pubUrl)}
-                >
-                  {'Remove pub'}
-                </button>
+              <li data-re-pubeditor-list-item key={`${pubUrl}`}>
+                <span data-re-pub-item>
+                  {pubUrl}
+                  <button
+                    data-re-button
+                    data-re-pub-item-remove-button
+                    onClick={() => removePub(pubUrl)}
+                  >
+                    {'✕'}
+                  </button>
+                </span>
               </li>
             );
           })}
         </ul>
       ) : null}
       <form
-        data-react-earthstar-pubeditor-add-form
+        data-re-pubeditor-add-form
         onSubmit={e => {
           e.preventDefault();
           if (pubToAdd.length > 0) {
@@ -65,19 +67,20 @@ export default function PubEditor({
         }}
       >
         <label
-          data-react-earthstar-pubeditor-newpub-label
-          data-react-earthstar-label
+          data-re-pubeditor-newpub-label
+          data-re-label
           htmlFor={'pub-to-add'}
         >
-          {'Pub URL'}
+          {'Pub server URL'}
         </label>
         <Combobox
+          data-re-combobox
+          data-re-pubeditor-newpub-combobox
           openOnFocus
           onSelect={item => addPub(item)}
-          data-react-earthstar-pubeditor-newpub-input
-          data-react-earthstar-input
         >
           <ComboboxInput
+            data-re-combobox-input
             selectOnClick
             value={pubToAdd}
             onChange={e => setPubToAdd(e.target.value)}
@@ -87,22 +90,18 @@ export default function PubEditor({
               <ComboboxList>
                 {selectablePubs.map(pubUrl => (
                   <ComboboxOption
-                    data-react-earthstar-option
+                    data-re-combobox-option
                     key={pubUrl}
                     value={pubUrl}
                   >
-                    {pubUrl}
+                    <span data-re-pub-item>{pubUrl}</span>
                   </ComboboxOption>
                 ))}
               </ComboboxList>
             </ComboboxPopover>
           ) : null}
         </Combobox>
-        <button
-          data-react-earthstar-pubeditor-add-button
-          data-react-earthstar-button
-          type={'submit'}
-        >
+        <button data-re-pubeditor-add-button data-re-button type={'submit'}>
           {'Add pub'}
         </button>
       </form>
