@@ -28,7 +28,7 @@ export default function({
         setCopied(true);
       }}
     >
-      {copied ? 'Copied!' : children || 'Copy'}
+      {copied ? 'Copied to clipboard!' : children || 'Copy'}
     </button>
   );
 }

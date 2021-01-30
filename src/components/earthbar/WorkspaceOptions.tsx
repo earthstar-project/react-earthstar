@@ -20,15 +20,15 @@ export function WorkspaceOptions({
       </section>
       <hr />
       <section data-re-section>
-        <h1>{'Pubs'}</h1>
-        <p>{'Manage where this workspace syncs its data to and from.'}</p>
+        <h1>{'Pub Servers'}</h1>
+        <p>{'Servers that help this workspace sync its data.'}</p>
         <PubEditor workspaceAddress={workspaceAddress} />
       </section>
       <hr />
       <section data-re-section>
-        <h1>{'Invite others'}</h1>
+        <h1>{'Invite People'}</h1>
         <p>
-          {'Generate invitation codes others can use to join this workspace.'}
+          {'Send this code to your friends so they can join the workspace.'}
         </p>
         <InvitationCreatorForm workspaceAddress={workspaceAddress} />
       </section>
@@ -36,9 +36,14 @@ export function WorkspaceOptions({
       <section data-re-section>
         <h1>{'Danger Zone'}</h1>
         <p>
-          {
-            'Your local copy of the workspace will be removed, but will remain with other pubs and peers it has been synced to.'
-          }
+          You can remove your copy of the workspace from this device, but it
+          will remain with pubs and other users it has synced with.
+        </p>
+        <p>
+          It's not possible to globally delete a workspace, but you can delete
+          your own data out of a workspace if the app allows it. If you do that,
+          make sure to give your deletions time to sync with the pubs before you
+          remove the entire workspace.
         </p>
         <RemoveWorkspaceButton onClick={onRemove} />
       </section>

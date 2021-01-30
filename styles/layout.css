@@ -20,6 +20,11 @@
   margin: 0;
 }
 
+[data-re-earthbar-panel] code {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 /* A grid layout for a single text input with label and button*/
 
 [data-re-pubeditor-add-form],
@@ -216,7 +221,7 @@
 }
 
 [data-re-workspace-creator-initial-pubs-fieldset] {
-  display: grid; 
+  display: grid;
   grid-template-areas: 'pubs pubs pubs pubs' 'pub-input pub-input pub-input pub-button';
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-column-gap: 6px;
@@ -231,7 +236,7 @@
 }
 
 [data-re-workspace-creator-pub-add-button] {
-  grid-area: pub-button
+  grid-area: pub-button;
 }
 
 [data-re-pubs-list] {
@@ -239,6 +244,17 @@
   margin: 0;
 }
 
+/* UserPanel */
+
+[data-re-user-panel-secret] code {
+  color: #888 !important;
+  background-color: #888 !important;
+}
+
+[data-re-user-panel-secret] code::selection {
+  color: white;
+  background-color: black;
+}
 
 /* ***** EARTHBAR ***** */
 
@@ -286,7 +302,7 @@
   align-items: baseline;
 }
 
-/* WorkspaceList*/
+/* WorkspaceList */
 
 [data-re-workspace-list-workspaces] {
   padding: 0;

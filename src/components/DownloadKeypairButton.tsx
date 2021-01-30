@@ -17,7 +17,7 @@ export default function DownloadKeypairButton(
       onClick={() => download(currentAuthor)}
       disabled={currentAuthor === null}
     >
-      {'Download keypair.json'}
+      {'Download keypair.json file'}
     </button>
   );
 }

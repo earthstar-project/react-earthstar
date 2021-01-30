@@ -41,7 +41,7 @@ export default function WorkspaceTab() {
       </select>
       {selectedOption !== 'ADD_WORKSPACE' ? (
         <EarthbarTab data-re-earthbar-workspace-select-tab>
-          <EarthbarTabLabel>{'Settings'}</EarthbarTabLabel>
+          <EarthbarTabLabel>{'Workspace settings'}</EarthbarTabLabel>
           <WorkspaceManagerPanel />
         </EarthbarTab>
       ) : (
