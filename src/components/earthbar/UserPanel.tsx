@@ -28,14 +28,16 @@ export default function UserPanel() {
 
       <section data-re-user-panel-save-identity-section>
         <h1 data-re-user-panel-save-identity-title>{'Save your identity'}</h1>
-        <p>Your author address:</p>
-        <div data-re-user-panel-address>
-          <code>{keypair?.address || ''}</code>
-        </div>
-        <p>Your author secret: (select it to see it)</p>
-        <div data-re-user-panel-secret>
-          <code>{keypair?.secret || ''}</code>
-        </div>
+        <dl>
+          <dt>Your author address:</dt>
+          <dd data-re-user-panel-address>
+            <code>{keypair?.address || ''}</code>
+          </dd>
+          <dt>Your author secret: (select it to see it)</dt>
+          <dd data-re-user-panel-secret>
+            <code>{keypair?.secret || ''}</code>
+          </dd>
+        </dl>
         <hr />
         <CopyAuthorAddressButton />
         <CopyAuthorSecretButton />

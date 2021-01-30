@@ -21,7 +21,7 @@ export function WorkspaceOptions({
       <hr />
       <section data-re-section>
         <h1>{'Pub Servers'}</h1>
-        <p>{'Cloud servers that help this workspace sync its data.'}</p>
+        <p>{'Servers that help this workspace sync its data.'}</p>
         <PubEditor workspaceAddress={workspaceAddress} />
       </section>
       <hr />

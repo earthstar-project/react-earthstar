@@ -21,7 +21,6 @@
 }
 
 [data-re-earthbar-panel] code {
-  font-size: 1.2em;
   overflow-wrap: break-word;
   word-break: break-word;
 }
@@ -222,7 +221,7 @@
 }
 
 [data-re-workspace-creator-initial-pubs-fieldset] {
-  display: grid; 
+  display: grid;
   grid-template-areas: 'pubs pubs pubs pubs' 'pub-input pub-input pub-input pub-button';
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-column-gap: 6px;
@@ -237,7 +236,7 @@
 }
 
 [data-re-workspace-creator-pub-add-button] {
-  grid-area: pub-button
+  grid-area: pub-button;
 }
 
 [data-re-pubs-list] {
@@ -245,18 +244,13 @@
   margin: 0;
 }
 
-
 /* UserPanel */
-
-[data-re-user-panel-address],
-[data-re-user-panel-secret] {
-  padding-left: 10px;
-}
 
 [data-re-user-panel-secret] code {
   color: #888 !important;
   background-color: #888 !important;
 }
+
 [data-re-user-panel-secret] code::selection {
   color: white;
   background-color: black;

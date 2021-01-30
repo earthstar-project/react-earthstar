@@ -1,5 +1,5 @@
 :root {
-  --gr6: #f4eed4;
+  --gr6: #faf4da;
   --gr5: #c8bfae;
   --gr4: #a0948b;
   --gr3: #7e706e;
@@ -21,6 +21,7 @@
 }
 
 [data-re-earthbar-panel] code {
+  font-size: 1.2em;
   color: var(--ac2);
   font-weight: bold;
 }
@@ -182,7 +183,7 @@
   font-family: var(--t1);
   font-size: 1em;
   padding: 6px;
-  border: 1px solid var(--gr5);
+  border: 1px solid var(--gr4);
   border-radius: 4px;
 }
 
@@ -219,10 +220,9 @@
 
 [data-re-summary] {
   color: var(--gr2);
-  /* display: inline-block; */ /* hide the triangle */
   padding: 2px;
   position: relative;
-  /* border-bottom: 1px solid var(--gr5); */
+  text-decoration: underline;
 }
 
 [data-re-summary]:hover {
@@ -231,7 +231,7 @@
 }
 
 [data-re-details-content] {
-  padding: 8px 0;
+  padding: 8px 0 0 20px;
 }
 
 [data-re-details-content] p {
@@ -369,6 +369,13 @@
   color: var(--gr4) !important;
   background-color: var(--gr4) !important;
 }
+
+dd[data-re-user-panel-address],
+dd[data-re-user-panel-secret] {
+  margin: 0.5em 0;
+  padding-left: 10px;
+}
+
 [data-re-user-panel-secret] code::selection {
   color: white;
   background-color: black;
