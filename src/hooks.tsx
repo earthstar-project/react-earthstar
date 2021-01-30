@@ -667,7 +667,7 @@ export function useIsLive(): [
   return [isLive, setIsLive];
 }
 
-function useStorage(workspaceAddress?: string) {
+export function useStorage(workspaceAddress?: string) {
   const [currentWorkspace] = useCurrentWorkspace();
   const [storages] = useStorages();
 
