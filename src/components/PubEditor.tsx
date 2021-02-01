@@ -101,7 +101,12 @@ export default function PubEditor({
             </ComboboxPopover>
           ) : null}
         </Combobox>
-        <button data-re-pubeditor-add-button data-re-button type={'submit'}>
+        <button
+          data-re-pubeditor-add-button
+          data-re-button
+          type={'submit'}
+          disabled={pubToAdd.length === 0}
+        >
           {'Add pub'}
         </button>
       </form>
