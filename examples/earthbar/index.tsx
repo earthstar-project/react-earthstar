@@ -125,12 +125,14 @@ function Examples() {
         </EarthbarExample>
       </EarthstarPeer>
       <hr />
-      <EarthbarExample title={'No workspaces'} />
-      <EarthbarExample title={'Multi, no workspaces'}>
-        <MultiWorkspaceTab />
-        <Spacer />
-        <AuthorTab />
-      </EarthbarExample>
+      <EarthstarPeer>
+        <EarthbarExample title={'No workspaces'} />
+        <EarthbarExample title={'Multi, no workspaces'}>
+          <MultiWorkspaceTab />
+          <Spacer />
+          <AuthorTab />
+        </EarthbarExample>
+      </EarthstarPeer>
     </>
   );
 }

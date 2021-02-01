@@ -1,6 +1,6 @@
 import React from 'react';
 import { ValidatorEs4, isErr } from 'earthstar';
-import { useAddWorkspace, usePubs } from '../hooks';
+import { useAddWorkspace, useCurrentWorkspace, usePubs } from '../hooks';
 import { Alert } from '@reach/alert';
 import {
   Combobox,
@@ -9,6 +9,7 @@ import {
   ComboboxList,
   ComboboxOption,
 } from '@reach/combobox';
+import { EarthbarContext } from './earthbar/Earthbar';
 
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 const NUMBERS = '1234567890';
@@ -34,6 +35,8 @@ export default function WorkspaceCreatorForm({
   const [pubs, setPubs] = usePubs();
   const add = useAddWorkspace();
 
+  const { setActiveIndex, setFocusedIndex } = React.useContext(EarthbarContext);
+
   const [workspaceName, setWorkspaceName] = React.useState('');
   const [workspaceSuffix, setWorkspaceSuffix] = React.useState(generateSuffix);
   const address = `+${workspaceName}.${workspaceSuffix}`;
@@ -43,6 +46,7 @@ export default function WorkspaceCreatorForm({
   const allPubs = Array.from(new Set(Object.values(pubs).flat()));
   const [addedPubs, setAddedPubs] = React.useState<string[]>([]);
   const selectablePubs = allPubs.filter(pubUrl => !addedPubs.includes(pubUrl));
+  const [, setCurrentWorkspace] = useCurrentWorkspace();
 
   const [pubToAdd, setPubToAdd] = React.useState('');
 
@@ -68,6 +72,10 @@ export default function WorkspaceCreatorForm({
           if (onCreate) {
             onCreate(address);
           }
+
+          setCurrentWorkspace(address);
+          setFocusedIndex(-1);
+          setActiveIndex(-1);
         }}
       >
         <fieldset data-re-fieldset>

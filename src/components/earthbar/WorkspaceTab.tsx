@@ -8,6 +8,7 @@ import {
 import { useCurrentWorkspace } from '../../index';
 import { EarthbarTabLabel, EarthbarTab, EarthbarTabPanel } from './Earthbar';
 import { getWorkspaceName } from '../../util';
+import { usePrevious } from '@reach/utils';
 
 export default function WorkspaceTab() {
   const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
@@ -15,6 +16,15 @@ export default function WorkspaceTab() {
     currentWorkspace || 'ADD_WORKSPACE'
   );
   const workspaces = useWorkspaces();
+
+  const previousWorkspace = usePrevious(currentWorkspace);
+
+  // This effect will change the selected option to match the current workspace when it changes
+  React.useEffect(() => {
+    if (currentWorkspace && previousWorkspace !== currentWorkspace) {
+      setSelectedOption(currentWorkspace);
+    }
+  }, [currentWorkspace, previousWorkspace]);
 
   return (
     <div data-re-earthbar-workspace-tab-zone>
