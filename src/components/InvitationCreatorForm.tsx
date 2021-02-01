@@ -19,7 +19,7 @@ export default function InvitationCreatorForm({
   }, [copied]);
 
   return (
-    <>
+    <div data-re-invitation-creator-form>
       {pubs.length > 0 ? (
         <dl data-re-invitation-creator-pub-options>
           <dt data-re-dt>{'Included pubs'}</dt>
@@ -55,15 +55,13 @@ export default function InvitationCreatorForm({
           </dd>
         </dl>
       ) : null}
-      <div data-re-invitation-creator-form>
-        <input
-          data-re-invitation-creator-input
-          data-re-input
-          value={invitationCode}
-          disabled={true}
-        />
-        <CopyButton copyValue={invitationCode} />
-      </div>
-    </>
+      <input
+        data-re-invitation-creator-input
+        data-re-input
+        value={invitationCode}
+        disabled={true}
+      />
+      <CopyButton copyValue={invitationCode} />
+    </div>
   );
 }
