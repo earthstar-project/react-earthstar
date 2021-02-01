@@ -8,6 +8,7 @@ import {
   useCurrentWorkspace,
 } from '../hooks';
 import { WorkspaceLabel } from '../components';
+import { EarthbarContext } from './earthbar';
 
 export default function InvitationRedemptionForm({
   onRedeem,
@@ -19,6 +20,7 @@ export default function InvitationRedemptionForm({
   const [, setCurrentWorkspace] = useCurrentWorkspace();
   const [code, setCode] = React.useState('');
   const result = useInvitation(code);
+  const { setActiveIndex, setFocusedIndex } = React.useContext(EarthbarContext);
 
   const [uncheckedPubs, setUncheckedPubs] = React.useState<string[]>([]);
 
@@ -84,6 +86,8 @@ export default function InvitationRedemptionForm({
             setCode('');
             setUncheckedPubs([]);
             setCurrentWorkspace(workspace);
+            setActiveIndex(-1);
+            setFocusedIndex(-1);
           }
         }}
       >
