@@ -257,6 +257,12 @@
   font-variant-numeric: tabular-nums;
 }
 
+@media screen and (max-width: 600px) {
+  [data-re-workspace-address-fields] {
+    font-size: 1em;
+  }
+}
+
 [data-re-workspace-name-input] {
   margin-left: 6px;
   color: var(--gr6);
