@@ -1,6 +1,6 @@
 import React from 'react';
 import { ValidatorEs4, isErr } from 'earthstar';
-import { useAddWorkspace, usePubs } from '../hooks';
+import { useAddWorkspace, useCurrentWorkspace, usePubs } from '../hooks';
 import { Alert } from '@reach/alert';
 import {
   Combobox,
@@ -43,6 +43,7 @@ export default function WorkspaceCreatorForm({
   const allPubs = Array.from(new Set(Object.values(pubs).flat()));
   const [addedPubs, setAddedPubs] = React.useState<string[]>([]);
   const selectablePubs = allPubs.filter(pubUrl => !addedPubs.includes(pubUrl));
+  const [, setCurrentWorkspace] = useCurrentWorkspace();
 
   const [pubToAdd, setPubToAdd] = React.useState('');
 
@@ -68,6 +69,8 @@ export default function WorkspaceCreatorForm({
           if (onCreate) {
             onCreate(address);
           }
+
+          setCurrentWorkspace(address);
         }}
       >
         <fieldset data-re-fieldset>

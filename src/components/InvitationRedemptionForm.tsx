@@ -1,7 +1,12 @@
 import React from 'react';
 import { isErr } from 'earthstar';
 import Alert from '@reach/alert';
-import { useInvitation, useWorkspaces, usePubs } from '../hooks';
+import {
+  useInvitation,
+  useWorkspaces,
+  usePubs,
+  useCurrentWorkspace,
+} from '../hooks';
 import { WorkspaceLabel } from '../components';
 
 export default function InvitationRedemptionForm({
@@ -11,6 +16,7 @@ export default function InvitationRedemptionForm({
 }) {
   const workspaces = useWorkspaces();
   const [pubs] = usePubs();
+  const [, setCurrentWorkspace] = useCurrentWorkspace();
   const [code, setCode] = React.useState('');
   const result = useInvitation(code);
 
@@ -77,6 +83,7 @@ export default function InvitationRedemptionForm({
             }
             setCode('');
             setUncheckedPubs([]);
+            setCurrentWorkspace(workspace);
           }
         }}
       >
