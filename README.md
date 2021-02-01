@@ -79,3 +79,4 @@ Click below for learning about these with their own docs
 - [Hooks](docs/hooks.md) - Learn how to access and write data and app state with hooks
 - [Earthbar](docs/earthbar.md) - Pre-made, customisable control center for common earthstar tasks — learn how to customise and style it here
 - [Components](docs/components.md) - Pre-made UIs to make your life easy! - learn what's available and how to style here
+- [Styling](docs/styling.md) How to style components from this package with pre-made themes, or do it yourself!

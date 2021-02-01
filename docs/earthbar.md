@@ -82,7 +82,16 @@ Alternatively, if there is a current author, there's a tab for changing your dis
 
 ## Styling
 
-(drafting this...)
+If you're using a bundler that supports CSS imports (e.g. like the one that comes with Create React App), add the following to your app:
+
+```js
+import "react-earthstar/styles/layout.css";
+import "react-earthstar/styles/junior.css";
+```
+
+This will import the basic layout styles and a default theme for Earthbar.
+
+To learn more, see the [styling guide](styling.md)
 
 ## Creating your own tabs
 
