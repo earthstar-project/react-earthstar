@@ -162,6 +162,7 @@ export default function WorkspaceCreatorForm({
           <button
             data-re-button
             data-re-workspace-creator-pub-add-button
+            disabled={pubToAdd.length === 0}
             onClick={e => {
               e.preventDefault();
               setPubToAdd('');
