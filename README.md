@@ -4,11 +4,11 @@
 
 react-earthstar is a UI toolkit for making collaborative, offline-first applets for small groups. Your applet's data is stored with the peers who use it, and on infrastructure you own or trust.
 
-- App examples here! Wikis! Chatrooms! More concrete, small group-y things!
+- Don't-have-to-think-about-it realtime collaborative data
+- No-servers-involved authentication
+- No-distinction-between-the-two offline and online support
 
-No monthly payments, API keys, or complicated user authentication!
-
-This is made possible by the Earthstar protocol.
+This is all made possible by the [Earthstar](https://github.com/earthstar-project/earthstar) protocol.
 
 ## What's Earthstar?
 

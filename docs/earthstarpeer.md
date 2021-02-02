@@ -1,4 +1,4 @@
-# <EarthstarPeer>
+# EarthstarPeer
 
 `EarthstarPeer` coordinates the state of your Earthstar app. This includes:
 
