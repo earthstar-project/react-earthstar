@@ -251,7 +251,7 @@
 
 [data-re-workspace-creator-initial-pubs-fieldset] {
   display: grid;
-  grid-template-areas: 'pubs pubs pubs pubs' 'pub-input pub-input pub-input pub-button';
+  grid-template-areas: 'legend legend legend legend' 'pubs pubs pubs pubs' 'pub-input pub-input pub-input pub-button';
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-column-gap: 6px;
 }
@@ -259,10 +259,14 @@
 @media screen and (max-width: 600px) {
   [data-re-workspace-creator-initial-pubs-fieldset] {
     display: grid;
-    grid-template-areas: 'pubs' 'pub-input' 'pub-button';
+    grid-template-areas: 'legend' 'pubs' 'pub-input' 'pub-button';
     grid-template-columns: 1fr;
     grid-row-gap: 6px;
   }
+}
+
+[data-re-workspace-creator-initial-pubs-fieldset] legend {
+  grid-area: legend;
 }
 
 [data-re-pubs-list] {

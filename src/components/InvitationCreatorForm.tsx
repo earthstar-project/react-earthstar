@@ -20,41 +20,39 @@ export default function InvitationCreatorForm({
 
   return (
     <div data-re-invitation-creator-form>
-      {pubs.length > 0 ? (
-        <dl data-re-invitation-creator-pub-options>
-          <dt data-re-dt>{'Included pubs'}</dt>
-          <dd data-re-dd>
-            {pubs.map(pubUrl => (
-              <div
-                data-re-invitation-creator-pub-option
-                data-re-pub-item
-                key={pubUrl}
-              >
-                <input
-                  data-re-checkbox
-                  id={`react-earthstar-invitation-${pubUrl}-option`}
-                  type="checkbox"
-                  checked={!excludedPubs.includes(pubUrl)}
-                  onChange={() => {
-                    const isExcluded = excludedPubs.includes(pubUrl);
+      <dl data-re-invitation-creator-pub-options>
+        <dt data-re-dt>{'Included pubs'}</dt>
+        <dd data-re-dd>
+          {pubs.map(pubUrl => (
+            <div
+              data-re-invitation-creator-pub-option
+              data-re-pub-item
+              key={pubUrl}
+            >
+              <input
+                data-re-checkbox
+                id={`react-earthstar-invitation-${pubUrl}-option`}
+                type="checkbox"
+                checked={!excludedPubs.includes(pubUrl)}
+                onChange={() => {
+                  const isExcluded = excludedPubs.includes(pubUrl);
 
-                    if (isExcluded) {
-                      return setExcludedPubs(pubs =>
-                        pubs.filter(url => url !== pubUrl)
-                      );
-                    }
+                  if (isExcluded) {
+                    return setExcludedPubs(pubs =>
+                      pubs.filter(url => url !== pubUrl)
+                    );
+                  }
 
-                    setExcludedPubs(pubs => [...pubs, pubUrl]);
-                  }}
-                />
-                <label htmlFor={`react-earthstar-invitation-${pubUrl}-option`}>
-                  {pubUrl}
-                </label>
-              </div>
-            ))}
-          </dd>
-        </dl>
-      ) : null}
+                  setExcludedPubs(pubs => [...pubs, pubUrl]);
+                }}
+              />
+              <label htmlFor={`react-earthstar-invitation-${pubUrl}-option`}>
+                {pubUrl}
+              </label>
+            </div>
+          ))}
+        </dd>
+      </dl>
       <input
         data-re-invitation-creator-input
         data-re-input

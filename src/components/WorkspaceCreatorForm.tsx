@@ -110,34 +110,26 @@ export default function WorkspaceCreatorForm({
             <Alert data-re->{validResult.message}</Alert>
           ) : null}
         </fieldset>
-
-        <fieldset
-          data-re-fieldset
-          data-re-workspace-creator-initial-pubs-fieldset
-        >
+        <div data-re-workspace-creator-initial-pubs-fieldset>
           <legend data-re-legend>{'Pub servers to sync with'}</legend>
-          {addedPubs.length > 0 ? (
-            <ul data-re-pubs-list>
-              {addedPubs.map(pubUrl => (
-                <li data-re-pubs-list-item key={pubUrl}>
-                  <span data-re-pub-item>
-                    {pubUrl}
-                    <button
-                      data-re-button
-                      data-re-pub-item-remove-button
-                      onClick={() => {
-                        setAddedPubs(prev =>
-                          prev.filter(url => url !== pubUrl)
-                        );
-                      }}
-                    >
-                      {'✕'}
-                    </button>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          <ul data-re-pubs-list>
+            {addedPubs.map(pubUrl => (
+              <li data-re-pubs-list-item key={pubUrl}>
+                <span data-re-pub-item>
+                  {pubUrl}
+                  <button
+                    data-re-button
+                    data-re-pub-item-remove-button
+                    onClick={() => {
+                      setAddedPubs(prev => prev.filter(url => url !== pubUrl));
+                    }}
+                  >
+                    {'✕'}
+                  </button>
+                </span>
+              </li>
+            ))}
+          </ul>
           <Combobox
             data-re-combobox
             data-re-workspace-creator-pub-input
@@ -179,7 +171,7 @@ export default function WorkspaceCreatorForm({
           >
             {'Add pub'}
           </button>
-        </fieldset>
+        </div>
         {isValid ? (
           <button
             data-re-button
