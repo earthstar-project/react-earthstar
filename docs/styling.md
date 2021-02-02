@@ -33,23 +33,31 @@ That Earthbar with the `junior` skin looks like this:
 
 Maybe you don't like creamy yellow and green. Fine! It's easy to change the colour scheme of the Junior skin, which is defined using CSS variables:
 
+![The default colour palette](images/palettes.png)
+
 ```css
 :root {
+  // The lightest colour
   --gr6: #faf4da;
   --gr5: #c8bfae;
   --gr4: #a0948b;
   --gr3: #7e706e;
   --gr2: #615155;
   --gr1: #44313b;
+  // The darkest colour
   --gr0: #220d1e;
   --ac4: #68a699;
+  // The accent colour
   --ac3: #29857e;
   --ac2: #276060;
+  // Typeface used by Earthbar
   --t1: 'Gill Sans', sans-serif;
 }
 ```
 
 Here are all the variables defined in `junior.css`. Redeclare them in a stylesheet _after_ junior.css in the document, and you'll be able to change them to whatever you prefer.
+
+To easily make a palette with the same contrast relationships as the default, you can use [Cinnamon's palette generator](https://codesandbox.io/s/color-contrast-calculator-2-k0som), or create one using [make-color-theme](https://github.com/earthstar-project/make-color-theme).
 
 ## Making your own skin
 
