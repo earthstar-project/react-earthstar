@@ -39,3 +39,11 @@ export function useDownload() {
     document.body.removeChild(a);
   }, []);
 }
+
+export function makeStorageKey(customKey: string | undefined, key: string) {
+  if (!customKey) {
+    return `earthstar-peer-${key}`;
+  }
+
+  return `earthstar-peer-${customKey}-${key}`;
+}

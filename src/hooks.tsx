@@ -15,6 +15,8 @@ import {
   OnePubOneWorkspaceSyncer,
 } from 'earthstar';
 import useDeepCompareEffect from 'use-deep-compare-effect';
+import { useLocalStorage } from '@rehooks/local-storage';
+import { makeStorageKey } from './util';
 
 const StorageContext = React.createContext<{
   storages: Record<string, IStorage>; // workspace address --> IStorage instance
@@ -53,6 +55,7 @@ export function EarthstarPeer({
   initCurrentAuthor = null,
   initCurrentWorkspace = null,
   initIsLive = true,
+
   children,
 }: {
   initWorkspaces?: IStorage[];
@@ -674,4 +677,45 @@ export function useStorage(workspaceAddress?: string) {
   const address = workspaceAddress || currentWorkspace;
 
   return address ? storages[address] : null;
+}
+
+type WorkspaceRecords = Record<
+  string,
+  Record<string, Record<string, Document>>
+>;
+
+export function useLocalStorageEarthstarSettings(storageKey: string) {
+  const lsAuthorKey = makeStorageKey(storageKey, 'current-author');
+  const lsPubsKey = makeStorageKey(storageKey, 'pubs');
+  const lsStoragesKey = makeStorageKey(storageKey, 'storages');
+  const lsCurrentWorkspaceKey = makeStorageKey(storageKey, 'current-workspace');
+  const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
+
+  // load the initial state from localStorage
+  const [workspacesDocsInStorage] = useLocalStorage<WorkspaceRecords>(
+    lsStoragesKey,
+    {}
+  );
+  const [initPubs] = useLocalStorage<Record<string, string[]>>(lsPubsKey, {});
+  const [initCurrentAuthor] = useLocalStorage<AuthorKeypair>(lsAuthorKey);
+  const [initCurrentWorkspace] = useLocalStorage(lsCurrentWorkspaceKey);
+  const [initIsLive] = useLocalStorage(lsIsLiveKey);
+
+  const initWorkspaces = Object.entries(workspacesDocsInStorage).map(
+    ([workspaceAddress, docs]) => {
+      const storage = new StorageMemory([ValidatorEs4], workspaceAddress);
+      // (this is a hack that knows too much about the internal structure of StorageMemory)
+      // (it would be better to ingest each document one by one, but also a lot slower)
+      storage._docs = docs;
+      return storage;
+    }
+  );
+
+  return {
+    initWorkspaces,
+    initPubs,
+    initCurrentAuthor,
+    initCurrentWorkspace,
+    initIsLive,
+  };
 }
