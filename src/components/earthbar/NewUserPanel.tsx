@@ -1,10 +1,8 @@
-import React from 'react';
-import { EarthbarTabPanel } from './Earthbar';
-import {
-  AuthorKeypairForm,
-  AuthorKeypairUpload,
-  NewKeypairForm,
-} from '../../index';
+import * as React from 'react';
+import EarthbarTabPanel from './EarthbarTabPanel';
+import AuthorKeypairForm from '../AuthorKeypairForm';
+import AuthorKeypairUpload from '../AuthorKeypairUpload';
+import NewKeypairForm from '../NewKeypairForm';
 
 export default function NewUserPanel() {
   return (

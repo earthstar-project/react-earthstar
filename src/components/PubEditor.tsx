@@ -5,7 +5,7 @@ import {
   ComboboxOption,
   ComboboxPopover,
 } from '@reach/combobox';
-import React from 'react';
+import * as React from 'react';
 import { usePubs, useWorkspacePubs } from '../hooks';
 
 export default function PubEditor({

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import {
   AuthorKeypair,
   IStorage,
@@ -12,134 +12,17 @@ import {
   WriteResult,
   ValidationError,
   WriteEvent,
-  OnePubOneWorkspaceSyncer,
 } from 'earthstar';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import { useLocalStorage } from '@rehooks/local-storage';
 import { makeStorageKey } from './util';
-
-const StorageContext = React.createContext<{
-  storages: Record<string, IStorage>; // workspace address --> IStorage instance
-  setStorages: React.Dispatch<React.SetStateAction<Record<string, IStorage>>>;
-}>({ storages: {}, setStorages: () => {} });
-
-const PubsContext = React.createContext<{
-  pubs: Record<string, string[]>; // workspace address --> pub urls
-  setPubs: React.Dispatch<React.SetStateAction<Record<string, string[]>>>;
-}>({ pubs: {}, setPubs: () => {} });
-
-const CurrentAuthorContext = React.createContext<{
-  currentAuthor: AuthorKeypair | null;
-  setCurrentAuthor: React.Dispatch<React.SetStateAction<AuthorKeypair | null>>;
-}>({ currentAuthor: null, setCurrentAuthor: () => {} });
-
-const CurrentWorkspaceContext = React.createContext<{
-  currentWorkspace: null | string;
-  setCurrentWorkspace: React.Dispatch<React.SetStateAction<string | null>>;
-}>({
-  currentWorkspace: null,
-  setCurrentWorkspace: () => {},
-});
-
-const IsLiveContext = React.createContext<{
-  isLive: boolean;
-  setIsLive: React.Dispatch<React.SetStateAction<boolean>>;
-}>({
-  isLive: true,
-  setIsLive: () => {},
-});
-
-export function EarthstarPeer({
-  initWorkspaces = [],
-  initPubs = {},
-  initCurrentAuthor = null,
-  initCurrentWorkspace = null,
-  initIsLive = true,
-
-  children,
-}: {
-  initWorkspaces?: IStorage[];
-  initPubs?: Record<string, string[]>;
-  initCurrentAuthor?: AuthorKeypair | null;
-  initCurrentWorkspace?: string | null;
-  initIsLive?: boolean;
-  children: React.ReactNode;
-}) {
-  const [storages, setStorages] = React.useState(
-    initWorkspaces.reduce<Record<string, IStorage>>((acc, storage) => {
-      return { ...acc, [storage.workspace]: storage };
-    }, {})
-  );
-
-  const [pubs, setPubs] = React.useState(initPubs);
-
-  const [currentAuthor, setCurrentAuthor] = React.useState(initCurrentAuthor);
-
-  const [currentWorkspace, setCurrentWorkspace] = React.useState(
-    initCurrentWorkspace && storages[initCurrentWorkspace]
-      ? initCurrentWorkspace
-      : null
-  );
-  const [isLive, setIsLive] = React.useState(initIsLive);
-
-  return (
-    <StorageContext.Provider value={{ storages, setStorages }}>
-      <PubsContext.Provider value={{ pubs, setPubs }}>
-        <CurrentAuthorContext.Provider
-          value={{ currentAuthor, setCurrentAuthor }}
-        >
-          <CurrentWorkspaceContext.Provider
-            value={{ currentWorkspace, setCurrentWorkspace }}
-          >
-            <IsLiveContext.Provider value={{ isLive, setIsLive }}>
-              {children}
-              {Object.keys(storages).map(workspaceAddress => (
-                <LiveSyncer
-                  key={workspaceAddress}
-                  workspaceAddress={workspaceAddress}
-                />
-              ))}
-            </IsLiveContext.Provider>
-          </CurrentWorkspaceContext.Provider>
-        </CurrentAuthorContext.Provider>
-      </PubsContext.Provider>
-    </StorageContext.Provider>
-  );
-}
-
-function LiveSyncer({ workspaceAddress }: { workspaceAddress: string }) {
-  const [isLive] = useIsLive();
-  const [storages] = useStorages();
-  const [pubs] = useWorkspacePubs(workspaceAddress);
-
-  React.useEffect(() => {
-    const syncers = pubs.map(
-      pubUrl => new OnePubOneWorkspaceSyncer(storages[workspaceAddress], pubUrl)
-    );
-
-    if (!isLive) {
-      syncers.forEach(syncer => {
-        syncer.stopPushStream();
-        syncer.stopPullStream();
-      });
-    } else {
-      // Start streaming when isLive changes to true
-      syncers.forEach(syncer => {
-        syncer.syncOnceAndContinueLive();
-      });
-    }
-
-    // On cleanup (unmount, value of syncers changes) stop all syncers from pulling and pushing
-    return () => {
-      syncers.forEach(syncer => {
-        syncer.stopPullStream();
-        syncer.stopPushStream();
-      });
-    };
-  }, [pubs, isLive, workspaceAddress, storages]);
-
-  return null;
-}
+import {
+  CurrentAuthorContext,
+  CurrentWorkspaceContext,
+  IsLiveContext,
+  PubsContext,
+  StorageContext,
+} from './contexts';
 
 export function useWorkspaces() {
   const [storages] = useStorages();

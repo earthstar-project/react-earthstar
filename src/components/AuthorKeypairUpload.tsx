@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { checkAuthorKeypairIsValid, isErr } from 'earthstar';
 import { useCurrentAuthor } from '../hooks';
 

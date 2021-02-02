@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { isErr, ValidatorEs4 } from 'earthstar';
 
 export function getAuthorShortName(address: string): string {

@@ -1,14 +1,14 @@
-import React from 'react';
+import * as React from 'react';
 import WorkspaceManagerPanel from './WorkspaceManagerPanel';
-import {
-  InvitationRedemptionForm,
-  useWorkspaces,
-  WorkspaceCreatorForm,
-} from '../..';
-import { useCurrentWorkspace } from '../../index';
-import { EarthbarTabLabel, EarthbarTab, EarthbarTabPanel } from './Earthbar';
+import InvitationRedemptionForm from '../InvitationRedemptionForm';
+import WorkspaceCreatorForm from '../WorkspaceCreatorForm';
+import EarthbarTab from './EarthbarTab';
+import EarthbarTabLabel from './EarthbarTabLabel';
+import EarthbarTabPanel from './EarthbarTabPanel';
+import { useCurrentWorkspace, useWorkspaces } from '../../hooks';
 import { getWorkspaceName } from '../../util';
 import { usePrevious } from '@reach/utils';
+import { EarthbarContext } from './contexts';
 
 export default function WorkspaceTab() {
   const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
@@ -25,6 +25,8 @@ export default function WorkspaceTab() {
       setSelectedOption(currentWorkspace);
     }
   }, [currentWorkspace, previousWorkspace]);
+
+  const { setFocusedIndex, setActiveIndex } = React.useContext(EarthbarContext);
 
   return (
     <div data-re-earthbar-workspace-tab-zone>
@@ -61,7 +63,12 @@ export default function WorkspaceTab() {
             <EarthbarTabPanel>
               <section data-re-section>
                 <h1>{'Join a workspace'}</h1>
-                <InvitationRedemptionForm />
+                <InvitationRedemptionForm
+                  onRedeem={() => {
+                    setFocusedIndex(-1);
+                    setActiveIndex(-1);
+                  }}
+                />
               </section>
             </EarthbarTabPanel>
           </EarthbarTab>
@@ -70,7 +77,12 @@ export default function WorkspaceTab() {
             <EarthbarTabPanel>
               <section data-re-section>
                 <h1>{'Create a new workspace'}</h1>
-                <WorkspaceCreatorForm />
+                <WorkspaceCreatorForm
+                  onCreate={() => {
+                    setFocusedIndex(-1);
+                    setActiveIndex(-1);
+                  }}
+                />
               </section>
             </EarthbarTabPanel>
           </EarthbarTab>

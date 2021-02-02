@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 import AuthorLabel from './AuthorLabel';
 import { useCurrentAuthor } from '../hooks';

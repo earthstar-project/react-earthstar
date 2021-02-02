@@ -1,5 +1,6 @@
-import React from 'react';
-import { EarthbarContext, EarthbarTabPanel } from './Earthbar';
+import * as React from 'react';
+import { EarthbarContext } from './contexts';
+import EarthbarTabPanel from './EarthbarTabPanel';
 import { WorkspaceOptions } from './WorkspaceOptions';
 
 export default function WorkspaceManagerPanel() {

@@ -1,13 +1,12 @@
-import React from 'react';
-import { EarthbarTabPanel } from './Earthbar';
-import {
-  WorkspaceLabel,
-  SyncingCheckbox,
-  InvitationRedemptionForm,
-  WorkspaceCreatorForm,
-} from '..';
-import { useWorkspaces } from '../..';
+import * as React from 'react';
+import WorkspaceLabel from '../WorkspaceLabel';
+import SyncingCheckbox from '../SyncingCheckbox';
+import InvitationRedemptionForm from '../InvitationRedemptionForm';
+import WorkspaceCreatorForm from '../WorkspaceCreatorForm';
+import { useWorkspaces } from '../../hooks';
 import { WorkspaceOptions } from './WorkspaceOptions';
+import { EarthbarContext } from './contexts';
+import EarthbarTabPanel from './EarthbarTabPanel';
 
 type WorkspaceManagerState =
   | { screen: 'list' }
@@ -101,6 +100,8 @@ export default function MultiWorkspaceManagerPanel() {
     screen: 'list',
   });
 
+  const { setFocusedIndex, setActiveIndex } = React.useContext(EarthbarContext);
+
   return (
     <EarthbarTabPanel>
       {state.screen === 'list' ? (
@@ -113,12 +114,22 @@ export default function MultiWorkspaceManagerPanel() {
           <hr />
           <section>
             <h1>{'Join a workspace'}</h1>
-            <InvitationRedemptionForm />
+            <InvitationRedemptionForm
+              onRedeem={() => {
+                setFocusedIndex(-1);
+                setActiveIndex(-1);
+              }}
+            />
           </section>
           <hr />
           <section>
             <h1>{'Make a workspace'}</h1>
-            <WorkspaceCreatorForm />
+            <WorkspaceCreatorForm
+              onCreate={() => {
+                setActiveIndex(-1);
+                setFocusedIndex(-1);
+              }}
+            />
           </section>
         </>
       ) : (
@@ -138,7 +149,9 @@ export default function MultiWorkspaceManagerPanel() {
           <hr />
           <WorkspaceOptions
             workspaceAddress={state.address}
-            onRemove={() => dispatch({ type: 'nav-list' })}
+            onRemove={() => {
+              dispatch({ type: 'nav-list' });
+            }}
           />
         </>
       )}

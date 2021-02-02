@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { generateAuthorKeypair, isErr, AuthorKeypair } from 'earthstar';
 import { useCurrentAuthor } from '../hooks';
 

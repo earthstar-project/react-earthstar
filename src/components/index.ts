@@ -1,3 +1,5 @@
+export { default as EarthstarPeer } from './EarthstarPeer';
+
 export { default as AddWorkspaceForm } from './AddWorkspaceForm';
 export { default as AuthorKeypairForm } from './AuthorKeypairForm';
 export { default as AuthorKeypairUpload } from './AuthorKeypairUpload';

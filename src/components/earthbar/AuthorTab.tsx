@@ -1,9 +1,10 @@
-import React from 'react';
-import { EarthbarTabLabel, EarthbarTab } from './Earthbar';
+import * as React from 'react';
 import UserPanel from './UserPanel';
 import NewUserPanel from './NewUserPanel';
-import { AuthorLabel } from '../..';
-import { useCurrentAuthor } from '../../index';
+import AuthorLabel from '../AuthorLabel';
+import { useCurrentAuthor } from '../../hooks';
+import EarthbarTab from './EarthbarTab';
+import EarthbarTabLabel from './EarthbarTabLabel';
 
 export default function AuthorTab() {
   const [currentAuthor] = useCurrentAuthor();
