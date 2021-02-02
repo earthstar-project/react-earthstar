@@ -13,6 +13,7 @@ import {
   TabPanelDescendantContext,
 } from './contexts';
 import { TabDescendant, TabPanelDescendant } from './types';
+import Spacer from './Spacer';
 
 export default function Earthbar({
   children = (
@@ -99,8 +100,4 @@ function EarthbarTabs({ children }: { children: React.ReactNode }) {
       {children}
     </div>
   );
-}
-
-export function Spacer() {
-  return <div data-re-earthbar-spacer />;
 }

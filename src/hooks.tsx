@@ -576,29 +576,30 @@ export function useLocalStorageEarthstarSettings(storageKey: string) {
 
   // load the initial state from localStorage
   const [workspacesDocsInStorage] = useLocalStorage<WorkspaceRecords>(
-    lsStoragesKey,
-    {}
+    lsStoragesKey
   );
-  const [initPubs] = useLocalStorage<Record<string, string[]>>(lsPubsKey, {});
+  const [initPubs] = useLocalStorage<Record<string, string[]>>(lsPubsKey);
   const [initCurrentAuthor] = useLocalStorage<AuthorKeypair>(lsAuthorKey);
   const [initCurrentWorkspace] = useLocalStorage(lsCurrentWorkspaceKey);
-  const [initIsLive] = useLocalStorage(lsIsLiveKey);
+  const [initIsLive] = useLocalStorage<boolean>(lsIsLiveKey);
 
-  const initWorkspaces = Object.entries(workspacesDocsInStorage).map(
-    ([workspaceAddress, docs]) => {
-      const storage = new StorageMemory([ValidatorEs4], workspaceAddress);
-      // (this is a hack that knows too much about the internal structure of StorageMemory)
-      // (it would be better to ingest each document one by one, but also a lot slower)
-      storage._docs = docs;
-      return storage;
-    }
-  );
+  const initWorkspaces = workspacesDocsInStorage
+    ? Object.entries(workspacesDocsInStorage).map(
+        ([workspaceAddress, docs]) => {
+          const storage = new StorageMemory([ValidatorEs4], workspaceAddress);
+          // (this is a hack that knows too much about the internal structure of StorageMemory)
+          // (it would be better to ingest each document one by one, but also a lot slower)
+          storage._docs = docs;
+          return storage;
+        }
+      )
+    : null;
 
   return {
-    initWorkspaces,
-    initPubs,
-    initCurrentAuthor,
-    initCurrentWorkspace,
-    initIsLive,
+    ...(initWorkspaces ? { initWorkspaces } : {}),
+    ...(initPubs ? { initPubs } : {}),
+    ...(initCurrentAuthor ? { initCurrentAuthor } : {}),
+    ...(initCurrentAuthor ? { initCurrentWorkspace } : {}),
+    ...(initIsLive ? { initIsLive } : {}),
   };
 }

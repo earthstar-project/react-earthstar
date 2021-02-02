@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { useDescendant } from '@reach/descendants';
 import {
   isFunction,
@@ -5,7 +6,6 @@ import {
   useUpdateEffect,
   wrapEvent,
 } from '@reach/utils';
-import React from 'react';
 import {
   EarthbarContext,
   EarthbarTabContext,
