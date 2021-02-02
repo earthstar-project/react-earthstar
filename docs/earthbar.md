@@ -1,5 +1,7 @@
 # Earthbar
 
+![The Earthbar](images/earthbar.png)
+
 In many cases, building a decent Earthstar app will mean providing a lot of features: managing workspaces, pubs, identities, invitations, etc.
 
 Additionally, people using your app may not know how an Earthstar app is different from what they're used to, and will need guidance through these concepts.
@@ -66,9 +68,17 @@ If you'd like to create your own tabs, check out 'Creating your own tabs' below.
 
 ### WorkspaceTab
 
+![Workspace panel](images/workspace-panel.png)
+
 This tab lets you select the current workspace from the tab bar, settings for the current workspace, as well as tabs for adding workspaces using an invitation code, or making a new one.
 
+![Join Panel](images/join-panel.png)
+
+![Create panel](images/create-panel.png)
+
 ### MultiWorkspaceTab
+
+![Workspace panel](images/multi-workspace-panel.png)
 
 This tab differs slightly from WorkspaceTab in that it is for apps that ignore the 'current workspace' concept, instead showing data from many workspaces at once. It has interfaces for managing all the known workspaces, as well as tabs for adding workspaces using an invitation code, or making a new one.
 
@@ -76,7 +86,11 @@ This tab differs slightly from WorkspaceTab in that it is for apps that ignore t
 
 This tab offers two interfaces:
 
+![New User Panel](images/new-user-panel.png)
+
 If there is no current author, there's a tab for creating a new user, or logging in with an address + secret, or a keypair.json file. There is also helper text for users to understand Earthstar's authentication model.
+
+![User Panel](images/new-user-panel.png)
 
 Alternatively, if there is a current author, there's a tab for changing your display name, copying your address + secret, downloading your identity as a keypair.json, and logging out.
 
