@@ -1,6 +1,11 @@
 import React from 'react';
 import { render } from 'react-dom';
-import { StorageMemory, ValidatorEs4 } from 'earthstar';
+import {
+  StorageMemory,
+  ValidatorEs4,
+  generateAuthorKeypair,
+  AuthorKeypair,
+} from 'earthstar';
 import {
   EarthstarPeer,
   AddWorkspaceForm,
@@ -22,12 +27,16 @@ import {
   WorkspaceCreatorForm,
   WorkspaceLabel,
   WorkspaceList,
+  SyncingCheckbox,
 } from '../../src/index';
 import '../../styles/layout.css';
+import '../../styles/junior.css';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
 const EXAMPLE_WORKSPACE_ADDR3 = '+sailing.a123';
+
+const EXAMPLE_USER = generateAuthorKeypair('test') as AuthorKeypair;
 
 function Example({
   children,
@@ -94,6 +103,7 @@ function Examples() {
           [EXAMPLE_WORKSPACE_ADDR3]: ['https://c.pub/'],
         }}
         initIsLive={false}
+        initCurrentAuthor={EXAMPLE_USER}
       >
         <hr />
         <h2>Adding, removing and editing workspaces</h2>
@@ -117,6 +127,12 @@ function Examples() {
           notes={'Add a workspace using an Earthstar invitation code'}
         >
           <InvitationRedemptionForm />
+        </Example>
+        <Example
+          title={'SyncingCheckbox'}
+          notes={'Toggle whether a workspace is syncing or not'}
+        >
+          <SyncingCheckbox />
         </Example>
         <Example
           title={'InvitationCreatorForm'}

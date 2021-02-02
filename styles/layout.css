@@ -55,6 +55,7 @@
   display: grid;
   grid-template-areas: 'workspace-label pub-label .' 'workspace-input pub-input add-workspace-button';
   grid-template-columns: 1.5fr 1.5fr 1fr;
+  grid-gap: 6px;
 }
 
 [data-re-add-workspace-address-label] {

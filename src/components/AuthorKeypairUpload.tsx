@@ -55,7 +55,6 @@ export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
         data-re-label
         htmlFor={'keypair-upload-button'}
       >
-        or{' '}
         <button
           data-re-keypair-upload-button
           data-re-button
