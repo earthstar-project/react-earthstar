@@ -78,6 +78,12 @@ A form which creates an invitation code for a given workspace, provided via the 
 
 A form which takes an invitation code and adds the encoded workspace and pubs to the app. Also offers an interface for selecting which pubs you'd like to add.
 
+## LocalStorageSettingsWriter
+
+(Doesn't render anything!)
+
+This component writes app settings to a browser's localStorage whenever there are changes. Use it with the `useLocalStorageEarthstarSettings` hook, which reads the values it writes.
+
 ## NewKeypairForm
 
 ![NewKeypairForm](images/new-keypair-form.png)

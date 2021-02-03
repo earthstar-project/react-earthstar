@@ -217,3 +217,21 @@ useSubscribeToStorages({
   },
 });
 ```
+
+### useLocalStorageEarthstarSettings
+
+If your Earthstar app is running in the browser, it's nice to have your user's settings persisted between sessions. This hook pulls the values from localStorage that can then be passed to `EarthstarPeer`.
+
+This hook expects a string which you can use to differentiate the keys used with localStorage. This is especially important when many apps will be run on the same address, e.g. localhost:3000.
+
+Use this key in combination with `<LocalStorageSettingsWriter>`, which will listen for changes and write them to localStorage.
+
+```jsx
+const initValues = useLocalStorageEarthstarSettings('my-app');
+
+return (
+  <EarthstarPeer {...initValues}>
+    <LocalStorageSettingsWriter />
+  </EarthstarPeer>
+)
+```
