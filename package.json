@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-preview.17",
+  "version": "1.0.0",
   "license": "AGPL-3.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
