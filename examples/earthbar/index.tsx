@@ -129,7 +129,7 @@ function Examples() {
         </EarthbarExample>
       </EarthstarPeer>
       <hr />
-      <EarthstarPeer>
+      <EarthstarPeer initIsLive={false}>
         <EarthbarExample title={'No workspaces'} />
         <EarthbarExample title={'Multi, no workspaces'}>
           <MultiWorkspaceTab />
@@ -138,7 +138,7 @@ function Examples() {
         </EarthbarExample>
       </EarthstarPeer>
       <hr />
-      <EarthstarPeer {...initValues}>
+      <EarthstarPeer {...initValues} initIsLive={false}>
         <EarthbarExample title={'From localstorage'} />
         <EarthbarExample title={'Multi, from localstorage'}>
           <MultiWorkspaceTab />

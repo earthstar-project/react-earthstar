@@ -21,8 +21,8 @@ export default function WorkspaceTab() {
 
   // This effect will change the selected option to match the current workspace when it changes
   React.useEffect(() => {
-    if (currentWorkspace && previousWorkspace !== currentWorkspace) {
-      setSelectedOption(currentWorkspace);
+    if (previousWorkspace !== currentWorkspace) {
+      setSelectedOption(currentWorkspace ? currentWorkspace : 'ADD_WORKSPACE');
     }
   }, [currentWorkspace, previousWorkspace]);
 
