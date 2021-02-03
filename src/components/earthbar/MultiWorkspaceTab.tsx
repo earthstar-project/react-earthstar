@@ -1,6 +1,7 @@
-import React from 'react';
+import * as React from 'react';
 import MultiWorkspaceManagerPanel from './MultiWorkspaceManagerPanel';
-import { EarthbarTabLabel, EarthbarTab } from './Earthbar';
+import EarthbarTab from './EarthbarTab';
+import EarthbarTabLabel from './EarthbarTabLabel';
 
 export default function MultiWorkspaceTab() {
   return (

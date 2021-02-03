@@ -1,5 +1,5 @@
-import React from 'react';
-import { EarthbarTabPanel } from './Earthbar';
+import * as React from 'react';
+import EarthbarTabPanel from './EarthbarTabPanel';
 import {
   CopyAuthorAddressButton,
   CopyAuthorSecretButton,
@@ -7,8 +7,7 @@ import {
   DownloadKeypairButton,
   SignOutButton,
 } from '../';
-import { useCurrentWorkspace } from '../..';
-import { useCurrentAuthor } from '../../hooks';
+import { useCurrentAuthor, useCurrentWorkspace } from '../../hooks';
 
 export default function UserPanel() {
   const [currentWorkspace] = useCurrentWorkspace();

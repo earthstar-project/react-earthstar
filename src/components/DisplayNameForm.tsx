@@ -1,5 +1,5 @@
-import React from 'react';
-import { WorkspaceLabel } from '.';
+import * as React from 'react';
+import WorkspaceLabel from './WorkspaceLabel';
 import { useDocument, useCurrentAuthor } from '../hooks';
 import { getAuthorShortName } from '../util';
 

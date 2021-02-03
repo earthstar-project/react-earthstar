@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { ValidatorEs4, isErr } from 'earthstar';
 import { useAddWorkspace, useCurrentWorkspace, usePubs } from '../hooks';
 import { Alert } from '@reach/alert';
@@ -9,7 +9,6 @@ import {
   ComboboxList,
   ComboboxOption,
 } from '@reach/combobox';
-import { EarthbarContext } from './earthbar/Earthbar';
 
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 const NUMBERS = '1234567890';
@@ -34,8 +33,6 @@ export default function WorkspaceCreatorForm({
 }) {
   const [pubs, setPubs] = usePubs();
   const add = useAddWorkspace();
-
-  const { setActiveIndex, setFocusedIndex } = React.useContext(EarthbarContext);
 
   const [workspaceName, setWorkspaceName] = React.useState('');
   const [workspaceSuffix, setWorkspaceSuffix] = React.useState(generateSuffix);
@@ -74,8 +71,6 @@ export default function WorkspaceCreatorForm({
           }
 
           setCurrentWorkspace(address);
-          setFocusedIndex(-1);
-          setActiveIndex(-1);
         }}
       >
         <fieldset data-re-fieldset>

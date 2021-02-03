@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { isErr, ValidatorEs4 } from 'earthstar';
 
 export function getAuthorShortName(address: string): string {
@@ -38,4 +38,12 @@ export function useDownload() {
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   }, []);
+}
+
+export function makeStorageKey(customKey: string | undefined, key: string) {
+  if (!customKey) {
+    return `earthstar-peer-${key}`;
+  }
+
+  return `earthstar-peer-${customKey}-${key}`;
 }

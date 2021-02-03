@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { render } from 'react-dom';
 import {
   StorageMemory,
@@ -12,6 +12,8 @@ import {
   AuthorTab,
   Spacer,
   MultiWorkspaceTab,
+  LocalStorageSettingsWriter,
+  useLocalStorageEarthstarSettings,
 } from '../../src/index';
 import '../../styles/layout.css';
 import '../../styles/junior.css';
@@ -80,6 +82,8 @@ function EarthbarExample({
 }
 
 function Examples() {
+  const initValues = useLocalStorageEarthstarSettings('example');
+
   return (
     <>
       <h1>react-earthstar earthbar</h1>
@@ -132,6 +136,16 @@ function Examples() {
           <Spacer />
           <AuthorTab />
         </EarthbarExample>
+      </EarthstarPeer>
+      <hr />
+      <EarthstarPeer {...initValues}>
+        <EarthbarExample title={'From localstorage'} />
+        <EarthbarExample title={'Multi, from localstorage'}>
+          <MultiWorkspaceTab />
+          <Spacer />
+          <AuthorTab />
+        </EarthbarExample>
+        <LocalStorageSettingsWriter storageKey={'example'} />
       </EarthstarPeer>
     </>
   );

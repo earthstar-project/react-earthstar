@@ -1,5 +1,5 @@
-import React from 'react';
-import { useCurrentWorkspace, useWorkspaces } from '../';
+import * as React from 'react';
+import { useCurrentWorkspace, useWorkspaces } from '../hooks';
 
 export default function WorkspaceSelect() {
   const workspaces = useWorkspaces();

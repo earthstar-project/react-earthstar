@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { useCurrentAuthor } from '../hooks';
 
 export default function SignOutButton(

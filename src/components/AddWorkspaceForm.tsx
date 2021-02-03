@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { isErr } from 'earthstar';
 
 import { useAddWorkspace, useWorkspacePubs } from '../hooks';

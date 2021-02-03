@@ -1,5 +1,5 @@
-import React from 'react';
-import { useMakeInvitation, useWorkspacePubs } from '..';
+import * as React from 'react';
+import { useMakeInvitation, useWorkspacePubs } from '../hooks';
 import CopyButton from './_CopyButton';
 
 export default function InvitationCreatorForm({
