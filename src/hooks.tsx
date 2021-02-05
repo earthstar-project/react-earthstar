@@ -587,9 +587,12 @@ export function useLocalStorageEarthstarSettings(storageKey: string) {
     ? Object.entries(workspacesDocsInStorage).map(
         ([workspaceAddress, docs]) => {
           const storage = new StorageMemory([ValidatorEs4], workspaceAddress);
+
+          // Filter out recursively saved docs from the past
+          const { _docs: badDeeplyNestedDocs, ...actualDocs } = docs;
           // (this is a hack that knows too much about the internal structure of StorageMemory)
           // (it would be better to ingest each document one by one, but also a lot slower)
-          storage._docs = docs;
+          storage._docs = actualDocs;
           return storage;
         }
       )
