@@ -39,12 +39,12 @@ export default function LocalStorageSettingsWriter({
   });
 
   React.useEffect(() => {
-    Object.values(storages).forEach(storage => {
-      writeStorage(lsStoragesKey, {
-        ...storages,
-        [storage.workspace]: (storage as StorageMemory)._docs,
-      });
-    });
+    writeStorage(
+      lsStoragesKey,
+      Object.entries(storages).reduce((acc, [address, storage]) => {
+        return { ...acc, [address]: (storage as StorageMemory)._docs };
+      }, {})
+    );
   }, [storages, lsStoragesKey]);
 
   React.useEffect(() => {
