@@ -33,8 +33,9 @@ export default function RemoveWorkspaceButton({
           remove(address);
         }
       }}
+      disabled={!address}
     >
-      {children || `Remove ${address}`}
+      {children || address ? `Remove ${address}` : "Can't remove"}
     </button>
   );
 }
