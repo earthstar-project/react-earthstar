@@ -14,8 +14,7 @@ import {
   WriteEvent,
 } from 'earthstar';
 import useDeepCompareEffect from 'use-deep-compare-effect';
-import { useLocalStorage } from '@rehooks/local-storage';
-import { makeStorageKey } from './util';
+import { getLocalStorage, makeStorageKey } from './util';
 import {
   CurrentAuthorContext,
   CurrentWorkspaceContext,
@@ -575,13 +574,13 @@ export function useLocalStorageEarthstarSettings(storageKey: string) {
   const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
 
   // load the initial state from localStorage
-  const [workspacesDocsInStorage] = useLocalStorage<WorkspaceRecords>(
+  const workspacesDocsInStorage = getLocalStorage<WorkspaceRecords>(
     lsStoragesKey
   );
-  const [initPubs] = useLocalStorage<Record<string, string[]>>(lsPubsKey);
-  const [initCurrentAuthor] = useLocalStorage<AuthorKeypair>(lsAuthorKey);
-  const [initCurrentWorkspace] = useLocalStorage(lsCurrentWorkspaceKey);
-  const [initIsLive] = useLocalStorage<boolean>(lsIsLiveKey);
+  const initPubs = getLocalStorage<Record<string, string[]>>(lsPubsKey);
+  const initCurrentAuthor = getLocalStorage<AuthorKeypair>(lsAuthorKey);
+  const initCurrentWorkspace = getLocalStorage(lsCurrentWorkspaceKey);
+  const initIsLive = getLocalStorage<boolean>(lsIsLiveKey);
 
   const initWorkspaces = workspacesDocsInStorage
     ? Object.entries(workspacesDocsInStorage).map(
@@ -602,7 +601,7 @@ export function useLocalStorageEarthstarSettings(storageKey: string) {
     ...(initWorkspaces ? { initWorkspaces } : {}),
     ...(initPubs ? { initPubs } : {}),
     ...(initCurrentAuthor ? { initCurrentAuthor } : {}),
-    ...(initCurrentAuthor ? { initCurrentWorkspace } : {}),
+    ...(initCurrentWorkspace ? { initCurrentWorkspace } : {}),
     ...(initIsLive ? { initIsLive } : {}),
   };
 }
