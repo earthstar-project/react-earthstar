@@ -8,6 +8,11 @@ import {
   useCurrentWorkspace,
 } from '../hooks';
 import WorkspaceLabel from '../components/WorkspaceLabel';
+import {
+  WhatIsAPub,
+  WhatIsAWorkspace,
+  WhereToGetInvitationCode,
+} from './guidance/guidances';
 
 export default function InvitationRedemptionForm({
   onRedeem,
@@ -111,7 +116,7 @@ export default function InvitationRedemptionForm({
                   ? ' (already added)'
                   : null}
               </dd>
-              <dt data-re-dt>{'Pubs'}</dt>
+              <dt data-re-dt>{'Pub servers'}</dt>
               <dd data-re-dd>
                 {result.pubs.length > 0
                   ? result.pubs.map(pubUrl => (
@@ -170,17 +175,9 @@ export default function InvitationRedemptionForm({
           </button>
         ) : null}
       </form>
-      <details data-re-details key={'help-where-to-get'}>
-        <summary data-re-summary>
-          {'Where can I get an invitation code?'}
-        </summary>
-        <div data-re-details-content>
-          <p>
-            Ask an existing member to make an invitation code from the workspace
-            settings page.
-          </p>
-        </div>
-      </details>
+      <WhatIsAWorkspace />
+      <WhereToGetInvitationCode />
+      <WhatIsAPub />
     </>
   );
 }
