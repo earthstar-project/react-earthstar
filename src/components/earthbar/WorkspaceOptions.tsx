@@ -45,7 +45,10 @@ export function WorkspaceOptions({
           make sure to give your deletions time to sync with the pubs before you
           remove the entire workspace.
         </p>
-        <RemoveWorkspaceButton onClick={onRemove} />
+        <RemoveWorkspaceButton
+          workspaceAddress={workspaceAddress}
+          onClick={onRemove}
+        />
       </section>
     </div>
   );
