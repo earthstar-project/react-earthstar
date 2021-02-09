@@ -405,7 +405,8 @@ dd[data-re-user-panel-secret] {
   margin: 0 2px;
 }
 
-[data-reach-alert] {
+[data-reach-alert],
+[data-re-error-note] {
   font-size: 0.9em;
   color: var(--ac3);
 }

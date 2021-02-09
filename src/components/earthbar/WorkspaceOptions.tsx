@@ -4,13 +4,14 @@ import {
   RemoveWorkspaceButton,
   InvitationCreatorForm,
   SyncingCheckbox,
+  DeleteMyDataButton,
 } from '..';
 
 export function WorkspaceOptions({
   workspaceAddress,
   onRemove,
 }: {
-  workspaceAddress?: string;
+  workspaceAddress: string;
   onRemove?: () => void;
 }) {
   return (
@@ -35,20 +36,46 @@ export function WorkspaceOptions({
       <hr />
       <section data-re-section>
         <h1>{'Danger Zone'}</h1>
-        <p>
-          You can remove your copy of the workspace from this device, but it
-          will remain with pubs and other users it has synced with.
-        </p>
-        <p>
-          It's not possible to globally delete a workspace, but you can delete
-          your own data out of a workspace if the app allows it. If you do that,
-          make sure to give your deletions time to sync with the pubs before you
-          remove the entire workspace.
-        </p>
+        <DeleteMyDataButton workspaceAddress={workspaceAddress} />
+        <details data-re-details>
+          <summary data-re-summary>
+            {'What will deleting my documents do?'}
+          </summary>
+          <div data-re-details-content>
+            <p>
+              {
+                'Deleting your documents will overwrite all the documents you created with empty strings, which is the usual way to "delete" things from Earthstar. These deletions will propagate across the network, erasing your content from everyone in the workspace the next time they sync.'
+              }
+            </p>
+            <p>
+              {
+                'If you do this, make sure you give Earthstar a chance to sync with pubs and get your empty versions out there, before you turn off your computer or log out of the workspace.'
+              }
+            </p>
+          </div>
+        </details>
+        <hr />
         <RemoveWorkspaceButton
           workspaceAddress={workspaceAddress}
           onClick={onRemove}
         />
+        <details data-re-details>
+          <summary data-re-summary>
+            {'Will this remove the workspace everywhere?'}
+          </summary>
+          <div data-re-details-content>
+            <p>
+              {
+                'This button will remove your copy of the workspace from this device, but it will remain with pubs and other users it has synced with.'
+              }
+            </p>
+            <p>
+              {
+                "It's not possible to globally delete a workspace, but you can delete your own data out of a workspace."
+              }
+            </p>
+          </div>
+        </details>
       </section>
     </div>
   );
