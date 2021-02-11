@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useCurrentAuthor, useStorage } from '../hooks';
 import WorkspaceLabel from './WorkspaceLabel';
 
-export default function DeleteMyDataButton(
+export default function DeleteMyDataForm(
   props: {
     workspaceAddress: string;
   } & React.ButtonHTMLAttributes<HTMLButtonElement>
@@ -12,6 +12,9 @@ export default function DeleteMyDataButton(
   const storage = useStorage(props.workspaceAddress);
 
   const canDelete = storage && currentAuthor;
+
+  const [prompt, setPrompt] = React.useState('');
+  const promptMatches = prompt === 'DELETE EVERYTHING';
 
   const [deleted, setDeleted] = React.useState(false);
   const [numberDeleted, setNumberDeleted] = React.useState<
@@ -27,7 +30,19 @@ export default function DeleteMyDataButton(
   }, [deleted]);
 
   return (
-    <>
+    <form data-re-form data-re-delete-my-data-form>
+      <label data-re-label data-re-delete-my-data-label>
+        {'Please type '}
+        <b>{'DELETE EVERYTHING '}</b>
+        {'to confirm'}
+      </label>
+      <input
+        data-re-input
+        data-re-delete-my-data-input
+        disabled={deleted}
+        value={prompt}
+        onChange={e => setPrompt(e.target.value)}
+      />
       <button
         {...props}
         data-re-button
@@ -38,7 +53,7 @@ export default function DeleteMyDataButton(
           }
 
           const shouldDelete = window.confirm(
-            `This will delete all your documents from ${props.workspaceAddress}. Are you sure you want to do this?`
+            `This will delete all your data from ${props.workspaceAddress}. Are you sure you want to do this?`
           );
 
           if (!shouldDelete) {
@@ -49,18 +64,19 @@ export default function DeleteMyDataButton(
 
           setNumberDeleted(numDeleted);
           setDeleted(true);
+          setPrompt('');
         }}
-        disabled={!canDelete || deleted}
+        disabled={!canDelete || deleted || !promptMatches}
       >
         {deleted ? (
-          `Deleted ${numberDeleted} documents`
+          `Deleted ${numberDeleted} data documents`
         ) : canDelete ? (
           <>
-            {'Delete my documents from '}
+            {'Delete my data from '}
             <WorkspaceLabel address={props.workspaceAddress} />
           </>
         ) : (
-          'Delete my documents'
+          'Delete my data in this workspace'
         )}
       </button>
       {!canDelete ? (
@@ -70,6 +86,6 @@ export default function DeleteMyDataButton(
             : 'No workspace specified.'}
         </div>
       ) : null}
-    </>
+    </form>
   );
 }

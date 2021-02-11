@@ -414,3 +414,19 @@ dd[data-re-user-panel-secret] {
 [data-re-invitation-redemption-button] {
   margin-top: 0.5em;
 }
+
+[data-re-earthbar-workspace-options] > [data-re-button] {
+  background: none;
+  color: var(--gr6);
+  box-shadow: none;
+  border: none;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-align: center;
+  width: 100%;
+  text-shadow: var(--sh);
+}
+
+[data-re-earthbar-workspace-options] > [data-re-button]:hover {
+  text-decoration-color: var(--gr5)
+}

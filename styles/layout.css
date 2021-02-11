@@ -143,6 +143,26 @@
   grid-area: button;
 }
 
+/* DeleteMyDataForm */
+
+[data-re-delete-my-data-form] {
+  display: grid;
+  grid-template-areas: 'label' 'input' 'button';
+  grid-row-gap: 6px;
+}
+
+[data-re-delete-my-data-label] {
+  grid-area: label;
+}
+
+[data-re-delete-my-data-input] {
+  grid-area: input;
+}
+
+[data-re-delete-my-data-button] {
+  grid-area: button
+}
+
 /* InvitationCreatorForm */
 
 [data-re-invitation-creator-form] {

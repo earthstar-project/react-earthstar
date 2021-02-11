@@ -8,7 +8,7 @@ export { default as CopyAuthorAddressButton } from './CopyAuthorAddressButton';
 export { default as CopyAuthorSecretButton } from './CopyAuthorSecretButton';
 export { default as CurrentAuthor } from './CurrentAuthor';
 export { default as CurrentWorkspaceSelect } from './CurrentWorkspaceSelect';
-export { default as DeleteMyDataButton } from './DeleteMyDataButton';
+export { default as DeleteMyDataForm } from './DeleteMyDataForm';
 export { default as DisplayNameForm } from './DisplayNameForm';
 export { default as DownloadKeypairButton } from './DownloadKeypairButton';
 export { default as InvitationCreatorForm } from './InvitationCreatorForm';
