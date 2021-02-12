@@ -138,7 +138,11 @@ export function WhatIsAWorkspace() {
           'You can join or create as many workspaces as you want. A single workspace can be used by many different apps.'
         }
       </p>
-      <p>{"Workspaces' data are stored on pub servers."}</p>
+      <p>
+        {
+          "Workspaces' data are stored on pub servers and in your browser's storage on your own computer."
+        }
+      </p>
     </Guidance>
   );
 }
