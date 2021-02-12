@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { isErr, ValidatorEs4 } from 'earthstar';
+import { isErr, QueryOpts, ValidatorEs4 } from 'earthstar';
 
 export function getAuthorShortName(address: string): string {
   const parsedAuthor = ValidatorEs4.parseAuthorAddress(address);
@@ -60,4 +60,44 @@ export function getLocalStorage<T>(key: string): T | null {
   } catch {
     return null;
   }
+}
+
+export function useMemoQueryOpts({
+  pathPrefix,
+  lowPath,
+  highPath,
+  contentIsEmpty,
+  includeHistory,
+  participatingAuthor,
+  path,
+  versionsByAuthor,
+  now,
+  limit,
+}: QueryOpts): QueryOpts {
+  return React.useMemo(
+    () => ({
+      pathPrefix,
+      lowPath,
+      highPath,
+      contentIsEmpty,
+      includeHistory,
+      participatingAuthor,
+      path,
+      versionsByAuthor,
+      now,
+      limit,
+    }),
+    [
+      pathPrefix,
+      lowPath,
+      highPath,
+      contentIsEmpty,
+      includeHistory,
+      participatingAuthor,
+      path,
+      versionsByAuthor,
+      now,
+      limit,
+    ]
+  );
 }

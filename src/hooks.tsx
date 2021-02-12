@@ -14,7 +14,7 @@ import {
   WriteEvent,
 } from 'earthstar';
 import useDeepCompareEffect from 'use-deep-compare-effect';
-import { getLocalStorage, makeStorageKey } from './util';
+import { getLocalStorage, makeStorageKey, useMemoQueryOpts } from './util';
 import {
   CurrentAuthorContext,
   CurrentWorkspaceContext,
@@ -185,51 +185,13 @@ export function useSync() {
 }
 
 export function usePaths(query: QueryOpts, workspaceAddress?: string) {
-  const {
-    pathPrefix,
-    lowPath,
-    highPath,
-    contentIsEmpty,
-    includeHistory,
-    participatingAuthor,
-    path,
-    versionsByAuthor,
-    now,
-    limit,
-  } = query;
-
   const storage = useStorage(workspaceAddress);
 
   if (!storage) {
     console.warn(`Couldn't find workspace with address ${workspaceAddress}`);
   }
 
-  const queryMemo: QueryOpts = React.useMemo(
-    () => ({
-      pathPrefix,
-      lowPath,
-      highPath,
-      contentIsEmpty,
-      includeHistory,
-      participatingAuthor,
-      path,
-      versionsByAuthor,
-      now,
-      limit,
-    }),
-    [
-      pathPrefix,
-      lowPath,
-      highPath,
-      contentIsEmpty,
-      includeHistory,
-      participatingAuthor,
-      path,
-      versionsByAuthor,
-      now,
-      limit,
-    ]
-  );
+  const queryMemo = useMemoQueryOpts(query);
 
   const paths = React.useMemo(() => storage?.paths(queryMemo) || [], [
     queryMemo,
@@ -369,31 +331,41 @@ export function useDocument(
   return [localDocument, set, deleteDoc];
 }
 
-export function useDocuments(query: QueryOpts, workspaceAddress?: string) {
+export function useDocuments(
+  query: QueryOpts,
+  workspaceAddress?: string
+): Document[] {
   const storage = useStorage(workspaceAddress);
   const fetchedDocs =
     storage?.paths(query).map(path => storage?.getDocument(path) as Document) ||
     [];
   const [docs, setDocs] = React.useState(fetchedDocs);
 
-  useDeepCompareEffect(() => {
+  const queryMemo = useMemoQueryOpts(query);
+
+  React.useEffect(() => {
     setDocs(
       storage
-        ?.paths(query)
+        ?.paths(queryMemo)
         .map(path => storage?.getDocument(path) as Document) || []
     );
-  }, [storage, query, setDocs]);
+  }, [storage, queryMemo, setDocs]);
 
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    onWrite: event => {
-      const paths = storage?.paths(query);
+  const onWrite = React.useCallback(
+    event => {
+      const paths = storage?.paths(queryMemo);
       if (paths?.includes(event.document.path)) {
         const fetchedDocs =
           paths?.map(path => storage?.getDocument(path) as Document) || [];
         setDocs(fetchedDocs);
       }
     },
+    [storage, setDocs, queryMemo]
+  );
+
+  useSubscribeToStorages({
+    workspaces: storage ? [storage.workspace] : undefined,
+    onWrite,
   });
 
   return docs;
