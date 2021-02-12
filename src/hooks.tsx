@@ -579,7 +579,7 @@ export function useLocalStorageEarthstarSettings(storageKey: string) {
   );
   const initPubs = getLocalStorage<Record<string, string[]>>(lsPubsKey);
   const initCurrentAuthor = getLocalStorage<AuthorKeypair>(lsAuthorKey);
-  const initCurrentWorkspace = getLocalStorage(lsCurrentWorkspaceKey);
+  const initCurrentWorkspace = getLocalStorage<string>(lsCurrentWorkspaceKey);
   const initIsLive = getLocalStorage<boolean>(lsIsLiveKey);
 
   const initWorkspaces = workspacesDocsInStorage
