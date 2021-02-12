@@ -26,6 +26,8 @@ import {
   useMakeInvitation,
   useDocuments,
   useStorage,
+  LocalStorageSettingsWriter,
+  useLocalStorageEarthstarSettings,
 } from '../src';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
@@ -56,8 +58,10 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
       initPubs={pubs}
       initCurrentAuthor={keypair}
       initIsLive={false}
+      initCurrentWorkspace={WORKSPACE_ADDR_A}
     >
       {children}
+      <LocalStorageSettingsWriter storageKey={'tests'} />
     </EarthstarPeer>
   );
 };
@@ -168,13 +172,13 @@ test('useCurrentWorkspace', async () => {
     wrapper,
   });
 
-  expect(result.current[0]).toBeNull();
+  expect(result.current[0]).toEqual(WORKSPACE_ADDR_A);
 
   act(() => {
-    result.current[1](WORKSPACE_ADDR_A);
+    result.current[1](WORKSPACE_ADDR_B);
   });
 
-  expect(result.current[0]).toEqual(WORKSPACE_ADDR_A);
+  expect(result.current[0]).toEqual(WORKSPACE_ADDR_B);
 
   act(() => {
     result.current[1]('+somethingunknown.a123');
@@ -556,4 +560,21 @@ test('useMakeInvitation', () => {
   expect(result.current.invitationCode).toEqual(
     'earthstar:///?workspace=+testa.a123&v=1'
   );
+});
+
+test('useLocalStorageSettings', () => {
+  const { result } = renderHook(
+    () => useLocalStorageEarthstarSettings('tests'),
+    { wrapper }
+  );
+
+  expect(result.current.initWorkspaces).toHaveLength(3);
+  expect(result.current.initWorkspaces[0]._docs._docs).toBeUndefined();
+  expect(result.current.initPubs).toEqual({
+    '+testa.a123': ['https://a.pub'],
+    '+testb.b234': ['https://b.pub'],
+    '+testc.c567': ['https://c.pub'],
+  });
+  expect(result.current.initCurrentAuthor).toBeDefined();
+  expect(result.current.initCurrentWorkspace).toBe(WORKSPACE_ADDR_A);
 });

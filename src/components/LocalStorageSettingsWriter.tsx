@@ -1,4 +1,3 @@
-import { writeStorage } from '@rehooks/local-storage';
 import { StorageMemory } from 'earthstar';
 import * as React from 'react';
 import {
@@ -28,39 +27,45 @@ export default function LocalStorageSettingsWriter({
   const [currentWorkspace] = useCurrentWorkspace();
   const [isLive] = useIsLive();
 
-  useSubscribeToStorages({
-    onWrite: event => {
-      const storage = storages[event.document.workspace];
-      writeStorage(lsStoragesKey, {
-        ...storages,
-        [event.document.workspace]: (storage as StorageMemory)._docs,
-      });
-    },
-  });
+  const onWrite = React.useCallback(() => {
+    const storagesStringified = JSON.stringify(
+      Object.values(storages).reduce((acc, storage) => {
+        const { _docs } = storage as StorageMemory;
 
-  React.useEffect(() => {
-    writeStorage(
-      lsStoragesKey,
-      Object.entries(storages).reduce((acc, [address, storage]) => {
-        return { ...acc, [address]: (storage as StorageMemory)._docs };
+        return { ...acc, [storage.workspace]: _docs };
       }, {})
     );
+
+    localStorage.setItem(lsStoragesKey, storagesStringified);
   }, [storages, lsStoragesKey]);
 
+  // Persist workspace docs on storage events
+  useSubscribeToStorages({
+    onWrite,
+  });
+
+  // Persist workspace docs when onWrite's value changes
   React.useEffect(() => {
-    writeStorage(lsPubsKey, pubs);
+    onWrite();
+  }, [onWrite]);
+
+  React.useEffect(() => {
+    localStorage.setItem(lsPubsKey, JSON.stringify(pubs));
   }, [pubs, lsPubsKey]);
 
   React.useEffect(() => {
-    writeStorage(lsAuthorKey, currentAuthor);
+    localStorage.setItem(lsAuthorKey, JSON.stringify(currentAuthor));
   }, [currentAuthor, lsAuthorKey]);
 
   React.useEffect(() => {
-    writeStorage(lsCurrentWorkspaceKey, currentWorkspace);
+    localStorage.setItem(
+      lsCurrentWorkspaceKey,
+      JSON.stringify(currentWorkspace)
+    );
   }, [currentWorkspace, lsCurrentWorkspaceKey]);
 
   React.useEffect(() => {
-    writeStorage(lsIsLiveKey, isLive);
+    localStorage.setItem(lsIsLiveKey, JSON.stringify(isLive));
   });
 
   return null;

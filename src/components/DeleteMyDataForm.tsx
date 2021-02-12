@@ -3,11 +3,7 @@ import * as React from 'react';
 import { useCurrentAuthor, useStorage } from '../hooks';
 import WorkspaceLabel from './WorkspaceLabel';
 
-export default function DeleteMyDataForm(
-  props: {
-    workspaceAddress: string;
-  } & React.ButtonHTMLAttributes<HTMLButtonElement>
-) {
+export default function DeleteMyDataForm(props: { workspaceAddress: string }) {
   const [currentAuthor] = useCurrentAuthor();
   const storage = useStorage(props.workspaceAddress);
 

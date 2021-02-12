@@ -47,3 +47,17 @@ export function makeStorageKey(customKey: string | undefined, key: string) {
 
   return `earthstar-peer-${customKey}-${key}`;
 }
+
+export function getLocalStorage<T>(key: string): T | null {
+  const value = localStorage.getItem(key);
+
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
