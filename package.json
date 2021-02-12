@@ -18,10 +18,10 @@
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "components-example": "parcel examples/components/index.html",
-    "earthbar-example": "parcel examples/earthbar/index.html --port 2345"
+    "earthbar-example": "parcel examples/earthbar/index.html"
   },
   "peerDependencies": {
-    "earthstar": "^5.7.4",
+    "earthstar": "^5.7.6",
     "react": "~16.13.1"
   },
   "husky": {
@@ -43,7 +43,7 @@
     "@types/jest": "^26.0.14",
     "@types/react-dom": "^16.9.8",
     "babel-jest": "^26.5.2",
-    "earthstar": "^5.7.4",
+    "earthstar": "^5.7.6",
     "eslint-plugin-react-hooks": "^4.1.2",
     "husky": "^4.3.0",
     "jest-localstorage-mock": "^2.4.6",

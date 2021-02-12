@@ -405,11 +405,28 @@ dd[data-re-user-panel-secret] {
   margin: 0 2px;
 }
 
-[data-reach-alert] {
+[data-reach-alert],
+[data-re-error-note] {
   font-size: 0.9em;
   color: var(--ac3);
 }
 
 [data-re-invitation-redemption-button] {
   margin-top: 0.5em;
+}
+
+[data-re-earthbar-workspace-options] > [data-re-button] {
+  background: none;
+  color: var(--gr6);
+  box-shadow: none;
+  border: none;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-align: center;
+  width: 100%;
+  text-shadow: var(--sh);
+}
+
+[data-re-earthbar-workspace-options] > [data-re-button]:hover {
+  text-decoration-color: var(--gr5)
 }

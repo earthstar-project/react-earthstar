@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AuthorKeypair, IStorage } from 'earthstar';
-import LiveSyncer from './LiveSyncer';
+import LiveSyncer from './_LiveSyncer';
 import {
   CurrentAuthorContext,
   CurrentWorkspaceContext,
@@ -8,6 +8,7 @@ import {
   PubsContext,
   StorageContext,
 } from '../contexts';
+import FocusSyncer from './_FocusSyncer';
 
 export default function EarthstarPeer({
   initWorkspaces = [],
@@ -59,6 +60,7 @@ export default function EarthstarPeer({
                   workspaceAddress={workspaceAddress}
                 />
               ))}
+              <FocusSyncer />
             </IsLiveContext.Provider>
           </CurrentWorkspaceContext.Provider>
         </CurrentAuthorContext.Provider>
