@@ -97,7 +97,7 @@ export function WorkspaceOptions({
             setIsDangerZoneShown(true);
           }}
         >
-          {'More, destructive settings'}
+          {'Data deletion settings'}
         </button>
       )}
     </div>
