@@ -7,6 +7,7 @@ import { useWorkspaces } from '../../hooks';
 import { WorkspaceOptions } from './WorkspaceOptions';
 import { EarthbarContext } from './contexts';
 import EarthbarTabPanel from './EarthbarTabPanel';
+import { WhatIsAWorkspace } from '../guidance/guidances';
 
 type WorkspaceManagerState =
   | { screen: 'list' }
@@ -90,6 +91,7 @@ function WorkspaceList({
             </p>
           </>
         )}
+        <WhatIsAWorkspace />
       </section>
     </div>
   );

@@ -5,6 +5,7 @@ import {
   InvitationCreatorForm,
   SyncingCheckbox,
 } from '..';
+import { WhatIsAPub } from '../guidance/guidances';
 
 export function WorkspaceOptions({
   workspaceAddress,
@@ -21,8 +22,8 @@ export function WorkspaceOptions({
       <hr />
       <section data-re-section>
         <h1>{'Pub Servers'}</h1>
-        <p>{'Servers that help this workspace sync its data.'}</p>
         <PubEditor workspaceAddress={workspaceAddress} />
+        <WhatIsAPub />
       </section>
       <hr />
       <section data-re-section>
