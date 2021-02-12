@@ -305,7 +305,7 @@
 
 [data-re-earthbar-tabs] {
   display: flex;
-  align-content: flex-end;
+  align-items: baseline;
 }
 
 /* EarthbarTabLabel */
