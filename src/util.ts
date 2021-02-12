@@ -55,5 +55,9 @@ export function getLocalStorage<T>(key: string): T | null {
     return null;
   }
 
-  return JSON.parse(value);
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
 }
