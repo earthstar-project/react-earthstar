@@ -80,7 +80,7 @@ export function useRemoveWorkspace() {
       const storage = storages[address];
 
       if (storage) {
-        storage.close();
+        storage.close({ delete: true });
       }
     },
     [setStorages, currentWorkspace, setCurrentWorkspace, storages]
@@ -372,7 +372,7 @@ export function useStorages(): [
 export function useSubscribeToStorages(options: {
   workspaces?: string[];
   paths?: string[];
-  history?: Pick<Query, 'history'>['history'];
+  history?: Query['history'];
   onWrite: (event: WriteEvent) => void;
 }) {
   const [storages] = useStorages();

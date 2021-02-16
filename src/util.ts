@@ -78,14 +78,14 @@ export function useMemoQueryOpts({
   timestampGt,
   timestampLt,
 }: Query): Query {
-  return React.useMemo(
-    () => ({
+  return React.useMemo(() => {
+    const obj = {
       author,
       contentLength,
       contentLengthGt,
       contentLengthLt,
       continueAfter,
-      history,
+      ...(history ? { history } : {}),
       limit,
       limitBytes,
       path,
@@ -94,22 +94,23 @@ export function useMemoQueryOpts({
       timestamp,
       timestampGt,
       timestampLt,
-    }),
-    [
-      author,
-      contentLength,
-      contentLengthGt,
-      contentLengthLt,
-      continueAfter,
-      history,
-      limit,
-      limitBytes,
-      path,
-      pathEndsWith,
-      pathStartsWith,
-      timestamp,
-      timestampGt,
-      timestampLt,
-    ]
-  );
+    };
+
+    return obj;
+  }, [
+    author,
+    contentLength,
+    contentLengthGt,
+    contentLengthLt,
+    continueAfter,
+    history,
+    limit,
+    limitBytes,
+    path,
+    pathEndsWith,
+    pathStartsWith,
+    timestamp,
+    timestampGt,
+    timestampLt,
+  ]);
 }

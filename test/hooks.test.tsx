@@ -2,12 +2,13 @@ import * as React from 'react';
 import {
   ValidatorEs4,
   StorageMemory,
-  QueryOpts,
+  Query,
   generateAuthorKeypair,
   AuthorKeypair,
   WriteEvent,
   isErr,
   EarthstarError,
+  syncLocal,
 } from 'earthstar';
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
@@ -188,7 +189,7 @@ test('useCurrentWorkspace', async () => {
 });
 
 test('usePaths', () => {
-  const useTest = (q: QueryOpts) => {
+  const useTest = (q: Query) => {
     const [query, setQuery] = React.useState(q);
     const paths = usePaths(query, WORKSPACE_ADDR_A);
     const [storages] = useStorages();
@@ -199,7 +200,7 @@ test('usePaths', () => {
   const { result } = renderHook(
     () =>
       useTest({
-        pathPrefix: '/test',
+        pathStartsWith: '/test',
       }),
     { wrapper }
   );
@@ -217,7 +218,7 @@ test('usePaths', () => {
   expect(result.current.paths).toEqual(['/test/1']);
 
   act(() => {
-    result.current.setQuery({ pathPrefix: '/nothing' });
+    result.current.setQuery({ pathStartsWith: '/nothing' });
   });
 
   expect(result.current.paths).toEqual([]);
@@ -271,7 +272,7 @@ test('useDocument', () => {
 });
 
 test('useDocuments', async () => {
-  const useTest = (q: QueryOpts) => {
+  const useTest = (q: Query) => {
     const [query, setQuery] = React.useState(q);
     const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
     const docs = useDocuments(query, workspace);
@@ -283,7 +284,7 @@ test('useDocuments', async () => {
   const { result } = renderHook(
     () =>
       useTest({
-        pathPrefix: '/docs-test',
+        pathStartsWith: '/docs-test',
       }),
     { wrapper }
   );
@@ -326,7 +327,7 @@ test('useSubscribeToStorages', () => {
   const useTest = (options?: {
     workspaces?: string[];
     paths?: string[];
-    includeHistory?: boolean;
+    history?: Query['history'];
   }) => {
     const [storages] = useStorages();
     const [state, setState] = React.useState<WriteEvent | null>(null);
@@ -428,7 +429,7 @@ test('useSubscribeToStorages', () => {
   const { result: historyResult } = renderHook(
     () =>
       useTest({
-        includeHistory: true,
+        history: 'all',
       }),
     { wrapper }
   );
@@ -463,7 +464,8 @@ test('useSubscribeToStorages', () => {
       path: '/test/history',
       timestamp: publishDate - 10000,
     });
-    historyResult.current.storages[WORKSPACE_ADDR_A].sync(otherStorage);
+
+    syncLocal(historyResult.current.storages[WORKSPACE_ADDR_A], otherStorage);
   });
 
   expect(historyResult.current.event?.isLocal).toBeFalsy();
