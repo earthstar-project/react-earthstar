@@ -5,7 +5,7 @@ import {
   StorageMemory,
   ValidatorEs4,
   syncLocalAndHttp,
-  QueryOpts,
+  Query,
   Document,
   isErr,
   EarthstarError,
@@ -77,7 +77,11 @@ export function useRemoveWorkspace() {
         return prevCopy;
       });
 
-      storages[address]?.deleteAndClose();
+      const storage = storages[address];
+
+      if (storage) {
+        storage.close();
+      }
     },
     [setStorages, currentWorkspace, setCurrentWorkspace, storages]
   );
@@ -184,7 +188,7 @@ export function useSync() {
   );
 }
 
-export function usePaths(query: QueryOpts, workspaceAddress?: string) {
+export function usePaths(query: Query, workspaceAddress?: string) {
   const storage = useStorage(workspaceAddress);
 
   if (!storage) {
@@ -212,31 +216,16 @@ export function usePaths(query: QueryOpts, workspaceAddress?: string) {
       }
 
       if (
-        queryMemo.pathPrefix &&
-        !event.document.path.startsWith(queryMemo.pathPrefix)
+        queryMemo.pathStartsWith &&
+        !event.document.path.startsWith(queryMemo.pathStartsWith)
       ) {
         return;
       }
 
       if (
-        queryMemo.lowPath &&
-        queryMemo.lowPath <= event.document.path === false
+        queryMemo.pathEndsWith &&
+        !event.document.path.endsWith(queryMemo.pathEndsWith)
       ) {
-        return;
-      }
-
-      if (
-        queryMemo.highPath &&
-        event.document.path < queryMemo.highPath === false
-      ) {
-        return;
-      }
-
-      if (queryMemo.contentIsEmpty && event.document.content !== '') {
-        return;
-      }
-
-      if (queryMemo.contentIsEmpty === false && event.document.content === '') {
         return;
       }
 
@@ -247,7 +236,7 @@ export function usePaths(query: QueryOpts, workspaceAddress?: string) {
 
   useSubscribeToStorages({
     workspaces: storage ? [storage.workspace] : undefined,
-    includeHistory: query.includeHistory,
+    history: query.history,
     onWrite,
   });
 
@@ -332,7 +321,7 @@ export function useDocument(
 }
 
 export function useDocuments(
-  query: QueryOpts,
+  query: Query,
   workspaceAddress?: string
 ): Document[] {
   const storage = useStorage(workspaceAddress);
@@ -383,14 +372,14 @@ export function useStorages(): [
 export function useSubscribeToStorages(options: {
   workspaces?: string[];
   paths?: string[];
-  includeHistory?: boolean;
+  history?: Pick<Query, 'history'>['history'];
   onWrite: (event: WriteEvent) => void;
 }) {
   const [storages] = useStorages();
 
   useDeepCompareEffect(() => {
     const onWrite = (event: WriteEvent) => {
-      if (event.isLatest === false && options.includeHistory !== true) {
+      if (event.isLatest === false && options.history !== 'all') {
         return;
       }
 
