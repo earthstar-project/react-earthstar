@@ -1,4 +1,3 @@
-import { StorageMemory } from 'earthstar';
 import * as React from 'react';
 import {
   useCurrentAuthor,
@@ -17,7 +16,7 @@ export default function LocalStorageSettingsWriter({
 }) {
   const lsAuthorKey = makeStorageKey(storageKey, 'current-author');
   const lsPubsKey = makeStorageKey(storageKey, 'pubs');
-  const lsStoragesKey = makeStorageKey(storageKey, 'storages');
+  const lsWorkspacesKey = makeStorageKey(storageKey, 'workspaces');
   const lsCurrentWorkspaceKey = makeStorageKey(storageKey, 'current-workspace');
   const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
 
@@ -29,15 +28,11 @@ export default function LocalStorageSettingsWriter({
 
   const onWrite = React.useCallback(() => {
     const storagesStringified = JSON.stringify(
-      Object.values(storages).reduce((acc, storage) => {
-        const { _docs } = storage as StorageMemory;
-
-        return { ...acc, [storage.workspace]: _docs };
-      }, {})
+      Object.keys(storages).map(key => key)
     );
 
-    localStorage.setItem(lsStoragesKey, storagesStringified);
-  }, [storages, lsStoragesKey]);
+    localStorage.setItem(lsWorkspacesKey, storagesStringified);
+  }, [storages, lsWorkspacesKey]);
 
   // Persist workspace docs on storage events
   useSubscribeToStorages({
