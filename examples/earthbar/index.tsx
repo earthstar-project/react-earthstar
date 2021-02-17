@@ -5,6 +5,7 @@ import {
   ValidatorEs4,
   generateAuthorKeypair,
   AuthorKeypair,
+  StorageToAsync,
 } from 'earthstar';
 import {
   EarthstarPeer,
@@ -81,6 +82,14 @@ function EarthbarExample({
   );
 }
 
+function makeStorages() {
+  return [
+    EXAMPLE_WORKSPACE_ADDR1,
+    EXAMPLE_WORKSPACE_ADDR2,
+    EXAMPLE_WORKSPACE_ADDR3,
+  ].map(addr => new StorageToAsync(new StorageMemory([ValidatorEs4], addr), 0));
+}
+
 function Examples() {
   const initValues = useLocalStorageEarthstarSettings('example');
 
@@ -88,11 +97,7 @@ function Examples() {
     <>
       <h1>react-earthstar earthbar</h1>
       <EarthstarPeer
-        initWorkspaces={[
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR1),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR2),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
-        ]}
+        initWorkspaces={makeStorages()}
         initPubs={pubs}
         initIsLive={false}
       >
@@ -107,11 +112,7 @@ function Examples() {
       </EarthstarPeer>
       <hr />
       <EarthstarPeer
-        initWorkspaces={[
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR1),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR2),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
-        ]}
+        initWorkspaces={makeStorages()}
         initPubs={pubs}
         initIsLive={false}
         initCurrentAuthor={EXAMPLE_USER}

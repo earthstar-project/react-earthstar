@@ -43,10 +43,6 @@ const PUB_A = 'https://a.pub';
 const PUB_B = 'https://b.pub';
 const PUB_C = 'https://c.pub';
 
-const storages = [WORKSPACE_ADDR_A, WORKSPACE_ADDR_B, WORKSPACE_ADDR_C].map(
-  address => new StorageToAsync(new StorageMemory([ValidatorEs4], address), 0)
-);
-
 const pubs = {
   [WORKSPACE_ADDR_A]: [PUB_A],
   [WORKSPACE_ADDR_B]: [PUB_B],
@@ -54,6 +50,10 @@ const pubs = {
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
+  const storages = [WORKSPACE_ADDR_A, WORKSPACE_ADDR_B, WORKSPACE_ADDR_C].map(
+    address => new StorageToAsync(new StorageMemory([ValidatorEs4], address), 0)
+  );
+
   return (
     <EarthstarPeer
       initWorkspaces={storages}
@@ -373,9 +373,6 @@ test('useSubscribeToStorages', async () => {
     });
   });
 
-  console.log('DEBUG');
-  console.log(result.current.event);
-
   expect(result.current.event?.document.path).toEqual('/test/1');
   expect(result.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_A);
   expect(result.current.event?.document.author).toEqual(keypair.address);
@@ -446,7 +443,7 @@ test('useSubscribeToStorages', async () => {
     });
   });
 
-  expect(workspaceResult.current.event?.document.path).toEqual('/test/b');
+  expect(pathResult.current.event?.document.path).toEqual('/test/b');
 
   // Can listen for all history
   const { result: historyResult } = renderHook(
@@ -597,7 +594,6 @@ test('useLocalStorageSettings', () => {
   );
 
   expect(result.current.initWorkspaces).toHaveLength(3);
-  expect(result.current.initWorkspaces[0]._docs._docs).toBeUndefined();
   expect(result.current.initPubs).toEqual({
     '+testa.a123': ['https://a.pub'],
     '+testb.b234': ['https://b.pub'],

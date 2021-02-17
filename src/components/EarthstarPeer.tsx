@@ -42,6 +42,12 @@ export default function EarthstarPeer({
   );
   const [isLive, setIsLive] = React.useState(initIsLive);
 
+  React.useEffect(() => {
+    return () => {
+      Object.values(storages).forEach(storage => storage.close());
+    };
+  }, [storages]);
+
   return (
     <StorageContext.Provider value={{ storages, setStorages }}>
       <PubsContext.Provider value={{ pubs, setPubs }}>

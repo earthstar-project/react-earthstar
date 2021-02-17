@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { OnePubOneWorkspaceSyncer } from 'earthstar';
-import { useIsLive, useStorages, useWorkspacePubs } from '../hooks';
+//import * as React from 'react';
+//import { OnePubOneWorkspaceSyncer } from 'earthstar';
+//import { useIsLive, useStorages, useWorkspacePubs } from '../hooks';
 
-export default function LiveSyncer({
-  workspaceAddress,
-}: {
-  workspaceAddress: string;
-}) {
+// TODO: There is no live syncing API for IStorageAsync yet
+
+export default function LiveSyncer({}: { workspaceAddress: string }) {
+  /*
   const [isLive] = useIsLive();
   const [storages] = useStorages();
   const [pubs] = useWorkspacePubs(workspaceAddress);
 
+  
   React.useEffect(() => {
     const syncers = pubs.map(
       pubUrl => new OnePubOneWorkspaceSyncer(storages[workspaceAddress], pubUrl)
@@ -36,6 +36,7 @@ export default function LiveSyncer({
       });
     };
   }, [pubs, isLive, workspaceAddress, storages]);
+  */
 
   return null;
 }

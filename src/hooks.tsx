@@ -212,9 +212,17 @@ export function usePaths(query: Query, workspaceAddress?: string): string[] {
   const [localPaths, setLocalPaths] = React.useState<string[]>([]);
 
   useDeepCompareEffect(() => {
+    let ignore = false;
+
     storage?.paths(queryMemo).then(pathResult => {
-      setLocalPaths(pathResult);
+      if (!ignore) {
+        setLocalPaths(pathResult);
+      }
     });
+
+    return () => {
+      ignore = true;
+    };
   }, [storage, queryMemo, setLocalPaths]);
 
   const onWrite = React.useCallback(
@@ -275,11 +283,19 @@ export function useDocument(
   const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
+    let ignore = false;
+
     setIsLoading(true);
     storage?.getDocument(path).then(doc => {
-      setLocalDocument(doc);
-      setIsLoading(false);
+      if (!ignore) {
+        setLocalDocument(doc);
+        setIsLoading(false);
+      }
     });
+
+    return () => {
+      ignore = true;
+    };
   }, [storage, path]);
 
   const onWrite = React.useCallback(
@@ -361,20 +377,26 @@ export function useDocuments(
 
   const queryMemo = useMemoQueryOpts(query);
 
-  const fetchDocs = React.useCallback(() => {
+  React.useEffect(() => {
+    let ignore = false;
+
     storage
       ?.paths(queryMemo)
       .then(pathsResult => {
         return Promise.all(pathsResult.map(path => storage?.getDocument(path)));
       })
-      .then(docsResult =>
-        setDocs(docsResult.filter((doc): doc is Document => doc !== undefined))
-      );
-  }, [queryMemo, storage]);
+      .then(docsResult => {
+        if (!ignore) {
+          setDocs(
+            docsResult.filter((doc): doc is Document => doc !== undefined)
+          );
+        }
+      });
 
-  React.useEffect(() => {
-    fetchDocs();
-  }, [fetchDocs]);
+    return () => {
+      ignore = true;
+    };
+  }, [storage, queryMemo]);
 
   const onWrite = React.useCallback(
     event => {
@@ -429,8 +451,6 @@ export function useSubscribeToStorages(options: {
 
   useDeepCompareEffect(() => {
     const onWrite = (event: WriteEvent) => {
-      console.log(event);
-
       if (event.isLatest === false && options.history !== 'all') {
         return;
       }
@@ -592,7 +612,10 @@ export function useLocalStorageEarthstarSettings(storageKey: string) {
 
   const initWorkspaces = workspacesInStorage
     ? workspacesInStorage.map(workspaceAddress => {
-        return new StorageLocalStorage([ValidatorEs4], workspaceAddress);
+        return new StorageToAsync(
+          new StorageLocalStorage([ValidatorEs4], workspaceAddress),
+          0
+        );
       })
     : null;
 

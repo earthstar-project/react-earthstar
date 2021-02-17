@@ -1,4 +1,4 @@
-import { deleteMyDocuments } from 'earthstar';
+// import { deleteMyDocuments } from 'earthstar';
 import * as React from 'react';
 import { useCurrentAuthor, useStorage } from '../hooks';
 import WorkspaceLabel from './WorkspaceLabel';
@@ -56,9 +56,10 @@ export default function DeleteMyDataForm(props: { workspaceAddress: string }) {
             return;
           }
 
-          const { numDeleted } = deleteMyDocuments(storage, currentAuthor);
+          // TODO: No deleteMyDocuments for IStorageAsync yet
+          //const { numDeleted } = deleteMyDocuments(storage, currentAuthor);
 
-          setNumberDeleted(numDeleted);
+          setNumberDeleted(/* numDeleted */ 0);
           setDeleted(true);
           setPrompt('');
         }}
