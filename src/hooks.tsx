@@ -63,6 +63,7 @@ export function useAddWorkspace() {
 
 export function useRemoveWorkspace(): (address: string) => Promise<void> {
   const [storages, setStorages] = useStorages();
+  const [pubs, setPubs] = usePubs();
   const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
 
   return React.useCallback(
@@ -83,6 +84,10 @@ export function useRemoveWorkspace(): (address: string) => Promise<void> {
         const storage = storages[address];
 
         if (storage) {
+          const nextPubs = { ...pubs };
+          delete nextPubs[address];
+          setPubs(nextPubs);
+
           return storage
             .close({ delete: true })
             .then(resolve)
@@ -92,7 +97,14 @@ export function useRemoveWorkspace(): (address: string) => Promise<void> {
         return reject();
       });
     },
-    [setStorages, currentWorkspace, setCurrentWorkspace, storages]
+    [
+      setStorages,
+      currentWorkspace,
+      setCurrentWorkspace,
+      storages,
+      pubs,
+      setPubs,
+    ]
   );
 }
 
