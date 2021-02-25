@@ -8,6 +8,7 @@ import { WorkspaceOptions } from './WorkspaceOptions';
 import { EarthbarContext } from './contexts';
 import EarthbarTabPanel from './EarthbarTabPanel';
 import { WhatIsAWorkspace } from '../guidance/guidances';
+import DisplayNameForm from '../DisplayNameForm';
 
 type WorkspaceManagerState =
   | { screen: 'list' }
@@ -147,6 +148,11 @@ export default function MultiWorkspaceManagerPanel() {
               </button>
               {state.address}
             </nav>
+          </section>
+          <hr />
+          <section>
+            <h1>{'Customize your identity'}</h1>
+            <DisplayNameForm workspaceAddress={state.address} />
           </section>
           <hr />
           <WorkspaceOptions

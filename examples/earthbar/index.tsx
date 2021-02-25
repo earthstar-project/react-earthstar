@@ -103,7 +103,8 @@ function Examples() {
       >
         <hr />
         <EarthbarExample title={'Default Earthbar'}></EarthbarExample>
-
+      </EarthstarPeer>
+      <EarthstarPeer initIsLive={false}>
         <EarthbarExample title={'Earthbar for all-workspaces-at-once app'}>
           <MultiWorkspaceTab />
           <Spacer />
@@ -120,7 +121,8 @@ function Examples() {
         <EarthbarExample
           title={'Default Earthbar (signed in)'}
         ></EarthbarExample>
-
+      </EarthstarPeer>
+      <EarthstarPeer initIsLive={false}>
         <EarthbarExample
           title={'Earthbar for all-workspaces-at-once app (signed in)'}
         >
@@ -132,6 +134,8 @@ function Examples() {
       <hr />
       <EarthstarPeer initIsLive={false}>
         <EarthbarExample title={'No workspaces'} />
+      </EarthstarPeer>
+      <EarthstarPeer initIsLive={false}>
         <EarthbarExample title={'Multi, no workspaces'}>
           <MultiWorkspaceTab />
           <Spacer />
@@ -141,6 +145,9 @@ function Examples() {
       <hr />
       <EarthstarPeer {...initValues} initIsLive={false}>
         <EarthbarExample title={'From localstorage'} />
+        <LocalStorageSettingsWriter storageKey={'example'} />
+      </EarthstarPeer>
+      <EarthstarPeer {...initValues} initIsLive={false}>
         <EarthbarExample title={'Multi, from localstorage'}>
           <MultiWorkspaceTab />
           <Spacer />
