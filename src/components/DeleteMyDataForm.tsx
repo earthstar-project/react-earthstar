@@ -1,5 +1,5 @@
-import { deleteMyDocuments } from 'earthstar';
 import * as React from 'react';
+import { deleteMyDocumentsAsync } from 'earthstar';
 import { useCurrentAuthor, useStorage } from '../hooks';
 import WorkspaceLabel from './WorkspaceLabel';
 
@@ -43,7 +43,7 @@ export default function DeleteMyDataForm(props: { workspaceAddress: string }) {
         {...props}
         data-re-button
         data-re-delete-my-data-button
-        onClick={() => {
+        onClick={async () => {
           if (!storage || !currentAuthor) {
             return;
           }
@@ -56,7 +56,10 @@ export default function DeleteMyDataForm(props: { workspaceAddress: string }) {
             return;
           }
 
-          const { numDeleted } = deleteMyDocuments(storage, currentAuthor);
+          const { numDeleted } = await deleteMyDocumentsAsync(
+            storage,
+            currentAuthor
+          );
 
           setNumberDeleted(numDeleted);
           setDeleted(true);

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { isErr, QueryOpts, ValidatorEs4 } from 'earthstar';
+import { isErr, Query, ValidatorEs4 } from 'earthstar';
 
 export function getAuthorShortName(address: string): string {
   const parsedAuthor = ValidatorEs4.parseAuthorAddress(address);
@@ -63,41 +63,54 @@ export function getLocalStorage<T>(key: string): T | null {
 }
 
 export function useMemoQueryOpts({
-  pathPrefix,
-  lowPath,
-  highPath,
-  contentIsEmpty,
-  includeHistory,
-  participatingAuthor,
-  path,
-  versionsByAuthor,
-  now,
+  author,
+  contentLength,
+  contentLengthGt,
+  contentLengthLt,
+  continueAfter,
+  history,
   limit,
-}: QueryOpts): QueryOpts {
-  return React.useMemo(
-    () => ({
-      pathPrefix,
-      lowPath,
-      highPath,
-      contentIsEmpty,
-      includeHistory,
-      participatingAuthor,
-      path,
-      versionsByAuthor,
-      now,
+  limitBytes,
+  path,
+  pathEndsWith,
+  pathStartsWith,
+  timestamp,
+  timestampGt,
+  timestampLt,
+}: Query): Query {
+  return React.useMemo(() => {
+    const obj = {
+      author,
+      contentLength,
+      contentLengthGt,
+      contentLengthLt,
+      continueAfter,
+      ...(history ? { history } : {}),
       limit,
-    }),
-    [
-      pathPrefix,
-      lowPath,
-      highPath,
-      contentIsEmpty,
-      includeHistory,
-      participatingAuthor,
+      limitBytes,
       path,
-      versionsByAuthor,
-      now,
-      limit,
-    ]
-  );
+      pathEndsWith,
+      pathStartsWith,
+      timestamp,
+      timestampGt,
+      timestampLt,
+    };
+
+    return obj;
+  }, [
+    author,
+    contentLength,
+    contentLengthGt,
+    contentLengthLt,
+    continueAfter,
+    history,
+    limit,
+    limitBytes,
+    path,
+    pathEndsWith,
+    pathStartsWith,
+    timestamp,
+    timestampGt,
+    timestampLt,
+  ]);
 }

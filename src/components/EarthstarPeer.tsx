@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AuthorKeypair, IStorage } from 'earthstar';
+import { AuthorKeypair, IStorageAsync } from 'earthstar';
 import LiveSyncer from './_LiveSyncer';
 import {
   CurrentAuthorContext,
@@ -16,10 +16,9 @@ export default function EarthstarPeer({
   initCurrentAuthor = null,
   initCurrentWorkspace = null,
   initIsLive = true,
-
   children,
 }: {
-  initWorkspaces?: IStorage[];
+  initWorkspaces?: IStorageAsync[];
   initPubs?: Record<string, string[]>;
   initCurrentAuthor?: AuthorKeypair | null;
   initCurrentWorkspace?: string | null;
@@ -27,7 +26,7 @@ export default function EarthstarPeer({
   children: React.ReactNode;
 }) {
   const [storages, setStorages] = React.useState(
-    initWorkspaces.reduce<Record<string, IStorage>>((acc, storage) => {
+    initWorkspaces.reduce<Record<string, IStorageAsync>>((acc, storage) => {
       return { ...acc, [storage.workspace]: storage };
     }, {})
   );
@@ -42,6 +41,12 @@ export default function EarthstarPeer({
       : null
   );
   const [isLive, setIsLive] = React.useState(initIsLive);
+
+  React.useEffect(() => {
+    return () => {
+      Object.values(storages).forEach(storage => storage.close());
+    };
+  }, [storages]);
 
   return (
     <StorageContext.Provider value={{ storages, setStorages }}>

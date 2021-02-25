@@ -5,6 +5,7 @@ import {
   ValidatorEs4,
   generateAuthorKeypair,
   AuthorKeypair,
+  StorageToAsync,
 } from 'earthstar';
 import {
   EarthstarPeer,
@@ -81,6 +82,14 @@ function EarthbarExample({
   );
 }
 
+function makeStorages() {
+  return [
+    EXAMPLE_WORKSPACE_ADDR1,
+    EXAMPLE_WORKSPACE_ADDR2,
+    EXAMPLE_WORKSPACE_ADDR3,
+  ].map(addr => new StorageToAsync(new StorageMemory([ValidatorEs4], addr), 0));
+}
+
 function Examples() {
   const initValues = useLocalStorageEarthstarSettings('example');
 
@@ -88,17 +97,14 @@ function Examples() {
     <>
       <h1>react-earthstar earthbar</h1>
       <EarthstarPeer
-        initWorkspaces={[
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR1),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR2),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
-        ]}
+        initWorkspaces={makeStorages()}
         initPubs={pubs}
         initIsLive={false}
       >
         <hr />
         <EarthbarExample title={'Default Earthbar'}></EarthbarExample>
-
+      </EarthstarPeer>
+      <EarthstarPeer initIsLive={false}>
         <EarthbarExample title={'Earthbar for all-workspaces-at-once app'}>
           <MultiWorkspaceTab />
           <Spacer />
@@ -107,11 +113,7 @@ function Examples() {
       </EarthstarPeer>
       <hr />
       <EarthstarPeer
-        initWorkspaces={[
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR1),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR2),
-          new StorageMemory([ValidatorEs4], EXAMPLE_WORKSPACE_ADDR3),
-        ]}
+        initWorkspaces={makeStorages()}
         initPubs={pubs}
         initIsLive={false}
         initCurrentAuthor={EXAMPLE_USER}
@@ -119,7 +121,8 @@ function Examples() {
         <EarthbarExample
           title={'Default Earthbar (signed in)'}
         ></EarthbarExample>
-
+      </EarthstarPeer>
+      <EarthstarPeer initIsLive={false}>
         <EarthbarExample
           title={'Earthbar for all-workspaces-at-once app (signed in)'}
         >
@@ -131,6 +134,8 @@ function Examples() {
       <hr />
       <EarthstarPeer initIsLive={false}>
         <EarthbarExample title={'No workspaces'} />
+      </EarthstarPeer>
+      <EarthstarPeer initIsLive={false}>
         <EarthbarExample title={'Multi, no workspaces'}>
           <MultiWorkspaceTab />
           <Spacer />
@@ -140,6 +145,9 @@ function Examples() {
       <hr />
       <EarthstarPeer {...initValues} initIsLive={false}>
         <EarthbarExample title={'From localstorage'} />
+        <LocalStorageSettingsWriter storageKey={'example'} />
+      </EarthstarPeer>
+      <EarthstarPeer {...initValues} initIsLive={false}>
         <EarthbarExample title={'Multi, from localstorage'}>
           <MultiWorkspaceTab />
           <Spacer />

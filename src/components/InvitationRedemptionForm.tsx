@@ -120,7 +120,10 @@ export default function InvitationRedemptionForm({
               <dd data-re-dd>
                 {result.pubs.length > 0
                   ? result.pubs.map(pubUrl => (
-                      <div data-re-invitation-redemption-pub-list-item>
+                      <div
+                        key={pubUrl}
+                        data-re-invitation-redemption-pub-list-item
+                      >
                         <span data-re-pub-item key={pubUrl}>
                           <input
                             data-re-checkbox
