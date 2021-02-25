@@ -28,7 +28,7 @@ add('+newclub.x789');
 
 ### useRemoveWorkspace
 
-Returns a function you can use to remove an existing workspace from your app.
+Returns a function you can use to remove an existing workspace from your app. The function returns a promise.
 
 ```jsx
 const remove = useRemoveWorkspace();
@@ -128,12 +128,18 @@ This hook will automatically re-render the component it's used in when the docum
 This hook takes an optional second argument representing the workspace to get the paths from. If this is not provided, the current workspace is used instead.
 
 ```jsx
-const [doc, setDoc, deleteDoc] = useDocument('/messages/welcome.txt');
+const [doc, setDoc, deleteDoc, status] = useDocument('/messages/welcome.txt');
 
 console.log(doc.content);
 // "Welcome to our workspace!"
 
-setDoc('Welcome, welcome, one and all!');
+// setDoc returns a promise
+await setDoc('Welcome, welcome, one and all!');
+
+// deleteDoc returns a promise
+await deleteDoc();
+
+// status can be 'idle', 'pending', 'success', or 'error'
 ```
 
 ### useDocuments

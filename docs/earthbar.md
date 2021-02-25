@@ -82,6 +82,8 @@ This tab lets you select the current workspace from the tab bar, settings for th
 
 This tab differs slightly from WorkspaceTab in that it is for apps that ignore the 'current workspace' concept, instead showing data from many workspaces at once. It has interfaces for managing all the known workspaces, as well as tabs for adding workspaces using an invitation code, or making a new one.
 
+Note: Rendering this component will make it so that the value of `currentWorkspace` will always be forced back to `null`.
+
 ### AuthorTab
 
 This tab offers two interfaces:
