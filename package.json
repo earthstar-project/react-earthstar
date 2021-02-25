@@ -22,7 +22,7 @@
     "earthbar-example": "parcel examples/earthbar/index.html"
   },
   "peerDependencies": {
-    "earthstar": "^5.7.6",
+    "earthstar": "^6.3.1",
     "react": "~16.13.1"
   },
   "husky": {
@@ -44,7 +44,7 @@
     "@types/jest": "^26.0.14",
     "@types/react-dom": "^16.9.8",
     "babel-jest": "^26.5.2",
-    "earthstar": "^6.1.0",
+    "earthstar": "^6.3.1",
     "eslint-plugin-react-hooks": "^4.1.2",
     "husky": "^4.3.0",
     "jest-localstorage-mock": "^2.4.6",

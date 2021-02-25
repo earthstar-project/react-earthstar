@@ -12,6 +12,7 @@ import {
   IStorageAsync,
   StorageToAsync,
   StorageLocalStorage,
+  syncLocalAndHttp,
 } from 'earthstar';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import { getLocalStorage, makeStorageKey, useMemoQueryOpts } from './util';
@@ -186,11 +187,7 @@ export function useSync() {
         }
 
         Promise.all(
-          workspacePubs.map(
-            _pubUrl =>
-              // TODO: sync async with pub — don't know how!
-              new Promise(resolve => resolve(''))
-          )
+          workspacePubs.map(pubUrl => syncLocalAndHttp(storage, pubUrl))
         )
           .then(resolve)
           .catch(reject);
@@ -261,6 +258,8 @@ export function usePaths(query: Query, workspaceAddress?: string): string[] {
   return localPaths;
 }
 
+type QueryStatus = 'idle' | 'pending' | 'success' | 'error';
+
 export function useDocument(
   path: string,
   workspaceAddress?: string
@@ -271,7 +270,7 @@ export function useDocument(
     deleteAfter?: number | null | undefined
   ) => Promise<WriteResult | ValidationError>,
   () => Promise<WriteResult | ValidationError>,
-  boolean
+  QueryStatus
 ] {
   const [currentAuthor] = useCurrentAuthor();
 
@@ -280,18 +279,23 @@ export function useDocument(
   const [localDocument, setLocalDocument] = React.useState<
     Document | undefined
   >(undefined);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [status, setStatus] = React.useState<QueryStatus>('idle');
 
   React.useEffect(() => {
     let ignore = false;
 
-    setIsLoading(true);
-    storage?.getDocument(path).then(doc => {
-      if (!ignore) {
-        setLocalDocument(doc);
-        setIsLoading(false);
-      }
-    });
+    setStatus('pending');
+    storage
+      ?.getDocument(path)
+      .then(doc => {
+        if (!ignore) {
+          setLocalDocument(doc);
+          setStatus('success');
+        }
+      })
+      .catch(() => {
+        setStatus('error');
+      });
 
     return () => {
       ignore = true;
@@ -333,7 +337,6 @@ export function useDocument(
           );
         }
 
-        setIsLoading(true);
         storage
           .set(currentAuthor, {
             format: 'es.4',
@@ -342,7 +345,6 @@ export function useDocument(
             deleteAfter,
           })
           .then(result => {
-            setIsLoading(false);
             if (isErr(result)) {
               console.group();
               console.warn(
@@ -364,7 +366,7 @@ export function useDocument(
     return set('');
   };
 
-  return [localDocument, set, deleteDoc, isLoading];
+  return [localDocument, set, deleteDoc, status];
 }
 
 export function useDocuments(
