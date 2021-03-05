@@ -5,7 +5,14 @@
     "type": "git",
     "url": "https://github.com/earthstar-project/react-earthstar"
   },
-  "keywords": ["react", "decentralized", "p2p", "distributed", "private", "earthstar"],
+  "keywords": [
+    "react",
+    "decentralized",
+    "p2p",
+    "distributed",
+    "private",
+    "earthstar"
+  ],
   "license": "AGPL-3.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -72,6 +79,7 @@
     "@reach/combobox": "^0.12.1",
     "@reach/descendants": "0.11.2",
     "@reach/utils": "^0.11.2",
+    "cyclosis": "^0.0.5",
     "use-deep-compare-effect": "^1.4.0"
   }
 }
