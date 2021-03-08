@@ -6,6 +6,7 @@ import {
   generateAuthorKeypair,
   AuthorKeypair,
   StorageToAsync,
+  setLogLevels,
 } from 'earthstar';
 import {
   EarthstarPeer,
@@ -24,6 +25,14 @@ const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
 const EXAMPLE_WORKSPACE_ADDR3 = '+sailing.a123';
 
 const EXAMPLE_USER = generateAuthorKeypair('test') as AuthorKeypair;
+
+// 0: error, 1: warn, 2: log, 3: debug
+setLogLevels({
+  sync: 2,
+  syncer2: 2,
+  storage: 2,
+  _other: 2,
+});
 
 const pubs = {
   [EXAMPLE_WORKSPACE_ADDR1]: [

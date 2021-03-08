@@ -9,6 +9,7 @@ import {
   StorageContext,
 } from '../contexts';
 import FocusSyncer from './_FocusSyncer';
+import { usePrevious } from '@reach/utils';
 
 export default function EarthstarPeer({
   initWorkspaces = [],
@@ -42,11 +43,23 @@ export default function EarthstarPeer({
   );
   const [isLive, setIsLive] = React.useState(initIsLive);
 
+  const prevStorages = usePrevious(storages);
+
+  // Close any workspace storages which have been removed from storages
   React.useEffect(() => {
-    return () => {
-      Object.values(storages).forEach(storage => storage.close());
-    };
-  }, [storages]);
+    const storagesSet = new Set(Object.values(storages));
+
+    const difference = Array.from(Object.values(prevStorages || [])).filter(
+      storage => !storagesSet.has(storage)
+    );
+
+    difference.forEach(
+      storage => {
+        storage.close({ delete: true });
+      },
+      [storages, prevStorages]
+    );
+  }, [storages, prevStorages]);
 
   return (
     <StorageContext.Provider value={{ storages, setStorages }}>

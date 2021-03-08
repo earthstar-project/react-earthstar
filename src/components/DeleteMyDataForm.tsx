@@ -40,7 +40,6 @@ export default function DeleteMyDataForm(props: { workspaceAddress: string }) {
         onChange={e => setPrompt(e.target.value)}
       />
       <button
-        {...props}
         data-re-button
         data-re-delete-my-data-button
         onClick={async () => {

@@ -12,9 +12,7 @@ export default function FocusSyncer() {
     }
 
     Object.keys(storages).forEach(address => {
-      sync(address).catch(err => {
-        console.error(err);
-      });
+      sync(address);
     });
   }, [sync, storages, isLive]);
 

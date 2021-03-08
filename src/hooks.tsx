@@ -61,41 +61,32 @@ export function useAddWorkspace() {
   );
 }
 
-export function useRemoveWorkspace(): (address: string) => Promise<void> {
+export function useRemoveWorkspace(): (address: string) => void {
   const [storages, setStorages] = useStorages();
   const [pubs, setPubs] = usePubs();
   const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
 
   return React.useCallback(
     (address: string) => {
-      return new Promise<void>((resolve, reject) => {
-        if (currentWorkspace === address) {
-          setCurrentWorkspace(null);
-        }
+      if (currentWorkspace === address) {
+        setCurrentWorkspace(null);
+      }
 
-        setStorages(prev => {
-          const prevCopy = { ...prev };
+      setStorages(prev => {
+        const prevCopy = { ...prev };
 
-          delete prevCopy[address];
+        delete prevCopy[address];
 
-          return prevCopy;
-        });
-
-        const storage = storages[address];
-
-        if (storage) {
-          const nextPubs = { ...pubs };
-          delete nextPubs[address];
-          setPubs(nextPubs);
-
-          return storage
-            .close({ delete: true })
-            .then(resolve)
-            .catch(reject);
-        }
-
-        return reject();
+        return prevCopy;
       });
+
+      const storage = storages[address];
+
+      if (storage) {
+        const nextPubs = { ...pubs };
+        delete nextPubs[address];
+        setPubs(nextPubs);
+      }
     },
     [
       setStorages,
