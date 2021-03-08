@@ -73,18 +73,18 @@ export class LobbyLayer extends Layer<{ currentAuthor?: AuthorKeypair }> {
     });
   }
 
-  async writePost(content: string, deleteAfter?: number) {
+  writePost(content: string, deleteAfter?: number) {
     let id = `${Date.now()}`;
 
-    await this._setPost(id, content, deleteAfter);
+    return this._setPost(id, content, deleteAfter);
   }
 
-  async editPost(id: string, content: string, deleteAfter?: number) {
-    await this._setPost(id, content, deleteAfter);
+  editPost(id: string, content: string, deleteAfter?: number) {
+    return this._setPost(id, content, deleteAfter);
   }
 
-  async deletePost(id: string) {
-    await this._setPost(id, '');
+  deletePost(id: string) {
+    return this._setPost(id, '');
   }
 
   subscribe(onWrite: (event: WriteEvent) => void) {
@@ -107,59 +107,105 @@ export class LobbyLayer extends Layer<{ currentAuthor?: AuthorKeypair }> {
 // and thus 'invalidate' the layer's subsequent usages
 // every time the layer's subscribe function fires.
 
-export function useLayer<ConfigType>(
-  LayerClass: typeof Layer,
+export function useLayer<ConfigType, LayerType extends Layer<ConfigType>>(
+  LayerClass: new (storage: IStorageAsync, config: ConfigType) => LayerType,
   config: ConfigType,
   workspaceAddress?: string
 ) {
   const storage = useStorage(workspaceAddress);
 
-  const [layer, setLayer] = React.useState<Layer<ConfigType> | undefined>();
-  const [, setTickTock] = React.useState(false);
+  const [layer, setLayer] = React.useState(() => {
+    if (storage) {
+      return new LayerClass(storage, config);
+    }
+
+    return null;
+  });
 
   useDeepCompareEffect(() => {
     if (storage) {
-      const newLayer = new LayerClass<ConfigType>(storage, config);
+      const newLayer = new LayerClass(storage, config);
 
       setLayer(newLayer);
     }
   }, [storage, config]);
 
+  return layer;
+}
+
+export function useLayerAsyncSelector<
+  ConfigType,
+  LayerType extends Layer<ConfigType>,
+  ReturnType
+>(layer: LayerType, selector: (layer: LayerType) => Promise<ReturnType>) {
+  const [result, setResult] = React.useState<ReturnType | undefined>(undefined);
+
   React.useEffect(() => {
-    layer?.subscribe(() => {
-      setTickTock(prev => !prev);
+    selector(layer).then(result => setResult(result));
+
+    const unsubscribe = layer.subscribe(() => {
+      selector(layer).then(result => {
+        console.log(result);
+        setResult(result);
+      });
     });
 
-    return () => {
-      layer?.unsubscribe();
-    };
-  });
+    return unsubscribe;
+  }, [layer, selector]);
 
-  return layer;
+  return result;
 }
 
 // The useLayer hook enables nicer APIs like this with react-earthstar
 
-// TODO: Tried to get fancy with generics, was duly punished.
-// I want to make sure the methods on `lobby` are nicely exposed by TS...
-
-export function MyComponent() {
+export function LayerTestApp() {
   const [currentAuthor] = useCurrentAuthor();
 
-  const lobby = useLayer(LobbyLayer, {
-    currentAuthor: currentAuthor || undefined,
-  });
+  const lobbyLayer = useLayer(
+    LobbyLayer,
+    currentAuthor
+      ? {
+          currentAuthor,
+        }
+      : {}
+  );
 
   /* 
   const reactions = useLayer(ReactionLayer);
-  reactions.getReactionFor(doc);
   const trustnet = useLayer(TrustnetLayer, { rootId: currentAuthor.address });
-  trustnet.getAllTrusted()
   */
 
+  return lobbyLayer ? <LobbyApp layer={lobbyLayer} /> : null;
+}
+
+function LobbyApp({ layer }: { layer: LobbyLayer }) {
+  const [newPost, setNewPost] = React.useState('');
+  const getPosts = React.useCallback(
+    (layer: LobbyLayer) => layer.getPosts(),
+    []
+  );
+  const posts = useLayerAsyncSelector(layer, getPosts);
+
   return (
-    <div>
-      {lobby ? lobby.getPosts().map(postDoc => <div>{doc.content}</div>) : null}
-    </div>
+    <>
+      <form
+        onSubmit={async e => {
+          e.preventDefault();
+
+          await layer.writePost(newPost);
+        }}
+      >
+        <textarea
+          value={newPost}
+          onChange={e => setNewPost(e.target.value)}
+        ></textarea>
+        <button type={'submit'}>{'Post!'}</button>
+      </form>
+      {posts
+        ? posts.map(post => {
+            return <div key={post.path}>{post.content}</div>;
+          })
+        : 'Hm!'}
+    </>
   );
 }
