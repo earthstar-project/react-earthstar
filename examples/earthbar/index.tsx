@@ -19,7 +19,7 @@ import {
 } from '../../src/index';
 import '../../styles/layout.css';
 import '../../styles/junior.css';
-import { LayerTestApp } from '../../src/layer';
+import { OnlyWithWorkspace, TodoApp } from '../../src/layer2';
 
 const EXAMPLE_WORKSPACE_ADDR1 = '+example.a123';
 const EXAMPLE_WORKSPACE_ADDR2 = '+gardening.a123';
@@ -29,10 +29,10 @@ const EXAMPLE_USER = generateAuthorKeypair('test') as AuthorKeypair;
 
 // 0: error, 1: warn, 2: log, 3: debug
 setLogLevels({
-  sync: 2,
-  syncer2: 2,
-  storage: 2,
-  _other: 2,
+  sync: 1,
+  syncer2: 1,
+  storage: 1,
+  _other: 1,
 });
 
 const pubs = {
@@ -156,7 +156,9 @@ function Examples() {
       <EarthstarPeer {...initValues} initIsLive={false}>
         <EarthbarExample title={'From localstorage'} />
         <LocalStorageSettingsWriter storageKey={'example'} />
-        <LayerTestApp />
+        <OnlyWithWorkspace>
+          <TodoApp />
+        </OnlyWithWorkspace>
       </EarthstarPeer>
       <EarthstarPeer {...initValues} initIsLive={false}>
         <EarthbarExample title={'Multi, from localstorage'}>
