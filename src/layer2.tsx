@@ -386,8 +386,15 @@ export function useLayer<
 export function useLayerPromise<
   EventType,
   LayerType extends LayerInstance<EventType>,
-  ReturnType
->(layer: LayerType, selector: (layer: LayerType) => Promise<ReturnType>) {
+  ReturnType,
+  ConfigType
+>(
+  LayerCtor: new (storage: IStorageAsync, config?: ConfigType) => LayerType,
+  selector: (layer: LayerType) => Promise<ReturnType>,
+  config?: ConfigType
+) {
+  const layer = useLayer(LayerCtor, config);
+
   const [result, setResult] = React.useState<ReturnType | undefined>(undefined);
 
   React.useEffect(() => {
@@ -405,16 +412,21 @@ export function useLayerPromise<
   }, [layer, selector]);
 
   React.useEffect(() => {
+    let ignore = false;
+
     const unsubscribe = layer.subscribe(() => {
       selector(layer).then(result => {
-        setResult(result);
+        if (!ignore) {
+          setResult(result);
+        }
       });
     });
 
     return () => {
-      console.log('unsubscribed useLayerPromise');
+      ignore = true;
       unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selector]);
 
   return result;
@@ -427,9 +439,8 @@ export function OnlyWithWorkspace({ children }: { children: React.ReactNode }) {
 }
 
 export function TodoApp() {
-  const todoLayer = useLayer(TodoLayer);
   const selector = React.useCallback((layer: TodoLayer) => layer.list(), []);
-  const list = useLayerPromise(todoLayer, selector);
+  const list = useLayerPromise(TodoLayer, selector);
 
   return (
     <div>
@@ -481,7 +492,7 @@ export function TodoItem({ id }: { id: string }) {
   const [currentAuthor] = useCurrentAuthor();
 
   const selector = React.useCallback((layer: TodoLayer) => layer.get(id), [id]);
-  const todo = useLayerPromise(todoLayer, selector);
+  const todo = useLayerPromise(TodoLayer, selector);
 
   return todo ? (
     <li>
