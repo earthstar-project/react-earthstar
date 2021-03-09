@@ -8,7 +8,6 @@ import {
   EarthstarError,
   WriteResult,
   ValidationError,
-  WriteEvent,
   IStorageAsync,
   StorageToAsync,
   StorageLocalStorage,
@@ -23,6 +22,7 @@ import {
   PubsContext,
   StorageContext,
 } from './contexts';
+import { DirectLayer, LayerInstance } from './layer2';
 
 export function useWorkspaces() {
   const [storages] = useStorages();
@@ -200,68 +200,112 @@ export function useSync() {
   );
 }
 
-export function usePaths(query: Query, workspaceAddress?: string): string[] {
+export function useLayer<
+  ConfigType,
+  EventType,
+  LayerType extends LayerInstance<EventType>
+>(
+  LayerCtor: new (storage: IStorageAsync, config?: ConfigType) => LayerType,
+  config?: ConfigType,
+  workspaceAddress?: string
+) {
   const storage = useStorage(workspaceAddress);
+  const [, reRender] = React.useState(true);
 
   if (!storage) {
-    console.warn(`Couldn't find workspace with address ${workspaceAddress}`);
+    throw new Error('Tried to use useLayer with no workspace specified!');
   }
 
-  const queryMemo = useMemoQueryOpts(query);
+  const layerRef = React.useRef(new LayerCtor(storage, config));
 
-  const [localPaths, setLocalPaths] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    const unsub = layerRef.current.subscribe(() => {
+      reRender(prev => !prev);
+    });
+
+    layerRef.current.proxy.clearWatches();
+
+    return () => {
+      unsub();
+    };
+  }, []);
 
   useDeepCompareEffect(() => {
+    layerRef.current = new LayerCtor(storage, config);
+    reRender(prev => !prev);
+  }, [storage, config]);
+
+  return layerRef.current;
+}
+
+export function useLayerPromise<
+  EventType,
+  LayerType extends LayerInstance<EventType>,
+  ReturnType,
+  ConfigType
+>(
+  LayerCtor: new (storage: IStorageAsync, config?: ConfigType) => LayerType,
+  selector: (layer: LayerType) => Promise<ReturnType>,
+  config?: ConfigType,
+  workspaceAddress?: string
+) {
+  const layer = useLayer(LayerCtor, config, workspaceAddress);
+
+  const [result, setResult] = React.useState<ReturnType | undefined>(undefined);
+
+  React.useEffect(() => {
     let ignore = false;
 
-    storage?.paths(queryMemo).then(pathResult => {
+    selector(layer).then(result => {
       if (!ignore) {
-        setLocalPaths(pathResult);
+        setResult(result);
       }
     });
 
     return () => {
       ignore = true;
     };
-  }, [storage, queryMemo, setLocalPaths]);
+  }, [layer, selector]);
 
-  const onWrite = React.useCallback(
-    event => {
-      if (!storage) {
-        return;
-      }
+  React.useEffect(() => {
+    let ignore = false;
 
-      if (
-        queryMemo.pathStartsWith &&
-        !event.document.path.startsWith(queryMemo.pathStartsWith)
-      ) {
-        return;
-      }
-
-      if (
-        queryMemo.pathEndsWith &&
-        !event.document.path.endsWith(queryMemo.pathEndsWith)
-      ) {
-        return;
-      }
-
-      storage.paths(queryMemo).then(result => {
-        setLocalPaths(result);
+    const unsubscribe = layer.subscribe(() => {
+      selector(layer).then(result => {
+        if (!ignore) {
+          setResult(result);
+        }
       });
-    },
-    [queryMemo, storage]
-  );
+    });
 
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    history: query.history,
-    onWrite,
-  });
+    return () => {
+      ignore = true;
+      unsubscribe();
+    };
+    // We can safely ignore layer below because it's a ref
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selector]);
 
-  return localPaths;
+  return result;
 }
 
-type QueryStatus = 'idle' | 'pending' | 'success' | 'error';
+export function usePaths(query: Query, workspaceAddress?: string): string[] {
+  const queryMemo = useMemoQueryOpts(query);
+
+  const selector = React.useCallback(
+    (layer: DirectLayer) => layer.proxy.paths(queryMemo),
+    [queryMemo]
+  );
+
+  const paths = useLayerPromise(
+    DirectLayer,
+    selector,
+    undefined,
+    workspaceAddress
+  );
+
+  return paths || [];
+}
 
 export function useDocument(
   path: string,
@@ -272,63 +316,27 @@ export function useDocument(
     content: string,
     deleteAfter?: number | null | undefined
   ) => Promise<WriteResult | ValidationError>,
-  () => Promise<WriteResult | ValidationError>,
-  QueryStatus
+  () => Promise<WriteResult | ValidationError>
 ] {
   const [currentAuthor] = useCurrentAuthor();
 
-  const storage = useStorage(workspaceAddress);
-
-  const [localDocument, setLocalDocument] = React.useState<
-    Document | undefined
-  >(undefined);
-  const [status, setStatus] = React.useState<QueryStatus>('idle');
-
-  React.useEffect(() => {
-    let ignore = false;
-
-    setStatus('pending');
-    storage
-      ?.getDocument(path)
-      .then(doc => {
-        if (!ignore) {
-          setLocalDocument(doc);
-          setStatus('success');
-        }
-      })
-      .catch(() => {
-        setStatus('error');
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [storage, path]);
-
-  const onWrite = React.useCallback(
-    event => {
-      setLocalDocument(event.document);
-    },
-    [setLocalDocument]
+  const selector = React.useCallback(
+    (layer: DirectLayer) => layer.proxy.getDocument(path),
+    [path]
   );
 
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    paths: [path],
-    onWrite,
-  });
+  const doc = useLayerPromise(
+    DirectLayer,
+    selector,
+    undefined,
+    workspaceAddress
+  );
+
+  const { proxy } = useLayer(DirectLayer, workspaceAddress);
 
   const set = React.useCallback(
     (content: string, deleteAfter?: number | null | undefined) => {
       return new Promise<ValidationError | WriteResult>((resolve, reject) => {
-        if (!storage) {
-          return reject(
-            new ValidationError(
-              `useDocument couldn't get the workspace ${workspaceAddress}`
-            )
-          );
-        }
-
         if (!currentAuthor) {
           console.warn(
             'Tried to set a document when no current author was set.'
@@ -340,7 +348,7 @@ export function useDocument(
           );
         }
 
-        storage
+        proxy
           .set(currentAuthor, {
             format: 'es.4',
             path,
@@ -362,79 +370,35 @@ export function useDocument(
           });
       });
     },
-    [path, currentAuthor, workspaceAddress, storage]
+    [path, currentAuthor, proxy]
   );
 
   const deleteDoc = () => {
     return set('');
   };
 
-  return [localDocument, set, deleteDoc, status];
+  return [doc, set, deleteDoc];
 }
 
 export function useDocuments(
   query: Query,
   workspaceAddress?: string
 ): Document[] {
-  const storage = useStorage(workspaceAddress);
-
-  const [docs, setDocs] = React.useState<Document[]>([]);
-
+  // TODO: make a callback for the selector
   const queryMemo = useMemoQueryOpts(query);
-
-  React.useEffect(() => {
-    let ignore = false;
-
-    storage
-      ?.paths(queryMemo)
-      .then(pathsResult => {
-        return Promise.all(pathsResult.map(path => storage?.getDocument(path)));
-      })
-      .then(docsResult => {
-        if (!ignore) {
-          setDocs(
-            docsResult.filter((doc): doc is Document => doc !== undefined)
-          );
-        }
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [storage, queryMemo]);
-
-  const onWrite = React.useCallback(
-    event => {
-      storage
-        ?.paths(queryMemo)
-        .then(pathsResult => {
-          if (!pathsResult.includes(event.document.path)) {
-            return;
-          }
-
-          return Promise.all(
-            pathsResult.map(path => storage?.getDocument(path))
-          );
-        })
-        .then(docsResult => {
-          if (docsResult === undefined) {
-            return;
-          }
-
-          setDocs(
-            docsResult.filter((doc): doc is Document => doc !== undefined)
-          );
-        });
-    },
-    [storage, setDocs, queryMemo]
+  const selector = React.useCallback(
+    (layer: DirectLayer) => layer.proxy.documents(queryMemo),
+    [queryMemo]
   );
 
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    onWrite,
-  });
+  const docs = useLayerPromise(
+    DirectLayer,
+    selector,
+    undefined,
+    workspaceAddress
+  );
 
-  return docs;
+  return docs || [];
 }
 
 export function useStorages(): [
@@ -444,50 +408,6 @@ export function useStorages(): [
   const { storages, setStorages } = React.useContext(StorageContext);
 
   return [storages, setStorages];
-}
-
-export function useSubscribeToStorages(options: {
-  workspaces?: string[];
-  paths?: string[];
-  history?: Query['history'];
-  onWrite: (event: WriteEvent) => void;
-}) {
-  const [storages] = useStorages();
-
-  useDeepCompareEffect(() => {
-    const onWrite = (event: WriteEvent) => {
-      if (event.isLatest === false && options.history !== 'all') {
-        return;
-      }
-
-      options.onWrite(event);
-    };
-
-    const unsubscribes = Object.values(storages)
-      .filter(storage => {
-        if (options.workspaces) {
-          return options.workspaces.includes(storage.workspace);
-        }
-
-        return true;
-      })
-      .map(storage => {
-        return storage.onWrite.subscribe(event => {
-          if (options.paths) {
-            if (options.paths.includes(event.document.path)) {
-              onWrite(event);
-            }
-            return;
-          }
-
-          onWrite(event);
-        });
-      });
-
-    return () => {
-      unsubscribes.forEach(unsubscribe => unsubscribe());
-    };
-  }, [storages, options]);
 }
 
 export function useInvitation(invitationCode: string) {

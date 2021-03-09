@@ -210,7 +210,7 @@ interface TaskEvent {
   id: string;
 }
 
-interface LayerInstance<EventType> {
+export interface LayerInstance<EventType> {
   proxy: StorageProxy;
   subscribe: (callback: (event: EventType) => void) => Thunk;
 }
@@ -346,6 +346,17 @@ export class TodoLayer implements LayerInstance<TaskEvent> {
   }
 }
 
+export class DirectLayer implements LayerInstance<WriteEvent> {
+  proxy: StorageProxy;
+  constructor(storage: IStorageAsync) {
+    this.proxy = makeStorageProxy(storage);
+  }
+
+  subscribe(cb: Cb) {
+    return this.proxy.subscribe(cb);
+  }
+}
+
 export function useLayer<
   ConfigType,
   EventType,
@@ -426,6 +437,7 @@ export function useLayerPromise<
       ignore = true;
       unsubscribe();
     };
+    // We can safely ignore layer below because it's a ref
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selector]);
 

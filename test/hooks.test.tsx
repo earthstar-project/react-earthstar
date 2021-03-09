@@ -5,12 +5,11 @@ import {
   Query,
   generateAuthorKeypair,
   AuthorKeypair,
-  WriteEvent,
   isErr,
   EarthstarError,
   StorageToAsync,
-  syncLocalAsync,
   sleep,
+  IStorageAsync,
 } from 'earthstar';
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
@@ -23,7 +22,6 @@ import {
   usePaths,
   useDocument,
   useStorages,
-  useSubscribeToStorages,
   useCurrentWorkspace,
   useInvitation,
   useMakeInvitation,
@@ -34,7 +32,6 @@ import {
 } from '../src';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
-const otherKeypair = generateAuthorKeypair('twoo') as AuthorKeypair;
 
 const WORKSPACE_ADDR_A = '+testa.a123';
 const WORKSPACE_ADDR_B = '+testb.b234';
@@ -196,9 +193,9 @@ test('usePaths', async () => {
   const useTest = (q: Query) => {
     const [query, setQuery] = React.useState(q);
     const paths = usePaths(query, WORKSPACE_ADDR_A);
-    const [storages] = useStorages();
+    const storage = useStorage(WORKSPACE_ADDR_A) as IStorageAsync;
 
-    return { paths, storage: storages[WORKSPACE_ADDR_A], setQuery };
+    return { paths, storage, setQuery };
   };
 
   const { result, waitForNextUpdate } = renderHook(
@@ -334,176 +331,6 @@ test('useDocuments', async () => {
   await waitForNextUpdate();
 
   expect(result.current.docs.length).toEqual(0);
-});
-
-test('useSubscribeToStorages', async () => {
-  const useTest = (options?: {
-    workspaces?: string[];
-    paths?: string[];
-    history?: Query['history'];
-  }) => {
-    const [storages] = useStorages();
-    const [event, setEvent] = React.useState<WriteEvent | null>(null);
-
-    const onWrite = React.useCallback(
-      (event: WriteEvent) => {
-        setEvent(event);
-      },
-      [setEvent]
-    );
-
-    useSubscribeToStorages({
-      ...options,
-      onWrite,
-    });
-
-    return { event: event, storages };
-  };
-
-  const { result } = renderHook(() => useTest(), {
-    wrapper,
-  });
-
-  expect(result.current.event).toEqual(null);
-
-  await act(async () => {
-    await result.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/1',
-    });
-  });
-
-  expect(result.current.event?.document.path).toEqual('/test/1');
-  expect(result.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_A);
-  expect(result.current.event?.document.author).toEqual(keypair.address);
-
-  // Can listen for specific workspaces
-  const { result: workspaceResult } = renderHook(
-    () =>
-      useTest({
-        workspaces: [WORKSPACE_ADDR_B],
-      }),
-    { wrapper }
-  );
-
-  expect(workspaceResult.current.event).toEqual(null);
-
-  await act(async () => {
-    await workspaceResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/1',
-    });
-  });
-
-  expect(workspaceResult.current.event).toEqual(null);
-
-  await act(async () => {
-    await workspaceResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/2',
-    });
-  });
-
-  expect(workspaceResult.current.event?.document.path).toEqual('/test/2');
-  expect(workspaceResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_B
-  );
-  expect(workspaceResult.current.event?.document.author).toEqual(
-    keypair.address
-  );
-
-  // Can listen for paths
-  const { result: pathResult } = renderHook(
-    () =>
-      useTest({
-        paths: ['/test/b'],
-      }),
-    { wrapper }
-  );
-
-  expect(pathResult.current.event).toEqual(null);
-
-  await act(async () => {
-    await pathResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/a',
-    });
-  });
-
-  expect(pathResult.current.event).toEqual(null);
-
-  await act(async () => {
-    await pathResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/b',
-    });
-  });
-
-  expect(pathResult.current.event?.document.path).toEqual('/test/b');
-
-  // Can listen for all history
-  const { result: historyResult } = renderHook(
-    () =>
-      useTest({
-        history: 'all',
-      }),
-    { wrapper }
-  );
-
-  expect(historyResult.current.event).toEqual(null);
-
-  const publishDate = Date.now() * 1000;
-
-  await act(async () => {
-    await historyResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Latest!',
-      path: '/test/history',
-      timestamp: publishDate,
-    });
-  });
-
-  expect(historyResult.current.event?.document.content).toEqual('Latest!');
-  expect(historyResult.current.event?.document.author).toEqual(keypair.address);
-  expect(historyResult.current.event?.document.path).toEqual('/test/history');
-  expect(historyResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_A
-  );
-  expect(historyResult.current.event?.document.timestamp).toEqual(publishDate);
-
-  const otherStorage = new StorageMemory([ValidatorEs4], WORKSPACE_ADDR_A);
-
-  await act(async () => {
-    otherStorage.set(otherKeypair, {
-      format: 'es.4',
-      content: 'Oldest!',
-      path: '/test/history',
-      timestamp: publishDate - 10000,
-    });
-
-    await syncLocalAsync(
-      historyResult.current.storages[WORKSPACE_ADDR_A],
-      otherStorage
-    );
-  });
-
-  expect(historyResult.current.event?.isLocal).toBeFalsy();
-  expect(historyResult.current.event?.document.content).toEqual('Oldest!');
-  expect(historyResult.current.event?.document.author).toEqual(
-    otherKeypair.address
-  );
-  expect(historyResult.current.event?.document.path).toEqual('/test/history');
-  expect(historyResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_A
-  );
-  expect(historyResult.current.event?.document.timestamp).toEqual(
-    publishDate - 10000
-  );
 });
 
 test('useInvitation', () => {
