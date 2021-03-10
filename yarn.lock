@@ -3469,10 +3469,10 @@ duplexer2@~0.1.4:
   dependencies:
     readable-stream "^2.0.2"
 
-earthstar@^6.3.4:
-  version "6.3.4"
-  resolved "https://registry.yarnpkg.com/earthstar/-/earthstar-6.3.4.tgz#b47fce29f023e62cd0909ef1a8022f2cbf034b2f"
-  integrity sha512-xX/h3UxYoROkwTHuQ/TwQysPUHLdZRjM8qA/q5R2eOmGKRpVYi6Hf7bUAAljSyP/5/8fkdUxpw1dO1rlRrzZHA==
+earthstar@^6.3.5:
+  version "6.3.5"
+  resolved "https://registry.yarnpkg.com/earthstar/-/earthstar-6.3.5.tgz#49e08cc31928be86820e8d84995c483f22551f4e"
+  integrity sha512-TrdPeV+4akMUqbgAozYlPBJinv2XOX6udWqsoAx5n6/YRmDb/lQxqpOtHUsXsnOsi29ERbe/CPQ36Anh4vOkmQ==
   dependencies:
     "@types/better-sqlite3" "^5.4.1"
     "@types/isomorphic-fetch" "0.0.35"
