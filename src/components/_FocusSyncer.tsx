@@ -12,21 +12,17 @@ export default function FocusSyncer() {
     }
 
     Object.keys(storages).forEach(address => {
-      console.log(`syncing ${address} on focus...`);
       sync(address);
     });
   }, [sync, storages, isLive]);
 
   React.useEffect(() => {
-    window.addEventListener('visibilitychange', onFocus, false);
     window.addEventListener('focus', onFocus, false);
 
     return () => {
-      // Be sure to unsubscribe if a new handler is set
-      window.removeEventListener('visibilitychange', onFocus);
       window.removeEventListener('focus', onFocus);
     };
-  });
+  }, [onFocus]);
 
   return null;
 }
