@@ -102,7 +102,7 @@ function SyncButton() {
 
 ### usePaths
 
-Returns a list of paths for a `QueryOpts` arg.
+Returns a list of paths for a `Query` arg.
 
 This hook will automatically re-render the component it's used in when the list of paths updates.
 
@@ -110,7 +110,7 @@ This hook takes an optional second argument representing the workspace to get th
 
 ```jsx
 const paths = usePaths({
-  pathPrefix: '/wiki/',
+  pathStartsWith: '/wiki/',
 });
 
 console.log(paths);
@@ -144,7 +144,7 @@ await deleteDoc();
 
 ### useDocuments
 
-Returns a list of documents for a given `QueryOpts` arg. Useful for when you want to obtain an unknown number of documents for use in a single component.
+Returns a list of documents for a given `Query` arg. Useful for when you want to obtain an unknown number of documents for use in a single component.
 
 This hook will automatically re-render the component it's used in when the list of documents matching the query updates.
 
@@ -152,7 +152,7 @@ This hook takes an optional second argument representing the workspace to get th
 
 ```jsx
 const docs = useDocuments({
-  pathPrefix: '/shopping-list/',
+  pathStartsWith: '/shopping-list/',
 });
 
 console.log(docs.map((doc) => doc.content));
