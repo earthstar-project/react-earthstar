@@ -43,14 +43,17 @@ export default function EarthstarPeer({
     }, {} as Record<string, IStorage>)
   );
 
-  const addStorage = React.useCallback((workspaceAddress: string) => {
-    const storage = onCreateWorkspace(workspaceAddress);
+  const addStorage = React.useCallback(
+    (workspaceAddress: string) => {
+      const storage = onCreateWorkspace(workspaceAddress);
 
-    setStorages(prev => ({
-      ...prev,
-      [workspaceAddress]: storage,
-    }));
-  }, []);
+      setStorages(prev => ({
+        ...prev,
+        [workspaceAddress]: storage,
+      }));
+    },
+    [onCreateWorkspace]
+  );
 
   const [pubs, setPubs] = React.useState(initPubs);
 

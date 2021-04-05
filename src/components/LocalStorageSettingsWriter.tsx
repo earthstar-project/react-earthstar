@@ -4,8 +4,7 @@ import {
   useCurrentWorkspace,
   useIsLive,
   usePubs,
-  useStorages,
-  useSubscribeToStorages,
+  useWorkspaces,
 } from '../hooks';
 import { makeStorageKey } from '../util';
 
@@ -20,29 +19,15 @@ export default function LocalStorageSettingsWriter({
   const lsCurrentWorkspaceKey = makeStorageKey(storageKey, 'current-workspace');
   const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
 
-  const [storages] = useStorages();
+  const workspaces = useWorkspaces();
   const [pubs] = usePubs();
   const [currentAuthor] = useCurrentAuthor();
   const [currentWorkspace] = useCurrentWorkspace();
   const [isLive] = useIsLive();
 
-  const onWrite = React.useCallback(() => {
-    const storagesStringified = JSON.stringify(
-      Object.keys(storages).map(key => key)
-    );
-
-    localStorage.setItem(lsWorkspacesKey, storagesStringified);
-  }, [storages, lsWorkspacesKey]);
-
-  // Persist workspace docs on storage events
-  useSubscribeToStorages({
-    onWrite,
-  });
-
-  // Persist workspace docs when onWrite's value changes
   React.useEffect(() => {
-    onWrite();
-  }, [onWrite]);
+    localStorage.setItem(lsWorkspacesKey, JSON.stringify(workspaces));
+  });
 
   React.useEffect(() => {
     localStorage.setItem(lsPubsKey, JSON.stringify(pubs));

@@ -2,15 +2,12 @@ import * as React from 'react';
 import {
   ValidatorEs4,
   StorageMemory,
-  Query,
   generateAuthorKeypair,
   AuthorKeypair,
-  WriteEvent,
   isErr,
   EarthstarError,
   sleep,
   StorageToAsync,
-  syncLocal,
 } from 'earthstar';
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
@@ -20,22 +17,16 @@ import {
   useRemoveWorkspace,
   useWorkspacePubs,
   usePubs,
-  usePaths,
-  useDocument,
   useStorages,
-  useSubscribeToStorages,
   useCurrentWorkspace,
   useInvitation,
   useMakeInvitation,
-  useDocuments,
-  useStorage,
   LocalStorageSettingsWriter,
   useLocalStorageEarthstarSettings,
 } from '../src';
 import StorageMemoryCache from '../src/StorageMemoryCache';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
-const otherKeypair = generateAuthorKeypair('twoo') as AuthorKeypair;
 
 const WORKSPACE_ADDR_A = '+testa.a123';
 const WORKSPACE_ADDR_B = '+testb.b234';
@@ -194,328 +185,6 @@ test('useCurrentWorkspace', () => {
   });
 
   expect(result.current[0]).toEqual(null);
-});
-
-test('usePaths', async () => {
-  const useTest = (q: Query) => {
-    const [query, setQuery] = React.useState(q);
-    const paths = usePaths(query, WORKSPACE_ADDR_A);
-    const [storages] = useStorages();
-
-    return { paths, storage: storages[WORKSPACE_ADDR_A], setQuery };
-  };
-
-  const { result, waitForNextUpdate } = renderHook(
-    () =>
-      useTest({
-        pathStartsWith: '/path-test/',
-      }),
-    { wrapper }
-  );
-
-  expect(result.current.paths).toEqual([]);
-
-  act(() => {
-    result.current.storage.set(keypair, {
-      format: 'es.4',
-      path: '/path-test/1',
-      content: 'Hello!',
-    });
-  });
-
-  await waitForNextUpdate();
-
-  expect(result.current.paths).toEqual(['/path-test/1']);
-
-  act(() => {
-    result.current.setQuery({ pathStartsWith: '/nothing' });
-  });
-
-  expect(result.current.paths).toEqual([]);
-});
-
-test('useDocument', async () => {
-  const useTest = () => {
-    const [storages] = useStorages();
-    const [path, setPath] = React.useState('/test/test.txt');
-    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
-    const [doc, setDoc, deleteDoc] = useDocument(path, workspace);
-
-    return { setWorkspace, setPath, doc, setDoc, deleteDoc, storages };
-  };
-
-  const { result } = renderHook(() => useTest(), {
-    wrapper,
-  });
-
-  expect(result.current.doc).toBeUndefined();
-
-  act(() => {
-    result.current.setDoc('Hey!');
-  });
-
-  // NB: We do not need to await results here as the cache storage is designed to synchronously set the new doc to storage.
-
-  expect(result.current.doc?.content).toEqual('Hey!');
-
-  act(() => {
-    result.current.deleteDoc();
-  });
-
-  expect(result.current.doc?.content).toEqual('');
-
-  act(() => {
-    result.current.setPath('/test/no.txt');
-  });
-
-  expect(result.current.doc?.content).toBeUndefined();
-
-  act(() => {
-    result.current.storages[WORKSPACE_ADDR_B].set(keypair, {
-      format: 'es.4',
-      path: '/test/workspace-changed.txt',
-      content: 'Switched!',
-    });
-    result.current.setWorkspace(WORKSPACE_ADDR_B);
-    result.current.setPath('/test/workspace-changed.txt');
-  });
-
-  expect(result.current.doc?.content).toEqual('Switched!');
-});
-
-test('useDocuments', async () => {
-  const useTest = (q: Query) => {
-    const [query, setQuery] = React.useState(q);
-    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
-    const docs = useDocuments(query, workspace);
-    const storage = useStorage(workspace);
-
-    return { docs, storage, setQuery, setWorkspace };
-  };
-
-  const { result, waitForNextUpdate } = renderHook(
-    () =>
-      useTest({
-        pathStartsWith: '/documents-test',
-      }),
-    { wrapper }
-  );
-
-  expect(result.current.docs).toEqual([]);
-
-  act(() => {
-    result.current.storage?.set(keypair, {
-      format: 'es.4',
-      path: '/documents-test/1',
-      content: 'A!',
-    });
-    result.current.storage?.set(keypair, {
-      format: 'es.4',
-      path: '/documents-test/2',
-      content: 'B!',
-    });
-    result.current.storage?.set(keypair, {
-      format: 'es.4',
-      path: '/documents-test/3',
-      content: 'C!',
-    });
-  });
-
-  await waitForNextUpdate();
-
-  expect(result.current.docs.length).toEqual(3);
-  expect(result.current.docs.map(doc => doc.content)).toEqual([
-    'A!',
-    'B!',
-    'C!',
-  ]);
-
-  act(() => {
-    result.current.setWorkspace(WORKSPACE_ADDR_B);
-  });
-
-  expect(result.current.docs.length).toEqual(0);
-});
-
-test('useSubscribeToStorages', async () => {
-  const useTest = (options?: {
-    workspaces?: string[];
-    paths?: string[];
-    history?: Query['history'];
-  }) => {
-    const [storages] = useStorages();
-    const [event, setEvent] = React.useState<WriteEvent | null>(null);
-
-    const onWrite = React.useCallback(
-      (event: WriteEvent) => {
-        act(() => {
-          setEvent(event);
-        });
-      },
-      [setEvent]
-    );
-
-    useSubscribeToStorages({
-      ...options,
-      onWrite,
-    });
-
-    return { event: event, storages };
-  };
-
-  const { result, waitForNextUpdate } = renderHook(() => useTest(), {
-    wrapper,
-  });
-
-  expect(result.current.event).toEqual(null);
-
-  act(() => {
-    result.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/subscribe-test/1',
-    });
-  });
-
-  await waitForNextUpdate();
-
-  expect(result.current.event?.document.path).toEqual('/subscribe-test/1');
-  expect(result.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_A);
-  expect(result.current.event?.document.author).toEqual(keypair.address);
-
-  // Can listen for specific workspaces
-  const {
-    result: workspaceResult,
-    waitForNextUpdate: workspaceWait,
-  } = renderHook(
-    () =>
-      useTest({
-        workspaces: [WORKSPACE_ADDR_B],
-      }),
-    { wrapper }
-  );
-
-  expect(workspaceResult.current.event).toEqual(null);
-
-  act(() => {
-    workspaceResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/1',
-    });
-  });
-
-  expect(workspaceResult.current.event).toEqual(null);
-
-  act(() => {
-    workspaceResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/2',
-    });
-  });
-
-  await workspaceWait();
-
-  expect(workspaceResult.current.event?.document.path).toEqual('/test/2');
-  expect(workspaceResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_B
-  );
-  expect(workspaceResult.current.event?.document.author).toEqual(
-    keypair.address
-  );
-
-  // Can listen for paths
-  const { result: pathResult, waitForNextUpdate: pathWait } = renderHook(
-    () =>
-      useTest({
-        paths: ['/test/b'],
-      }),
-    { wrapper }
-  );
-
-  expect(pathResult.current.event).toEqual(null);
-
-  act(() => {
-    pathResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/a',
-    });
-  });
-
-  expect(pathResult.current.event).toEqual(null);
-
-  act(() => {
-    pathResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/b',
-    });
-  });
-
-  await pathWait();
-
-  expect(pathResult.current.event?.document.path).toEqual('/test/b');
-
-  // Can listen for all history
-  const { result: historyResult, waitForNextUpdate: historyWait } = renderHook(
-    () =>
-      useTest({
-        history: 'all',
-      }),
-    { wrapper }
-  );
-
-  expect(historyResult.current.event).toEqual(null);
-
-  const publishDate = Date.now() * 1000;
-
-  act(() => {
-    historyResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Latest!',
-      path: '/test/history',
-      timestamp: publishDate,
-    });
-  });
-
-  await historyWait();
-  expect(historyResult.current.event?.document.content).toEqual('Latest!');
-  expect(historyResult.current.event?.document.author).toEqual(keypair.address);
-  expect(historyResult.current.event?.document.path).toEqual('/test/history');
-  expect(historyResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_A
-  );
-  expect(historyResult.current.event?.document.timestamp).toEqual(publishDate);
-
-  const otherStorage = new StorageMemory([ValidatorEs4], WORKSPACE_ADDR_A);
-
-  act(() => {
-    otherStorage.set(otherKeypair, {
-      format: 'es.4',
-      content: 'Oldest!',
-      path: '/test/history',
-      timestamp: publishDate - 10000,
-    });
-
-    syncLocal(historyResult.current.storages[WORKSPACE_ADDR_A], otherStorage);
-  });
-
-  await historyWait();
-
-  expect(historyResult.current.event?.isLocal).toBeFalsy();
-  expect(historyResult.current.event?.document.content).toEqual('Oldest!');
-  expect(historyResult.current.event?.document.author).toEqual(
-    otherKeypair.address
-  );
-  expect(historyResult.current.event?.document.path).toEqual('/test/history');
-  expect(historyResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_A
-  );
-  expect(historyResult.current.event?.document.timestamp).toEqual(
-    publishDate - 10000
-  );
 });
 
 test('useInvitation', () => {

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import WorkspaceLabel from './WorkspaceLabel';
-import { useDocument, useCurrentAuthor } from '../hooks';
+import { useWorkspaceStorage, useCurrentAuthor } from '../hooks';
 import { getAuthorShortName } from '../util';
 
 export default function DisplayNameForm({
@@ -9,10 +9,13 @@ export default function DisplayNameForm({
   workspaceAddress?: string;
 }) {
   const [currentAuthor] = useCurrentAuthor();
-  const [displayNameDoc, setDisplayNameDoc] = useDocument(
-    `/about/~${currentAuthor?.address}/displayName.txt`,
-    workspaceAddress
-  );
+  const storage = useWorkspaceStorage(workspaceAddress);
+
+  const displayNamePath = `/about/~${currentAuthor?.address}/displayName.txt`;
+
+  const displayNameDoc = storage.getDocument(displayNamePath);
+
+  console.log(displayNameDoc?.content);
 
   const [newDisplayName, setNewDisplayName] = React.useState(
     displayNameDoc?.content || ''
@@ -30,7 +33,11 @@ export default function DisplayNameForm({
       onSubmit={e => {
         e.preventDefault();
         setNewDisplayName('');
-        setDisplayNameDoc(newDisplayName);
+        storage.set(currentAuthor, {
+          content: newDisplayName,
+          format: 'es.4',
+          path: displayNamePath,
+        });
       }}
     >
       <label

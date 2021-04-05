@@ -2,19 +2,13 @@ import * as React from 'react';
 import {
   AuthorKeypair,
   ValidatorEs4,
-  Query,
-  Document,
   isErr,
   EarthstarError,
-  WriteResult,
-  ValidationError,
-  WriteEvent,
-  IStorage,
   syncLocalAndHttp,
-  queryMatchesDoc,
+  IStorage,
 } from 'earthstar';
 import useDeepCompareEffect from 'use-deep-compare-effect';
-import { getLocalStorage, makeStorageKey, useMemoQueryOpts } from './util';
+import { getLocalStorage, makeStorageKey } from './util';
 import {
   CurrentAuthorContext,
   CurrentWorkspaceContext,
@@ -22,6 +16,7 @@ import {
   PubsContext,
   StorageContext,
 } from './contexts';
+import { makeStorageProxy } from './StorageProxy';
 
 export function useWorkspaces() {
   const [storages] = useStorages();
@@ -50,7 +45,7 @@ export function useAddWorkspace() {
         return new EarthstarError('Something went wrong!');
       }
     },
-    [storages]
+    [storages, addStorage]
   );
 }
 
@@ -193,160 +188,56 @@ export function useSync() {
   );
 }
 
-export function usePaths(query: Query, workspaceAddress?: string): string[] {
+export function useWorkspaceStorage(workspaceAddress?: string) {
   const storage = useStorage(workspaceAddress);
+  const [, reRender] = React.useState(true);
+  //const [currentAuthor] = useCurrentAuthor();
 
   if (!storage) {
-    console.warn(`Couldn't find workspace with address ${workspaceAddress}`);
+    throw new Error(
+      'Tried to use useWorkspaceStorage with no workspace specified!'
+    );
   }
 
-  const queryMemo = useMemoQueryOpts(query);
+  const proxyRef = React.useRef(makeStorageProxy(storage));
 
-  const [localPaths, setLocalPaths] = React.useState<string[]>(
-    storage?.paths(queryMemo) || []
-  );
+  React.useEffect(() => {
+    const unsub = proxyRef.current.subscribe(() => {
+      reRender(prev => !prev);
+    });
+
+    proxyRef.current.clearWatches();
+
+    return () => {
+      if (unsub) {
+        unsub();
+      }
+    };
+  }, []);
 
   useDeepCompareEffect(() => {
-    setLocalPaths(storage?.paths(queryMemo) || []);
-  }, [storage, queryMemo, setLocalPaths]);
+    proxyRef.current = makeStorageProxy(storage);
+    reRender(prev => !prev);
+  }, [storage]);
 
-  const onWrite = React.useCallback(
-    event => {
-      if (!storage) {
-        return;
-      }
+  /*
+  const withCurrentAuthor = React.useMemo(() => {
+    return {
+      ...proxyRef.current,
+      set(docToSet: DocToSet) {
+        if (!currentAuthor) {
+          return new ValidationError(
+            'Tried to use set when no currentAuthor was present!'
+          );
+        }
 
-      if (!queryMatchesDoc(queryMemo, event.document)) {
-        return;
-      }
+        return proxyRef.current.set(currentAuthor, docToSet);
+      },
+    };
+  }, [currentAuthor]);
+  */
 
-      setLocalPaths(storage.paths(queryMemo) || []);
-    },
-    [queryMemo, storage]
-  );
-
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    history: query.history,
-    onWrite,
-  });
-
-  return localPaths;
-}
-
-export function useDocument(
-  path: string,
-  workspaceAddress?: string
-): [
-  Document | undefined,
-  (
-    content: string,
-    deleteAfter?: number | null | undefined
-  ) => WriteResult | ValidationError,
-  () => WriteResult | ValidationError
-] {
-  const [currentAuthor] = useCurrentAuthor();
-
-  const storage = useStorage(workspaceAddress);
-
-  const [localDocument, setLocalDocument] = React.useState<
-    Document | undefined
-  >(storage?.getDocument(path));
-
-  React.useEffect(() => {
-    setLocalDocument(storage?.getDocument(path));
-  }, [storage, path]);
-
-  const onWrite = React.useCallback(
-    event => {
-      setLocalDocument(event.document);
-    },
-    [setLocalDocument]
-  );
-
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    paths: [path],
-    onWrite,
-  });
-
-  const set = React.useCallback(
-    (content: string, deleteAfter?: number | null | undefined) => {
-      if (!storage) {
-        return new ValidationError(
-          `useDocument couldn't get the workspace ${workspaceAddress}`
-        );
-      }
-
-      if (!currentAuthor) {
-        console.warn('Tried to set a document when no current author was set.');
-
-        return new ValidationError(
-          'Tried to set a document when no current author was set.'
-        );
-      }
-
-      const result = storage.set(currentAuthor, {
-        format: 'es.4',
-        path,
-        content,
-        deleteAfter,
-      });
-
-      if (isErr(result)) {
-        console.group();
-        console.warn(`There was a problem setting the document at ${path}:`);
-        console.warn(result.message);
-        console.groupEnd();
-      }
-
-      console.log(storage.getDocument(path));
-
-      setLocalDocument(storage.getDocument(path));
-
-      return result;
-    },
-    [path, currentAuthor, workspaceAddress, storage]
-  );
-
-  const deleteDoc = () => {
-    return set('');
-  };
-
-  return [localDocument, set, deleteDoc];
-}
-
-export function useDocuments(
-  query: Query,
-  workspaceAddress?: string
-): Document[] {
-  const storage = useStorage(workspaceAddress);
-
-  const queryMemo = useMemoQueryOpts(query);
-
-  const [docs, setDocs] = React.useState<Document[]>(
-    storage?.documents(queryMemo) || []
-  );
-
-  React.useEffect(() => {
-    setDocs(storage?.documents(queryMemo) || []);
-  }, [storage, queryMemo]);
-
-  const onWrite = React.useCallback(
-    event => {
-      if (queryMatchesDoc(queryMemo, event.document)) {
-        setDocs(storage?.documents(queryMemo) || []);
-      }
-    },
-    [storage, setDocs, queryMemo]
-  );
-
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    onWrite,
-  });
-
-  return docs;
+  return proxyRef.current;
 }
 
 export function useStorages(): [
@@ -356,54 +247,6 @@ export function useStorages(): [
   const { storages, setStorages } = React.useContext(StorageContext);
 
   return [storages, setStorages];
-}
-
-export function useSubscribeToStorages(options: {
-  workspaces?: string[];
-  paths?: string[];
-  history?: Query['history'];
-  onWrite: (event: WriteEvent) => void;
-}) {
-  const [storages] = useStorages();
-
-  useDeepCompareEffect(() => {
-    const onWrite = (event: WriteEvent) => {
-      if (
-        event.isLatest === false &&
-        options.history &&
-        options.history !== 'all'
-      ) {
-        return;
-      }
-
-      options.onWrite(event);
-    };
-
-    const unsubscribes = Object.values(storages)
-      .filter(storage => {
-        if (options.workspaces) {
-          return options.workspaces.includes(storage.workspace);
-        }
-
-        return true;
-      })
-      .map(storage => {
-        return storage.onWrite.subscribe(event => {
-          if (options.paths) {
-            if (options.paths.includes(event.document.path)) {
-              onWrite(event);
-            }
-            return;
-          }
-
-          onWrite(event);
-        });
-      });
-
-    return () => {
-      unsubscribes.forEach(unsubscribe => unsubscribe());
-    };
-  }, [storages, options]);
 }
 
 export function useInvitation(invitationCode: string) {
