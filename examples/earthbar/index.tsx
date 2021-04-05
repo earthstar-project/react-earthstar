@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { render } from 'react-dom';
 import {
-  StorageMemory,
   ValidatorEs4,
   generateAuthorKeypair,
   AuthorKeypair,
-  StorageToAsync,
   setLogLevels,
+  StorageLocalStorage,
 } from 'earthstar';
 import {
   EarthstarPeer,
@@ -91,13 +90,11 @@ function EarthbarExample({
   );
 }
 
-function makeStorages() {
-  return [
-    EXAMPLE_WORKSPACE_ADDR1,
-    EXAMPLE_WORKSPACE_ADDR2,
-    EXAMPLE_WORKSPACE_ADDR3,
-  ].map(addr => new StorageToAsync(new StorageMemory([ValidatorEs4], addr), 0));
-}
+const workspaces = [
+  EXAMPLE_WORKSPACE_ADDR1,
+  EXAMPLE_WORKSPACE_ADDR2,
+  EXAMPLE_WORKSPACE_ADDR3,
+];
 
 function Examples() {
   const initValues = useLocalStorageEarthstarSettings('example');
@@ -106,7 +103,7 @@ function Examples() {
     <>
       <h1>react-earthstar earthbar</h1>
       <EarthstarPeer
-        initWorkspaces={makeStorages()}
+        initWorkspaces={workspaces}
         initPubs={pubs}
         initIsLive={false}
       >
@@ -122,7 +119,7 @@ function Examples() {
       </EarthstarPeer>
       <hr />
       <EarthstarPeer
-        initWorkspaces={makeStorages()}
+        initWorkspaces={workspaces}
         initPubs={pubs}
         initIsLive={false}
         initCurrentAuthor={EXAMPLE_USER}
@@ -152,11 +149,23 @@ function Examples() {
         </EarthbarExample>
       </EarthstarPeer>
       <hr />
-      <EarthstarPeer {...initValues} initIsLive={false}>
+      <EarthstarPeer
+        {...initValues}
+        initIsLive={false}
+        onCreateWorkspace={workspaceAddress => {
+          return new StorageLocalStorage([ValidatorEs4], workspaceAddress);
+        }}
+      >
         <EarthbarExample title={'From localstorage'} />
         <LocalStorageSettingsWriter storageKey={'example'} />
       </EarthstarPeer>
-      <EarthstarPeer {...initValues} initIsLive={false}>
+      <EarthstarPeer
+        {...initValues}
+        initIsLive={false}
+        onCreateWorkspace={workspaceAddress => {
+          return new StorageLocalStorage([ValidatorEs4], workspaceAddress);
+        }}
+      >
         <EarthbarExample title={'Multi, from localstorage'}>
           <MultiWorkspaceTab />
           <Spacer />

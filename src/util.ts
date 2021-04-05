@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { isErr, Query, ValidatorEs4 } from 'earthstar';
+import { isErr, Query, ValidatorEs4, cleanUpQuery } from 'earthstar';
 
 export function getAuthorShortName(address: string): string {
   const parsedAuthor = ValidatorEs4.parseAuthorAddress(address);
@@ -96,7 +96,7 @@ export function useMemoQueryOpts({
       timestampLt,
     };
 
-    return obj;
+    return cleanUpQuery(obj);
   }, [
     author,
     contentLength,

@@ -8,9 +8,9 @@ import {
   WriteEvent,
   isErr,
   EarthstarError,
-  StorageToAsync,
-  syncLocalAsync,
   sleep,
+  StorageToAsync,
+  syncLocal,
 } from 'earthstar';
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
@@ -32,6 +32,7 @@ import {
   LocalStorageSettingsWriter,
   useLocalStorageEarthstarSettings,
 } from '../src';
+import StorageMemoryCache from '../src/StorageMemoryCache';
 
 const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
 const otherKeypair = generateAuthorKeypair('twoo') as AuthorKeypair;
@@ -51,17 +52,20 @@ const pubs = {
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
-  const storages = [WORKSPACE_ADDR_A, WORKSPACE_ADDR_B, WORKSPACE_ADDR_C].map(
-    address => new StorageToAsync(new StorageMemory([ValidatorEs4], address), 0)
-  );
-
   return (
     <EarthstarPeer
-      initWorkspaces={storages}
+      initWorkspaces={[WORKSPACE_ADDR_A, WORKSPACE_ADDR_B, WORKSPACE_ADDR_C]}
       initPubs={pubs}
       initCurrentAuthor={keypair}
       initIsLive={false}
       initCurrentWorkspace={WORKSPACE_ADDR_A}
+      onCreateWorkspace={workspaceAddress => {
+        return new StorageMemoryCache([ValidatorEs4], workspaceAddress, () => {
+          return new StorageToAsync(
+            new StorageMemory([ValidatorEs4], workspaceAddress)
+          );
+        });
+      }}
     >
       {children}
       <LocalStorageSettingsWriter storageKey={'tests'} />
@@ -172,7 +176,7 @@ test('usePubs', () => {
 
 test.todo('useSync');
 
-test('useCurrentWorkspace', async () => {
+test('useCurrentWorkspace', () => {
   const { result } = renderHook(() => useCurrentWorkspace(), {
     wrapper,
   });
@@ -204,28 +208,28 @@ test('usePaths', async () => {
   const { result, waitForNextUpdate } = renderHook(
     () =>
       useTest({
-        pathStartsWith: '/test',
+        pathStartsWith: '/path-test/',
       }),
     { wrapper }
   );
 
   expect(result.current.paths).toEqual([]);
 
-  await act(async () => {
-    await result.current.storage.set(keypair, {
+  act(() => {
+    result.current.storage.set(keypair, {
       format: 'es.4',
-      path: '/test/1',
+      path: '/path-test/1',
       content: 'Hello!',
     });
   });
 
-  expect(result.current.paths).toEqual(['/test/1']);
+  await waitForNextUpdate();
+
+  expect(result.current.paths).toEqual(['/path-test/1']);
 
   act(() => {
     result.current.setQuery({ pathStartsWith: '/nothing' });
   });
-
-  await waitForNextUpdate();
 
   expect(result.current.paths).toEqual([]);
 });
@@ -240,23 +244,22 @@ test('useDocument', async () => {
     return { setWorkspace, setPath, doc, setDoc, deleteDoc, storages };
   };
 
-  const { result, waitForNextUpdate } = renderHook(() => useTest(), {
+  const { result } = renderHook(() => useTest(), {
     wrapper,
   });
 
-  // Wait for the initial load of the document
-  await waitForNextUpdate();
-
   expect(result.current.doc).toBeUndefined();
 
-  await act(async () => {
-    await result.current.setDoc('Hey!');
+  act(() => {
+    result.current.setDoc('Hey!');
   });
+
+  // NB: We do not need to await results here as the cache storage is designed to synchronously set the new doc to storage.
 
   expect(result.current.doc?.content).toEqual('Hey!');
 
-  await act(async () => {
-    await result.current.deleteDoc();
+  act(() => {
+    result.current.deleteDoc();
   });
 
   expect(result.current.doc?.content).toEqual('');
@@ -265,12 +268,10 @@ test('useDocument', async () => {
     result.current.setPath('/test/no.txt');
   });
 
-  await waitForNextUpdate();
-
   expect(result.current.doc?.content).toBeUndefined();
 
-  await act(async () => {
-    await result.current.storages[WORKSPACE_ADDR_B].set(keypair, {
+  act(() => {
+    result.current.storages[WORKSPACE_ADDR_B].set(keypair, {
       format: 'es.4',
       path: '/test/workspace-changed.txt',
       content: 'Switched!',
@@ -295,30 +296,32 @@ test('useDocuments', async () => {
   const { result, waitForNextUpdate } = renderHook(
     () =>
       useTest({
-        pathStartsWith: '/docs-test',
+        pathStartsWith: '/documents-test',
       }),
     { wrapper }
   );
 
   expect(result.current.docs).toEqual([]);
 
-  await act(async () => {
-    await result.current.storage?.set(keypair, {
+  act(() => {
+    result.current.storage?.set(keypair, {
       format: 'es.4',
-      path: '/docs-test/1',
+      path: '/documents-test/1',
       content: 'A!',
     });
-    await result.current.storage?.set(keypair, {
+    result.current.storage?.set(keypair, {
       format: 'es.4',
-      path: '/docs-test/2',
+      path: '/documents-test/2',
       content: 'B!',
     });
-    await result.current.storage?.set(keypair, {
+    result.current.storage?.set(keypair, {
       format: 'es.4',
-      path: '/docs-test/3',
+      path: '/documents-test/3',
       content: 'C!',
     });
   });
+
+  await waitForNextUpdate();
 
   expect(result.current.docs.length).toEqual(3);
   expect(result.current.docs.map(doc => doc.content)).toEqual([
@@ -330,8 +333,6 @@ test('useDocuments', async () => {
   act(() => {
     result.current.setWorkspace(WORKSPACE_ADDR_B);
   });
-
-  await waitForNextUpdate();
 
   expect(result.current.docs.length).toEqual(0);
 });
@@ -347,7 +348,9 @@ test('useSubscribeToStorages', async () => {
 
     const onWrite = React.useCallback(
       (event: WriteEvent) => {
-        setEvent(event);
+        act(() => {
+          setEvent(event);
+        });
       },
       [setEvent]
     );
@@ -360,26 +363,31 @@ test('useSubscribeToStorages', async () => {
     return { event: event, storages };
   };
 
-  const { result } = renderHook(() => useTest(), {
+  const { result, waitForNextUpdate } = renderHook(() => useTest(), {
     wrapper,
   });
 
   expect(result.current.event).toEqual(null);
 
-  await act(async () => {
-    await result.current.storages[WORKSPACE_ADDR_A].set(keypair, {
+  act(() => {
+    result.current.storages[WORKSPACE_ADDR_A].set(keypair, {
       format: 'es.4',
       content: 'Hello!',
-      path: '/test/1',
+      path: '/subscribe-test/1',
     });
   });
 
-  expect(result.current.event?.document.path).toEqual('/test/1');
+  await waitForNextUpdate();
+
+  expect(result.current.event?.document.path).toEqual('/subscribe-test/1');
   expect(result.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_A);
   expect(result.current.event?.document.author).toEqual(keypair.address);
 
   // Can listen for specific workspaces
-  const { result: workspaceResult } = renderHook(
+  const {
+    result: workspaceResult,
+    waitForNextUpdate: workspaceWait,
+  } = renderHook(
     () =>
       useTest({
         workspaces: [WORKSPACE_ADDR_B],
@@ -389,8 +397,8 @@ test('useSubscribeToStorages', async () => {
 
   expect(workspaceResult.current.event).toEqual(null);
 
-  await act(async () => {
-    await workspaceResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
+  act(() => {
+    workspaceResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
       format: 'es.4',
       content: 'Hello!',
       path: '/test/1',
@@ -399,13 +407,15 @@ test('useSubscribeToStorages', async () => {
 
   expect(workspaceResult.current.event).toEqual(null);
 
-  await act(async () => {
-    await workspaceResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
+  act(() => {
+    workspaceResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
       format: 'es.4',
       content: 'Hello!',
       path: '/test/2',
     });
   });
+
+  await workspaceWait();
 
   expect(workspaceResult.current.event?.document.path).toEqual('/test/2');
   expect(workspaceResult.current.event?.document.workspace).toEqual(
@@ -416,7 +426,7 @@ test('useSubscribeToStorages', async () => {
   );
 
   // Can listen for paths
-  const { result: pathResult } = renderHook(
+  const { result: pathResult, waitForNextUpdate: pathWait } = renderHook(
     () =>
       useTest({
         paths: ['/test/b'],
@@ -426,8 +436,8 @@ test('useSubscribeToStorages', async () => {
 
   expect(pathResult.current.event).toEqual(null);
 
-  await act(async () => {
-    await pathResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
+  act(() => {
+    pathResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
       format: 'es.4',
       content: 'Hello!',
       path: '/test/a',
@@ -436,18 +446,20 @@ test('useSubscribeToStorages', async () => {
 
   expect(pathResult.current.event).toEqual(null);
 
-  await act(async () => {
-    await pathResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
+  act(() => {
+    pathResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
       format: 'es.4',
       content: 'Hello!',
       path: '/test/b',
     });
   });
 
+  await pathWait();
+
   expect(pathResult.current.event?.document.path).toEqual('/test/b');
 
   // Can listen for all history
-  const { result: historyResult } = renderHook(
+  const { result: historyResult, waitForNextUpdate: historyWait } = renderHook(
     () =>
       useTest({
         history: 'all',
@@ -459,8 +471,8 @@ test('useSubscribeToStorages', async () => {
 
   const publishDate = Date.now() * 1000;
 
-  await act(async () => {
-    await historyResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
+  act(() => {
+    historyResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
       format: 'es.4',
       content: 'Latest!',
       path: '/test/history',
@@ -468,6 +480,7 @@ test('useSubscribeToStorages', async () => {
     });
   });
 
+  await historyWait();
   expect(historyResult.current.event?.document.content).toEqual('Latest!');
   expect(historyResult.current.event?.document.author).toEqual(keypair.address);
   expect(historyResult.current.event?.document.path).toEqual('/test/history');
@@ -478,7 +491,7 @@ test('useSubscribeToStorages', async () => {
 
   const otherStorage = new StorageMemory([ValidatorEs4], WORKSPACE_ADDR_A);
 
-  await act(async () => {
+  act(() => {
     otherStorage.set(otherKeypair, {
       format: 'es.4',
       content: 'Oldest!',
@@ -486,11 +499,10 @@ test('useSubscribeToStorages', async () => {
       timestamp: publishDate - 10000,
     });
 
-    await syncLocalAsync(
-      historyResult.current.storages[WORKSPACE_ADDR_A],
-      otherStorage
-    );
+    syncLocal(historyResult.current.storages[WORKSPACE_ADDR_A], otherStorage);
   });
+
+  await historyWait();
 
   expect(historyResult.current.event?.isLocal).toBeFalsy();
   expect(historyResult.current.event?.document.content).toEqual('Oldest!');

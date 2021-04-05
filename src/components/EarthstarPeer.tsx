@@ -1,5 +1,10 @@
 import * as React from 'react';
-import { AuthorKeypair, IStorageAsync } from 'earthstar';
+import {
+  AuthorKeypair,
+  IStorage,
+  StorageLocalStorage,
+  ValidatorEs4,
+} from 'earthstar';
 import LiveSyncer from './_LiveSyncer';
 import {
   CurrentAuthorContext,
@@ -17,20 +22,35 @@ export default function EarthstarPeer({
   initCurrentAuthor = null,
   initCurrentWorkspace = null,
   initIsLive = true,
+  onCreateWorkspace = workspaceAddress =>
+    new StorageLocalStorage([ValidatorEs4], workspaceAddress),
   children,
 }: {
-  initWorkspaces?: IStorageAsync[];
+  initWorkspaces?: string[];
   initPubs?: Record<string, string[]>;
   initCurrentAuthor?: AuthorKeypair | null;
   initCurrentWorkspace?: string | null;
   initIsLive?: boolean;
   children: React.ReactNode;
+  onCreateWorkspace?: (workspaceAddress: string) => IStorage;
 }) {
   const [storages, setStorages] = React.useState(
-    initWorkspaces.reduce<Record<string, IStorageAsync>>((acc, storage) => {
-      return { ...acc, [storage.workspace]: storage };
-    }, {})
+    initWorkspaces.reduce((acc, workspaceAddress) => {
+      return {
+        ...acc,
+        [workspaceAddress]: onCreateWorkspace(workspaceAddress),
+      };
+    }, {} as Record<string, IStorage>)
   );
+
+  const addStorage = React.useCallback((workspaceAddress: string) => {
+    const storage = onCreateWorkspace(workspaceAddress);
+
+    setStorages(prev => ({
+      ...prev,
+      [workspaceAddress]: storage,
+    }));
+  }, []);
 
   const [pubs, setPubs] = React.useState(initPubs);
 
@@ -62,7 +82,7 @@ export default function EarthstarPeer({
   }, [storages, prevStorages]);
 
   return (
-    <StorageContext.Provider value={{ storages, setStorages }}>
+    <StorageContext.Provider value={{ storages, setStorages, addStorage }}>
       <PubsContext.Provider value={{ pubs, setPubs }}>
         <CurrentAuthorContext.Provider
           value={{ currentAuthor, setCurrentAuthor }}

@@ -1,12 +1,11 @@
-import { AuthorKeypair, IStorageAsync } from 'earthstar';
+import { AuthorKeypair, IStorage } from 'earthstar';
 import * as React from 'react';
 
 export const StorageContext = React.createContext<{
-  storages: Record<string, IStorageAsync>; // workspace address --> IStorage instance
-  setStorages: React.Dispatch<
-    React.SetStateAction<Record<string, IStorageAsync>>
-  >;
-}>({ storages: {}, setStorages: () => {} });
+  storages: Record<string, IStorage>; // workspace address --> IStorage instance
+  setStorages: React.Dispatch<React.SetStateAction<Record<string, IStorage>>>;
+  addStorage: (workspaceAddress: string) => void;
+}>({ storages: {}, setStorages: () => {}, addStorage: () => {} });
 
 export const PubsContext = React.createContext<{
   pubs: Record<string, string[]>; // workspace address --> pub urls
