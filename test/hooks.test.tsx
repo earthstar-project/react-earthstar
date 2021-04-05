@@ -23,6 +23,7 @@ import {
   useMakeInvitation,
   LocalStorageSettingsWriter,
   useLocalStorageEarthstarSettings,
+  useWorkspaceStorage,
 } from '../src';
 import StorageMemoryCache from '../src/StorageMemoryCache';
 
@@ -185,6 +186,36 @@ test('useCurrentWorkspace', () => {
   });
 
   expect(result.current[0]).toEqual(null);
+});
+
+test('useWorkspaceStorage', async () => {
+  const { result } = renderHook(() => useWorkspaceStorage(), {
+    wrapper,
+  });
+
+  expect(result.current.documents()).toEqual([]);
+
+  act(() => {
+    result.current.set(keypair, {
+      path: '/storage-test/test.txt',
+      format: 'es.4',
+      content: 'Hello world!',
+    });
+  });
+
+  expect(result.current.getContent('/storage-test/test.txt')).toEqual(
+    'Hello world!'
+  );
+
+  expect(result.current.documents().length).toEqual(1);
+
+  const query = { pathStartsWith: `/storage-test` };
+
+  expect(result.current.documents(query)).toEqual([]);
+
+  //await waitForNextUpdate();
+
+  expect(result.current.documents(query).length).toEqual(1);
 });
 
 test('useInvitation', () => {

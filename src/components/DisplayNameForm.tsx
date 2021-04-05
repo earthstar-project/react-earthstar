@@ -15,8 +15,6 @@ export default function DisplayNameForm({
 
   const displayNameDoc = storage.getDocument(displayNamePath);
 
-  console.log(displayNameDoc?.content);
-
   const [newDisplayName, setNewDisplayName] = React.useState(
     displayNameDoc?.content || ''
   );

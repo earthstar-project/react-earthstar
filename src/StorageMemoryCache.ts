@@ -69,6 +69,11 @@ export default class StorageMemoryCache extends StorageBase {
       limitBytes: undefined,
     });
 
+    this._queryCache.set(this._emptyQuery, {
+      docs: [],
+      expires: Date.now() * 1000,
+    });
+
     this._backingStorage.onWrite.subscribe(event => {
       this.onWrite.send({
         ...event,
@@ -98,19 +103,28 @@ export default class StorageMemoryCache extends StorageBase {
 
     let now = this._now || Date.now() * 1000;
 
-    if (query.limit === 0 || query.limitBytes === 0) {
+    if (query?.limit === 0 || query?.limitBytes === 0) {
       return [];
     }
 
-    const cacheResult = this._queryCache.get(query);
+    const isEmpty =
+      query === undefined ||
+      (query &&
+        Object.keys(query).length === 0 &&
+        query.constructor === Object);
+
+    const cacheResult = this._queryCache.get(
+      isEmpty ? this._emptyQuery : query
+    );
+
+    console.log(query, cacheResult);
 
     const isCacheHit = cacheResult && cacheResult.expires >= now;
 
     if (!isCacheHit || (cacheResult && cacheResult.expires < now)) {
       this._backingStorage.documents(query).then(result => {
-        this._queryCache.set(query, {
-          docs: result,
-          expires: now + this._timeToLive,
+        result.forEach(doc => {
+          this._upsertDocument(doc);
         });
       });
     }
@@ -130,11 +144,14 @@ export default class StorageMemoryCache extends StorageBase {
 
     this._backingStorage.ingestDocument(doc, fromSessionId).then(result => {
       if (isErr(result)) {
+        console.log('argh');
         return;
       }
 
       this._backingStorage.getDocument(doc.path).then(latestDoc => {
         let isLatest = deepEqual(doc, latestDoc);
+
+        this._upsertDocument(doc);
 
         this.onWrite.send({
           kind: 'DOCUMENT_WRITE',
@@ -224,9 +241,8 @@ export default class StorageMemoryCache extends StorageBase {
       });
     }
 
-    console.log(this._queryCache.entries());
-
     for (let entry of this._queryCache) {
+      const query = entry[0];
       const { docs, expires } = entry[1];
 
       let foundIndex = docs.findIndex(
@@ -236,7 +252,10 @@ export default class StorageMemoryCache extends StorageBase {
 
       // TODO: does not take history, limit, limitBytes into account...
       //let dontRiskIt = key.limit || key.limitBytes || key.history;
-      let matchesQuery = queryMatchesDoc(entry[0], docToUpsert);
+      let matchesQuery =
+        query === this._emptyQuery || query === undefined
+          ? true
+          : queryMatchesDoc(query, docToUpsert);
 
       let next = {
         docs,
@@ -260,10 +279,21 @@ export default class StorageMemoryCache extends StorageBase {
         );
       }
 
-      console.log({ query: entry[0], next });
-
-      this._queryCache.set(entry[0], next);
+      this._queryCache.set(query || this._emptyQuery, next);
     }
+
+    console.log(this._queryCache.entries());
+
+    // PINNING IT: looks like the same query is appearing twice in the cache here
+    // we'll need to memoise it!
+
+    this.onWrite.send({
+      kind: 'DOCUMENT_WRITE',
+      document: docToUpsert,
+      fromSessionId: this.sessionId,
+      isLocal: true,
+      isLatest: true,
+    });
   }
 
   discardExpiredDocuments() {

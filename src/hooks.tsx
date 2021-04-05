@@ -220,23 +220,6 @@ export function useWorkspaceStorage(workspaceAddress?: string) {
     reRender(prev => !prev);
   }, [storage]);
 
-  /*
-  const withCurrentAuthor = React.useMemo(() => {
-    return {
-      ...proxyRef.current,
-      set(docToSet: DocToSet) {
-        if (!currentAuthor) {
-          return new ValidationError(
-            'Tried to use set when no currentAuthor was present!'
-          );
-        }
-
-        return proxyRef.current.set(currentAuthor, docToSet);
-      },
-    };
-  }, [currentAuthor]);
-  */
-
   return proxyRef.current;
 }
 
