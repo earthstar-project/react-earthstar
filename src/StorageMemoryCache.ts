@@ -1,4 +1,3 @@
-import { deepEqual } from 'fast-equals';
 import {
   cleanUpQuery,
   IStorageAsync,
@@ -77,7 +76,7 @@ export default class StorageMemoryCache extends StorageBase {
     this._backingStorage.onWrite.subscribe(event => {
       this.onWrite.send({
         ...event,
-        fromSessionId: this.sessionId,
+        fromSessionId: this._backingStorage.sessionId,
       });
     });
   }
@@ -123,8 +122,9 @@ export default class StorageMemoryCache extends StorageBase {
 
     if (!isCacheHit || (cacheResult && cacheResult.expires < now)) {
       this._backingStorage.documents(query).then(result => {
-        result.forEach(doc => {
-          this._upsertDocument(doc);
+        this._queryCache.set(query, {
+          docs: result,
+          expires: now + this._timeToLive,
         });
       });
     }
@@ -148,18 +148,8 @@ export default class StorageMemoryCache extends StorageBase {
         return;
       }
 
-      this._backingStorage.getDocument(doc.path).then(latestDoc => {
-        let isLatest = deepEqual(doc, latestDoc);
-
+      this._backingStorage.getDocument(doc.path).then(() => {
         this._upsertDocument(doc);
-
-        this.onWrite.send({
-          kind: 'DOCUMENT_WRITE',
-          document: doc,
-          fromSessionId: fromSessionId,
-          isLocal: fromSessionId === this.sessionId,
-          isLatest: isLatest,
-        });
       });
     });
 
@@ -283,9 +273,7 @@ export default class StorageMemoryCache extends StorageBase {
     }
 
     console.log(this._queryCache.entries());
-
-    // PINNING IT: looks like the same query is appearing twice in the cache here
-    // we'll need to memoise it!
+    console.log('SENDING FROM CACHE');
 
     this.onWrite.send({
       kind: 'DOCUMENT_WRITE',

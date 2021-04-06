@@ -7,7 +7,6 @@ import {
   syncLocalAndHttp,
   IStorage,
 } from 'earthstar';
-import useDeepCompareEffect from 'use-deep-compare-effect';
 import { getLocalStorage, makeStorageKey } from './util';
 import {
   CurrentAuthorContext,
@@ -191,7 +190,6 @@ export function useSync() {
 export function useWorkspaceStorage(workspaceAddress?: string) {
   const storage = useStorage(workspaceAddress);
   const [, reRender] = React.useState(true);
-  //const [currentAuthor] = useCurrentAuthor();
 
   if (!storage) {
     throw new Error(
@@ -202,23 +200,21 @@ export function useWorkspaceStorage(workspaceAddress?: string) {
   const proxyRef = React.useRef(makeStorageProxy(storage));
 
   React.useEffect(() => {
-    const unsub = proxyRef.current.subscribe(() => {
+    const unsub = proxyRef.current.subscribe(event => {
+      console.log(`EVENT in useWorkspaceStorage: ${event}`);
       reRender(prev => !prev);
     });
 
-    proxyRef.current.clearWatches();
+    console.log('EFFECT CALLED!');
 
     return () => {
-      if (unsub) {
-        unsub();
-      }
+      unsub();
     };
   }, []);
 
-  useDeepCompareEffect(() => {
-    proxyRef.current = makeStorageProxy(storage);
-    reRender(prev => !prev);
-  }, [storage]);
+  React.useEffect(() => {
+    proxyRef.current.clearWatches();
+  });
 
   return proxyRef.current;
 }

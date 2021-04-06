@@ -189,9 +189,12 @@ test('useCurrentWorkspace', () => {
 });
 
 test('useWorkspaceStorage', async () => {
-  const { result } = renderHook(() => useWorkspaceStorage(), {
-    wrapper,
-  });
+  const { result, waitForNextUpdate } = renderHook(
+    () => useWorkspaceStorage(),
+    {
+      wrapper,
+    }
+  );
 
   expect(result.current.documents()).toEqual([]);
 
@@ -213,9 +216,9 @@ test('useWorkspaceStorage', async () => {
 
   expect(result.current.documents(query)).toEqual([]);
 
-  //await waitForNextUpdate();
+  await waitForNextUpdate();
 
-  expect(result.current.documents(query).length).toEqual(1);
+  expect(result.current.documents(query)[0].content).toEqual('Hello world!');
 });
 
 test('useInvitation', () => {

@@ -129,6 +129,7 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   proxy.watchedDocQueries = ___watchedDocQueries;
 
   proxy.clearWatches = () => {
+    console.log('CLEARED');
     ___watchedPaths.clear();
     ___watchedDocQueries.clear();
   };
@@ -136,8 +137,12 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   // let users of the proxy subscribe to writeEvents they will care about
   let ___cbs = new Set<Cb>();
   proxy.subscribe = (cb: any): UnsubFn => {
+    console.log('SOMETHING SUBSCRIBED!');
+
     ___cbs.add(cb);
-    return () => ___cbs.delete(cb);
+    return () => {
+      ___cbs.delete(cb);
+    };
   };
   proxy.clearSubscriptions = () => {
     ___cbs.clear();
@@ -147,6 +152,10 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   let unsubFromStorage = storage.onWrite.subscribe((evt: WriteEvent) => {
     // We've gotten a write event.  Do we care about it?
     // Filter the events to only the docs and queries we're watching.
+    console.log('STORAGEPROXY SUB FIRED');
+    console.log(___watchedPaths);
+    console.log(___watchedDocQueries);
+
     let shouldRunCallbacks = false;
 
     // Easy to check for specific paths we're watching...
@@ -180,6 +189,12 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
     // Run the callbacks
 
     if (shouldRunCallbacks) {
+      console.log('SHOULD RUN CALLBACKS!');
+
+      if (___cbs.size > 0) {
+        console.log('SENDING FROM PROXY...');
+      }
+
       ___cbs.forEach(cb => cb(evt));
     }
   });
