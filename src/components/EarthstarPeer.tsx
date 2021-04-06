@@ -2,7 +2,7 @@ import * as React from 'react';
 import {
   AuthorKeypair,
   IStorage,
-  StorageLocalStorage,
+  StorageMemory,
   ValidatorEs4,
 } from 'earthstar';
 import LiveSyncer from './_LiveSyncer';
@@ -23,7 +23,7 @@ export default function EarthstarPeer({
   initCurrentWorkspace = null,
   initIsLive = true,
   onCreateWorkspace = workspaceAddress =>
-    new StorageLocalStorage([ValidatorEs4], workspaceAddress),
+    new StorageMemory([ValidatorEs4], workspaceAddress),
   children,
 }: {
   initWorkspaces?: string[];

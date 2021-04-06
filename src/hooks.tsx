@@ -16,6 +16,7 @@ import {
   StorageContext,
 } from './contexts';
 import { makeStorageProxy } from './StorageProxy';
+import { usePrevious } from '@reach/utils';
 
 export function useWorkspaces() {
   const [storages] = useStorages();
@@ -199,22 +200,24 @@ export function useWorkspaceStorage(workspaceAddress?: string) {
 
   const proxyRef = React.useRef(makeStorageProxy(storage));
 
+  const prevStorage = usePrevious(storage);
+
   React.useEffect(() => {
-    const unsub = proxyRef.current.subscribe(event => {
-      console.log(`EVENT in useWorkspaceStorage: ${event}`);
+    if (prevStorage && prevStorage !== storage) {
+      proxyRef.current = makeStorageProxy(storage);
+      reRender(prev => !prev);
+    }
+    // if the storage has changed
+    // make a new one
+
+    const unsub = proxyRef.current.subscribe(() => {
       reRender(prev => !prev);
     });
-
-    console.log('EFFECT CALLED!');
 
     return () => {
       unsub();
     };
-  }, []);
-
-  React.useEffect(() => {
-    proxyRef.current.clearWatches();
-  });
+  }, [storage, prevStorage]);
 
   return proxyRef.current;
 }

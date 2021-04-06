@@ -15,6 +15,9 @@ import {
   MultiWorkspaceTab,
   LocalStorageSettingsWriter,
   useLocalStorageEarthstarSettings,
+  useWorkspaceStorage,
+  useCurrentWorkspace,
+  useCurrentAuthor,
 } from '../../src/index';
 import '../../styles/layout.css';
 import '../../styles/junior.css';
@@ -96,6 +99,66 @@ const workspaces = [
   EXAMPLE_WORKSPACE_ADDR3,
 ];
 
+function OnlyWorkspace({ children }: { children: React.ReactNode }) {
+  const [currentWorkspace] = useCurrentWorkspace();
+
+  if (!currentWorkspace) {
+    return null;
+  }
+
+  return <>{children}</>;
+}
+
+function Test() {
+  const storage = useWorkspaceStorage();
+  const [currentAuthor] = useCurrentAuthor();
+  const [lastCreatedDoc, setLastCreatedDoc] = React.useState<
+    string | undefined
+  >();
+
+  const files = storage.documents({ pathStartsWith: '/directory/' });
+  const mostRecent = lastCreatedDoc
+    ? storage.getDocument(lastCreatedDoc)
+    : null;
+
+  return (
+    <div>
+      <h1>{'My directory'}</h1>
+      {currentAuthor ? (
+        <button
+          onClick={() => {
+            const path = `/directory/${Date.now()}.txt`;
+
+            storage.set(currentAuthor, {
+              content: 'Hello world!',
+              format: 'es.4',
+              path,
+            });
+
+            setLastCreatedDoc(path);
+          }}
+        >
+          Add file
+        </button>
+      ) : null}
+      {mostRecent ? (
+        <div>
+          <h2>Most Recent</h2>
+          <div>
+            <b>{mostRecent.path}</b>: {mostRecent.content}
+          </div>
+        </div>
+      ) : null}
+      <h2>All files</h2>
+      {files.map(file => (
+        <li>
+          <b>{file.path}</b>: {file.content}
+        </li>
+      ))}
+    </div>
+  );
+}
+
 function Examples() {
   const initValues = useLocalStorageEarthstarSettings('example');
 
@@ -107,6 +170,9 @@ function Examples() {
         initPubs={pubs}
         initIsLive={false}
       >
+        <OnlyWorkspace>
+          <Test />
+        </OnlyWorkspace>
         <hr />
         <EarthbarExample title={'Default Earthbar'}></EarthbarExample>
       </EarthstarPeer>
