@@ -1,6 +1,6 @@
 import * as React from 'react';
 import WorkspaceLabel from './WorkspaceLabel';
-import { useWorkspaceStorage, useCurrentAuthor } from '../hooks';
+import { useStorage, useCurrentAuthor } from '../hooks';
 import { getAuthorShortName } from '../util';
 
 export default function DisplayNameForm({
@@ -9,7 +9,7 @@ export default function DisplayNameForm({
   workspaceAddress?: string;
 }) {
   const [currentAuthor] = useCurrentAuthor();
-  const storage = useWorkspaceStorage(workspaceAddress);
+  const storage = useStorage(workspaceAddress);
 
   const displayNamePath = `/about/~${currentAuthor?.address}/displayName.txt`;
 

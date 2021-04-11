@@ -6,7 +6,6 @@ import {
   AuthorKeypair,
   isErr,
   EarthstarError,
-  sleep,
   StorageToAsync,
 } from 'earthstar';
 import { renderHook, act } from '@testing-library/react-hooks';
@@ -23,7 +22,7 @@ import {
   useMakeInvitation,
   LocalStorageSettingsWriter,
   useLocalStorageEarthstarSettings,
-  useWorkspaceStorage,
+  useStorage,
 } from '../src';
 import StorageMemoryCache from '../src/StorageMemoryCache';
 
@@ -188,13 +187,10 @@ test('useCurrentWorkspace', () => {
   expect(result.current[0]).toEqual(null);
 });
 
-test('useWorkspaceStorage', async () => {
-  const { result, waitForNextUpdate } = renderHook(
-    () => useWorkspaceStorage(),
-    {
-      wrapper,
-    }
-  );
+test('useStorage', async () => {
+  const { result, waitForNextUpdate } = renderHook(() => useStorage(), {
+    wrapper,
+  });
 
   expect(result.current.documents()).toEqual([]);
 
@@ -317,43 +313,4 @@ test('useLocalStorageSettings', () => {
   });
   expect(result.current.initCurrentAuthor).toBeDefined();
   expect(result.current.initCurrentWorkspace).toBe(WORKSPACE_ADDR_A);
-});
-
-test('useStorage', async () => {
-  const useTest = () => {
-    const [storages, setStorages] = useStorages();
-
-    const workspaces = useWorkspaces();
-
-    return { workspaces, storages, setStorages };
-  };
-
-  const { result } = renderHook(() => useTest(), {
-    wrapper,
-  });
-
-  const storage = result.current.storages[WORKSPACE_ADDR_C];
-
-  expect(storage.isClosed()).toBeFalsy();
-
-  act(() => {
-    result.current.setStorages(prev => {
-      const prevCopy = { ...prev };
-
-      delete prevCopy[WORKSPACE_ADDR_C];
-
-      return prevCopy;
-    });
-  });
-
-  // Wait a tick for Earthstar peer to close the removed storage
-  await sleep(0);
-
-  // Removed workspaces should be closed by EarthstarPeer
-  expect(storage.isClosed()).toBeTruthy();
-
-  expect(result.current.workspaces).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-  ]);
 });

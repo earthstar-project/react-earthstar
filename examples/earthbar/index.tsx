@@ -15,7 +15,7 @@ import {
   MultiWorkspaceTab,
   LocalStorageSettingsWriter,
   useLocalStorageEarthstarSettings,
-  useWorkspaceStorage,
+  useStorage,
   useCurrentWorkspace,
   useCurrentAuthor,
 } from '../../src/index';
@@ -110,7 +110,7 @@ function OnlyWorkspace({ children }: { children: React.ReactNode }) {
 }
 
 function Test() {
-  const storage = useWorkspaceStorage();
+  const storage = useStorage();
   const [currentAuthor] = useCurrentAuthor();
   const [lastCreatedDoc, setLastCreatedDoc] = React.useState<
     string | undefined

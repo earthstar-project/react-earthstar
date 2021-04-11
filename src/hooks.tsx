@@ -188,8 +188,16 @@ export function useSync() {
   );
 }
 
-export function useWorkspaceStorage(workspaceAddress?: string) {
-  const storage = useStorage(workspaceAddress);
+export function useStorage(workspaceAddress?: string) {
+  const [currentWorkspace] = useCurrentWorkspace();
+  const [storages] = useStorages();
+
+  const address = workspaceAddress || currentWorkspace;
+
+  const storage = React.useMemo(() => {
+    return address ? storages[address] : null;
+  }, [address, storages]);
+
   const [, reRender] = React.useState(true);
 
   if (!storage) {
@@ -329,17 +337,6 @@ export function useIsLive(): [
   const { isLive, setIsLive } = React.useContext(IsLiveContext);
 
   return [isLive, setIsLive];
-}
-
-export function useStorage(workspaceAddress?: string) {
-  const [currentWorkspace] = useCurrentWorkspace();
-  const [storages] = useStorages();
-
-  const address = workspaceAddress || currentWorkspace;
-
-  return React.useMemo(() => {
-    return address ? storages[address] : null;
-  }, [address, storages]);
 }
 
 export function useLocalStorageEarthstarSettings(storageKey: string) {
