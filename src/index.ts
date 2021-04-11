@@ -8,4 +8,4 @@ export * from './components';
 export * from './components/earthbar';
 
 // TEMP: Export StorageMemoryCache
-export * from './StorageMemoryCache';
+export { default as StorageMemoryCache } from './StorageMemoryCache';
