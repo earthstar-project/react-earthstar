@@ -16,7 +16,6 @@ import {
   StorageContext,
 } from './contexts';
 import { makeStorageProxy } from './StorageProxy';
-import { usePrevious } from '@reach/utils';
 
 export function useWorkspaces() {
   const [storages] = useStorages();
