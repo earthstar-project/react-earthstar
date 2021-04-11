@@ -194,30 +194,27 @@ export function useStorage(workspaceAddress?: string) {
 
   const address = workspaceAddress || currentWorkspace;
 
-  const storage = React.useMemo(() => {
-    return address ? storages[address] : null;
-  }, [address, storages]);
-
   const [, reRender] = React.useState(true);
 
-  if (!storage) {
-    throw new Error(
-      'Tried to use useWorkspaceStorage with no workspace specified!'
-    );
+  const [currentStorage, setCurrentStorage] = React.useState(() => {
+    return address ? storages[address] : null;
+  });
+
+  if (!currentStorage) {
+    throw new Error('Tried to use useStorage with no workspace specified!');
   }
 
-  const proxyRef = React.useRef(makeStorageProxy(storage));
-
-  const prevStorage = usePrevious(storage);
+  const proxyRef = React.useRef(makeStorageProxy(currentStorage));
 
   React.useEffect(() => {
-    if (prevStorage && prevStorage !== storage) {
-      proxyRef.current = makeStorageProxy(storage);
+    if (address && address !== currentStorage.workspace) {
+      setCurrentStorage(storages[address]);
+      proxyRef.current = makeStorageProxy(storages[address]);
       reRender(prev => !prev);
     }
-    // if the storage has changed
-    // make a new one
+  }, [address, storages, currentStorage.workspace]);
 
+  React.useEffect(() => {
     const unsub = proxyRef.current.subscribe(() => {
       reRender(prev => !prev);
     });
@@ -225,7 +222,7 @@ export function useStorage(workspaceAddress?: string) {
     return () => {
       unsub();
     };
-  }, [storage, prevStorage]);
+  }, [currentStorage]);
 
   return proxyRef.current;
 }
