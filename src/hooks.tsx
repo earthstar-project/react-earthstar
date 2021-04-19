@@ -212,6 +212,8 @@ export function useStorage(workspaceAddress?: string) {
   React.useEffect(() => {
     if (address && address !== currentStorage.workspace) {
       setCurrentStorage(storages[address]);
+      console.log('remaking proxy');
+      proxyRef.current?.unsubFromStorage();
       proxyRef.current = makeStorageProxy(storages[address]);
       reRender(prev => !prev);
     }

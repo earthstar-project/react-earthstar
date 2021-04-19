@@ -68,6 +68,7 @@ export interface StorageProxy extends IStorage {
   clearWatches: () => void;
   subscribe: (cb: Cb) => Thunk;
   clearSubscriptions: () => void;
+  unsubFromStorage: () => void;
 }
 
 export function makeStorageProxy(storage: IStorage): StorageProxy {
@@ -149,7 +150,7 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   };
 
   // subscribe the proxy itself to WriteEvents from Earthstar
-  let unsubFromStorage = storage.onWrite.subscribe((evt: WriteEvent) => {
+  proxy.unsubFromStorage = storage.onWrite.subscribe((evt: WriteEvent) => {
     // We've gotten a write event.  Do we care about it?
     // Filter the events to only the docs and queries we're watching.
     console.log('STORAGEPROXY SUB FIRED');
@@ -203,7 +204,7 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   storage.onWillClose.subscribe(() => {
     proxy.clearSubscriptions();
     proxy.clearWatches();
-    unsubFromStorage();
+    proxy.unsubFromStorage();
   });
 
   return proxy as StorageProxy;
