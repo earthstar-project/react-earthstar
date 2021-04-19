@@ -15,7 +15,7 @@ import {
   PubsContext,
   StorageContext,
 } from './contexts';
-import { makeStorageProxy } from './StorageProxy';
+import { makeStorageProxy, StorageProxy } from './StorageProxy';
 
 export function useWorkspaces() {
   const [storages] = useStorages();
@@ -203,7 +203,11 @@ export function useStorage(workspaceAddress?: string) {
     throw new Error('Tried to use useStorage with no workspace specified!');
   }
 
-  const proxyRef = React.useRef(makeStorageProxy(currentStorage));
+  const proxyRef = React.useRef<null | StorageProxy>(null);
+
+  if (proxyRef.current === null) {
+    proxyRef.current = makeStorageProxy(currentStorage);
+  }
 
   React.useEffect(() => {
     if (address && address !== currentStorage.workspace) {
@@ -214,16 +218,18 @@ export function useStorage(workspaceAddress?: string) {
   }, [address, storages, currentStorage.workspace]);
 
   React.useEffect(() => {
-    const unsub = proxyRef.current.subscribe(() => {
+    const unsub = proxyRef.current?.subscribe(() => {
       reRender(prev => !prev);
     });
 
     return () => {
-      unsub();
+      if (unsub) {
+        unsub();
+      }
     };
   }, [currentStorage]);
 
-  return proxyRef.current;
+  return proxyRef.current as StorageProxy;
 }
 
 export function useStorages(): [
