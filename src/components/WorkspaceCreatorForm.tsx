@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ValidatorEs4, isErr } from 'earthstar';
+import { isErr, checkWorkspaceIsValid } from 'stone-soup';
 import { useAddWorkspace, useCurrentWorkspace, usePubs } from '../hooks';
 import { Alert } from '@reach/alert';
 import {
@@ -44,7 +44,7 @@ export default function WorkspaceCreatorForm({
   const [workspaceName, setWorkspaceName] = React.useState('');
   const [workspaceSuffix, setWorkspaceSuffix] = React.useState(generateSuffix);
   const address = `+${workspaceName}.${workspaceSuffix}`;
-  const validResult = ValidatorEs4._checkWorkspaceIsValid(address);
+  const validResult = checkWorkspaceIsValid(address);
   const isValid = !isErr(validResult);
 
   const allPubs = Array.from(new Set(Object.values(pubs).flat()));

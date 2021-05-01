@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { OnePubOneWorkspaceSyncer } from 'earthstar';
+import { QueryFollower } from 'stone-soup';
 import { useIsLive, useStorages, useWorkspacePubs } from '../hooks';
 
 export default function LiveSyncer({

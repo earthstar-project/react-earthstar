@@ -1,10 +1,5 @@
 import * as React from 'react';
-import {
-  AuthorKeypair,
-  IStorage,
-  StorageMemory,
-  ValidatorEs4,
-} from 'earthstar';
+import { AuthorKeypair, StorageAsync, ICrypto } from 'stone-soup';
 import LiveSyncer from './_LiveSyncer';
 import {
   CurrentAuthorContext,
@@ -12,6 +7,7 @@ import {
   IsLiveContext,
   PubsContext,
   StorageContext,
+  CryptoContext,
 } from '../contexts';
 import FocusSyncer from './_FocusSyncer';
 import { usePrevious } from '@reach/utils';
@@ -22,8 +18,8 @@ export default function EarthstarPeer({
   initCurrentAuthor = null,
   initCurrentWorkspace = null,
   initIsLive = true,
-  onCreateWorkspace = workspaceAddress =>
-    new StorageMemory([ValidatorEs4], workspaceAddress),
+  onCreateWorkspace,
+  crypto,
   children,
 }: {
   initWorkspaces?: string[];
@@ -32,20 +28,24 @@ export default function EarthstarPeer({
   initCurrentWorkspace?: string | null;
   initIsLive?: boolean;
   children: React.ReactNode;
-  onCreateWorkspace?: (workspaceAddress: string) => IStorage;
+  crypto: ICrypto;
+  onCreateWorkspace: (
+    workspaceAddress: string,
+    crypto: ICrypto
+  ) => StorageAsync;
 }) {
   const [storages, setStorages] = React.useState(
     initWorkspaces.reduce((acc, workspaceAddress) => {
       return {
         ...acc,
-        [workspaceAddress]: onCreateWorkspace(workspaceAddress),
+        [workspaceAddress]: onCreateWorkspace(workspaceAddress, crypto),
       };
-    }, {} as Record<string, IStorage>)
+    }, {} as Record<string, StorageAsync>)
   );
 
   const addStorage = React.useCallback(
     (workspaceAddress: string) => {
-      const storage = onCreateWorkspace(workspaceAddress);
+      const storage = onCreateWorkspace(workspaceAddress, crypto);
 
       setStorages(prev => ({
         ...prev,
@@ -78,7 +78,7 @@ export default function EarthstarPeer({
 
     difference.forEach(
       storage => {
-        storage.close({ delete: true });
+        storage.close();
       },
       [storages, prevStorages]
     );
@@ -94,14 +94,16 @@ export default function EarthstarPeer({
             value={{ currentWorkspace, setCurrentWorkspace }}
           >
             <IsLiveContext.Provider value={{ isLive, setIsLive }}>
-              {children}
-              {Object.keys(storages).map(workspaceAddress => (
-                <LiveSyncer
-                  key={workspaceAddress}
-                  workspaceAddress={workspaceAddress}
-                />
-              ))}
-              <FocusSyncer />
+              <CryptoContext.Provider value={crypto}>
+                {children}
+                {Object.keys(storages).map(workspaceAddress => (
+                  <LiveSyncer
+                    key={workspaceAddress}
+                    workspaceAddress={workspaceAddress}
+                  />
+                ))}
+                <FocusSyncer />
+              </CryptoContext.Provider>
             </IsLiveContext.Provider>
           </CurrentWorkspaceContext.Provider>
         </CurrentAuthorContext.Provider>

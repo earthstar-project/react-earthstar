@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { isErr } from 'earthstar';
+import { isErr } from 'stone-soup';
 import Alert from '@reach/alert';
 import {
   useInvitation,

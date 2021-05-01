@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { generateAuthorKeypair, isErr, AuthorKeypair } from 'earthstar';
+import { isErr, AuthorKeypair } from 'stone-soup';
+import { CryptoContext } from '../contexts';
 import { useCurrentAuthor } from '../hooks';
 
 type NewKeypairFormProps = {
@@ -9,9 +10,10 @@ type NewKeypairFormProps = {
 export default function NewKeypairForm({ onSuccess }: NewKeypairFormProps) {
   const [currentAuthor, setCurrentAuthor] = useCurrentAuthor();
   const [shortName, setShortName] = React.useState('');
+  const crypto = React.useContext(CryptoContext);
 
   const onCreate = React.useCallback(() => {
-    const keypair = generateAuthorKeypair(shortName);
+    const keypair = crypto.generateAuthorKeypair(shortName);
 
     if (isErr(keypair)) {
       alert(keypair.message);

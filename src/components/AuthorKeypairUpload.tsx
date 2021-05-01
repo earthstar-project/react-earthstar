@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { checkAuthorKeypairIsValid, isErr } from 'earthstar';
+import { checkAuthorIsValid, isErr } from 'stone-soup';
 import { useCurrentAuthor } from '../hooks';
 
 type AuthorKeypairUploadProps = React.InputHTMLAttributes<HTMLInputElement>;
@@ -36,7 +36,7 @@ export default function AuthorKeypairUpload(props: AuthorKeypairUploadProps) {
 
             const maybeKeypair = JSON.parse(result);
 
-            const validationResult = checkAuthorKeypairIsValid(maybeKeypair);
+            const validationResult = checkAuthorIsValid(maybeKeypair.address);
 
             if (isErr(validationResult)) {
               alert(validationResult.message);

@@ -1,13 +1,13 @@
 import * as React from 'react';
-import { isErr, Query, ValidatorEs4, cleanUpQuery } from 'earthstar';
+import { isErr, Query, cleanUpQuery, parseAuthorAddress } from 'stone-soup';
 
 export function getAuthorShortName(address: string): string {
-  const parsedAuthor = ValidatorEs4.parseAuthorAddress(address);
+  const parsedAuthor = parseAuthorAddress(address);
   if (isErr(parsedAuthor)) {
     return address;
   }
 
-  return parsedAuthor.shortname;
+  return parsedAuthor.name;
 }
 
 const WORKSPACE_NAME_REGEX = /\+(.*)\./;
@@ -60,57 +60,4 @@ export function getLocalStorage<T>(key: string): T | null {
   } catch {
     return null;
   }
-}
-
-export function useMemoQueryOpts({
-  author,
-  contentLength,
-  contentLengthGt,
-  contentLengthLt,
-  continueAfter,
-  history,
-  limit,
-  limitBytes,
-  path,
-  pathEndsWith,
-  pathStartsWith,
-  timestamp,
-  timestampGt,
-  timestampLt,
-}: Query): Query {
-  return React.useMemo(() => {
-    const obj = {
-      author,
-      contentLength,
-      contentLengthGt,
-      contentLengthLt,
-      continueAfter,
-      ...(history ? { history } : {}),
-      limit,
-      limitBytes,
-      path,
-      pathEndsWith,
-      pathStartsWith,
-      timestamp,
-      timestampGt,
-      timestampLt,
-    };
-
-    return cleanUpQuery(obj);
-  }, [
-    author,
-    contentLength,
-    contentLengthGt,
-    contentLengthLt,
-    continueAfter,
-    history,
-    limit,
-    limitBytes,
-    path,
-    pathEndsWith,
-    pathStartsWith,
-    timestamp,
-    timestampGt,
-    timestampLt,
-  ]);
 }

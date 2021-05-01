@@ -6,14 +6,14 @@ import { getAuthorShortName } from '../util';
 export default function DisplayNameForm({
   workspaceAddress,
 }: {
-  workspaceAddress?: string;
+  workspaceAddress: string;
 }) {
   const [currentAuthor] = useCurrentAuthor();
   const storage = useStorage(workspaceAddress);
 
   const displayNamePath = `/about/~${currentAuthor?.address}/displayName.txt`;
 
-  const displayNameDoc = storage.getDocument(displayNamePath);
+  const displayNameDoc = storage.getLatestDocAtPath(displayNamePath);
 
   const [newDisplayName, setNewDisplayName] = React.useState(
     displayNameDoc?.content || ''
@@ -35,6 +35,7 @@ export default function DisplayNameForm({
           content: newDisplayName,
           format: 'es.4',
           path: displayNamePath,
+          workspace: workspaceAddress,
         });
       }}
     >

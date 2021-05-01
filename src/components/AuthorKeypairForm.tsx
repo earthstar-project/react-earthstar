@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { checkAuthorKeypairIsValid, isErr } from 'earthstar';
+import { checkAuthorIsValid, isErr } from 'stone-soup';
 import { useCurrentAuthor } from '../hooks';
 
 export default function AuthorKeypairForm() {
@@ -16,7 +16,7 @@ export default function AuthorKeypairForm() {
 
         const keypair = { address, secret };
 
-        const result = checkAuthorKeypairIsValid(keypair);
+        const result = checkAuthorIsValid(keypair.address);
 
         if (isErr(result)) {
           alert(result.message);

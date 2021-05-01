@@ -1,9 +1,11 @@
-import { AuthorKeypair, IStorage } from 'earthstar';
+import { AuthorKeypair, ICrypto, StorageAsync } from 'stone-soup';
 import * as React from 'react';
 
 export const StorageContext = React.createContext<{
-  storages: Record<string, IStorage>; // workspace address --> IStorage instance
-  setStorages: React.Dispatch<React.SetStateAction<Record<string, IStorage>>>;
+  storages: Record<string, StorageAsync>; // workspace address --> IStorage instance
+  setStorages: React.Dispatch<
+    React.SetStateAction<Record<string, StorageAsync>>
+  >;
   addStorage: (workspaceAddress: string) => void;
 }>({ storages: {}, setStorages: () => {}, addStorage: () => {} });
 
@@ -32,3 +34,8 @@ export const IsLiveContext = React.createContext<{
   isLive: true,
   setIsLive: () => {},
 });
+
+// This is only used internally so we don't need to provide a default value.
+export const CryptoContext = React.createContext<ICrypto>(
+  ({} as unknown) as ICrypto
+);

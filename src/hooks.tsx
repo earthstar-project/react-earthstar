@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {
   AuthorKeypair,
-  ValidatorEs4,
   isErr,
   EarthstarError,
-  syncLocalAndHttp,
-  IStorage,
-} from 'earthstar';
+  StorageAsync,
+  StorageCache,
+  checkWorkspaceIsValid,
+} from 'stone-soup';
 import { getLocalStorage, makeStorageKey } from './util';
 import {
   CurrentAuthorContext,
@@ -15,7 +15,6 @@ import {
   PubsContext,
   StorageContext,
 } from './contexts';
-import { makeStorageProxy, StorageProxy } from './StorageProxy';
 
 export function useWorkspaces() {
   const [storages] = useStorages();
@@ -157,6 +156,7 @@ export function useCurrentWorkspace(): [
   return [currentWorkspace, setCurrentWorkspace];
 }
 
+/*
 export function useSync() {
   const [storages] = useStorages();
   const [pubs] = usePubs();
@@ -186,6 +186,7 @@ export function useSync() {
     [pubs, storages]
   );
 }
+*/
 
 export function useStorage(workspaceAddress?: string) {
   const [currentWorkspace] = useCurrentWorkspace();
@@ -203,24 +204,24 @@ export function useStorage(workspaceAddress?: string) {
     throw new Error('Tried to use useStorage with no workspace specified!');
   }
 
-  const proxyRef = React.useRef<null | StorageProxy>(null);
+  const cacheRef = React.useRef<null | StorageCache>(null);
 
-  if (proxyRef.current === null) {
-    proxyRef.current = makeStorageProxy(currentStorage);
+  if (cacheRef.current === null) {
+    cacheRef.current = new StorageCache(currentStorage);
   }
 
   React.useEffect(() => {
     if (address && address !== currentStorage.workspace) {
       setCurrentStorage(storages[address]);
       console.log('remaking proxy');
-      proxyRef.current?.unsubFromStorage();
-      proxyRef.current = makeStorageProxy(storages[address]);
+      cacheRef.current?._onCacheUpdatedCallbacks.clear();
+      cacheRef.current = new StorageCache(storages[address]);
       reRender(prev => !prev);
     }
   }, [address, storages, currentStorage.workspace]);
 
   React.useEffect(() => {
-    const unsub = proxyRef.current?.subscribe(() => {
+    const unsub = cacheRef.current?.onCacheUpdated(() => {
       reRender(prev => !prev);
     });
 
@@ -231,12 +232,12 @@ export function useStorage(workspaceAddress?: string) {
     };
   }, [currentStorage]);
 
-  return proxyRef.current as StorageProxy;
+  return cacheRef.current as StorageCache;
 }
 
 export function useStorages(): [
-  Record<string, IStorage>,
-  React.Dispatch<React.SetStateAction<Record<string, IStorage>>>
+  Record<string, StorageAsync>,
+  React.Dispatch<React.SetStateAction<Record<string, StorageAsync>>>
 ] {
   const { storages, setStorages } = React.useContext(StorageContext);
 
@@ -274,9 +275,7 @@ export function useInvitation(invitationCode: string) {
 
     const plussedWorkspace = workspace.replace(' ', '+');
 
-    const workspaceIsValid = ValidatorEs4._checkWorkspaceIsValid(
-      plussedWorkspace
-    );
+    const workspaceIsValid = checkWorkspaceIsValid(plussedWorkspace);
 
     if (isErr(workspaceIsValid)) {
       return workspaceIsValid;
