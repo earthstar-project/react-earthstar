@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AuthorKeypair, StorageAsync, ICrypto } from 'stone-soup';
+import { AuthorKeypair, StorageAsync } from 'stone-soup';
 import LiveSyncer from './_LiveSyncer';
 import {
   CurrentAuthorContext,
@@ -7,7 +7,6 @@ import {
   IsLiveContext,
   PubsContext,
   StorageContext,
-  CryptoContext,
 } from '../contexts';
 import FocusSyncer from './_FocusSyncer';
 import { usePrevious } from '@reach/utils';
@@ -19,7 +18,6 @@ export default function EarthstarPeer({
   initCurrentWorkspace = null,
   initIsLive = true,
   onCreateWorkspace,
-  crypto,
   children,
 }: {
   initWorkspaces?: string[];
@@ -28,24 +26,20 @@ export default function EarthstarPeer({
   initCurrentWorkspace?: string | null;
   initIsLive?: boolean;
   children: React.ReactNode;
-  crypto: ICrypto;
-  onCreateWorkspace: (
-    workspaceAddress: string,
-    crypto: ICrypto
-  ) => StorageAsync;
+  onCreateWorkspace: (workspaceAddress: string) => StorageAsync;
 }) {
   const [storages, setStorages] = React.useState(
     initWorkspaces.reduce((acc, workspaceAddress) => {
       return {
         ...acc,
-        [workspaceAddress]: onCreateWorkspace(workspaceAddress, crypto),
+        [workspaceAddress]: onCreateWorkspace(workspaceAddress),
       };
     }, {} as Record<string, StorageAsync>)
   );
 
   const addStorage = React.useCallback(
     (workspaceAddress: string) => {
-      const storage = onCreateWorkspace(workspaceAddress, crypto);
+      const storage = onCreateWorkspace(workspaceAddress);
 
       setStorages(prev => ({
         ...prev,
@@ -94,16 +88,14 @@ export default function EarthstarPeer({
             value={{ currentWorkspace, setCurrentWorkspace }}
           >
             <IsLiveContext.Provider value={{ isLive, setIsLive }}>
-              <CryptoContext.Provider value={crypto}>
-                {children}
-                {Object.keys(storages).map(workspaceAddress => (
-                  <LiveSyncer
-                    key={workspaceAddress}
-                    workspaceAddress={workspaceAddress}
-                  />
-                ))}
-                <FocusSyncer />
-              </CryptoContext.Provider>
+              {children}
+              {Object.keys(storages).map(workspaceAddress => (
+                <LiveSyncer
+                  key={workspaceAddress}
+                  workspaceAddress={workspaceAddress}
+                />
+              ))}
+              <FocusSyncer />
             </IsLiveContext.Provider>
           </CurrentWorkspaceContext.Provider>
         </CurrentAuthorContext.Provider>

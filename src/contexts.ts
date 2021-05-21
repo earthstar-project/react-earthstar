@@ -1,4 +1,4 @@
-import { AuthorKeypair, ICrypto, StorageAsync } from 'stone-soup';
+import { AuthorKeypair, StorageAsync } from 'stone-soup';
 import * as React from 'react';
 
 export const StorageContext = React.createContext<{
@@ -34,8 +34,3 @@ export const IsLiveContext = React.createContext<{
   isLive: true,
   setIsLive: () => {},
 });
-
-// This is only used internally so we don't need to provide a default value.
-export const CryptoContext = React.createContext<ICrypto>(
-  ({} as unknown) as ICrypto
-);
