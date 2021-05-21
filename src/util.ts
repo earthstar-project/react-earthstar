@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { isErr, Query, cleanUpQuery, parseAuthorAddress } from 'stone-soup';
+import { isErr, parseAuthorAddress } from 'stone-soup';
 
 export function getAuthorShortName(address: string): string {
   const parsedAuthor = parseAuthorAddress(address);

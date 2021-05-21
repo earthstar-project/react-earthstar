@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { deleteMyDocumentsAsync } from 'earthstar';
+import { isErr } from 'stone-soup';
 import { useCurrentAuthor, useStorage } from '../hooks';
 import WorkspaceLabel from './WorkspaceLabel';
 
@@ -55,10 +55,15 @@ export default function DeleteMyDataForm(props: { workspaceAddress: string }) {
             return;
           }
 
-          const { numDeleted } = await deleteMyDocumentsAsync(
-            storage,
+          const numDeleted = await storage._storage.overwriteAllDocsByAuthor(
             currentAuthor
           );
+
+          if (isErr(numDeleted)) {
+            setDeleted(false);
+            alert('Something went wrong!');
+            return;
+          }
 
           setNumberDeleted(numDeleted);
           setDeleted(true);

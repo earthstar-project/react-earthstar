@@ -78,7 +78,7 @@
     "@reach/descendants": "0.11.2",
     "@reach/utils": "^0.11.2",
     "fast-equals": "^2.0.0",
-    "stone-soup": "^4.1.0",
+    "stone-soup": "^6.1.0",
     "use-deep-compare-effect": "^1.4.0"
   }
 }

@@ -35,7 +35,6 @@ export default function DisplayNameForm({
           content: newDisplayName,
           format: 'es.4',
           path: displayNamePath,
-          workspace: workspaceAddress,
         });
       }}
     >
