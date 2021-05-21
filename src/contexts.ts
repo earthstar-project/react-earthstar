@@ -1,13 +1,7 @@
-import { AuthorKeypair, StorageAsync } from 'stone-soup';
+import { AuthorKeypair, Peer } from 'stone-soup';
 import * as React from 'react';
 
-export const StorageContext = React.createContext<{
-  storages: Record<string, StorageAsync>; // workspace address --> IStorage instance
-  setStorages: React.Dispatch<
-    React.SetStateAction<Record<string, StorageAsync>>
-  >;
-  addStorage: (workspaceAddress: string) => void;
-}>({ storages: {}, setStorages: () => {}, addStorage: () => {} });
+export const PeerContext = React.createContext<Peer>(new Peer());
 
 export const PubsContext = React.createContext<{
   pubs: Record<string, string[]>; // workspace address --> pub urls
@@ -34,3 +28,7 @@ export const IsLiveContext = React.createContext<{
   isLive: true,
   setIsLive: () => {},
 });
+
+export const AddWorkspaceContext = React.createContext<
+  (workspaceAddress: string) => void
+>(() => {});

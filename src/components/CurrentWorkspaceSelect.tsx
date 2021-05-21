@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { useCurrentWorkspace, useWorkspaces } from '../hooks';
+import { useCurrentWorkspace, usePeer } from '../hooks';
 
 export default function WorkspaceSelect() {
-  const workspaces = useWorkspaces();
+  const peer = usePeer();
+  const workspaces = peer.workspaces();
   const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
 
   const selectValue = currentWorkspace || 'NONE';

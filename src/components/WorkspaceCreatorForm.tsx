@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { isErr, checkWorkspaceIsValid } from 'stone-soup';
-import { useAddWorkspace, useCurrentWorkspace, usePubs } from '../hooks';
+import { useCurrentWorkspace, usePubs } from '../hooks';
 import { Alert } from '@reach/alert';
 import {
   Combobox,
@@ -16,6 +16,7 @@ import {
   WhereToFindPubServers,
   WhoCanJoinMyWorkspace,
 } from './guidance/guidances';
+import { AddWorkspaceContext } from '../contexts';
 
 const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 const NUMBERS = '1234567890';
@@ -39,7 +40,8 @@ export default function WorkspaceCreatorForm({
   onCreate?: (workspace: string) => void;
 }) {
   const [pubs, setPubs] = usePubs();
-  const add = useAddWorkspace();
+
+  const add = React.useContext(AddWorkspaceContext);
 
   const [workspaceName, setWorkspaceName] = React.useState('');
   const [workspaceSuffix, setWorkspaceSuffix] = React.useState(generateSuffix);

@@ -3,8 +3,8 @@ import {
   useCurrentAuthor,
   useCurrentWorkspace,
   useIsLive,
+  usePeer,
   usePubs,
-  useWorkspaces,
 } from '../hooks';
 import { makeStorageKey } from '../util';
 
@@ -19,7 +19,8 @@ export default function LocalStorageSettingsWriter({
   const lsCurrentWorkspaceKey = makeStorageKey(storageKey, 'current-workspace');
   const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
 
-  const workspaces = useWorkspaces();
+  const peer = usePeer();
+  const workspaces = peer.workspaces();
   const [pubs] = usePubs();
   const [currentAuthor] = useCurrentAuthor();
   const [currentWorkspace] = useCurrentWorkspace();

@@ -1,10 +1,10 @@
 import * as React from 'react';
-
-import { useWorkspaces } from '../hooks';
+import { usePeer } from '../hooks';
 import WorkspaceLabel from './WorkspaceLabel';
 
 export default function WorkspaceChooser() {
-  const workspaces = useWorkspaces();
+  const peer = usePeer();
+  const workspaces = peer.workspaces();
 
   return (
     <ul data-re-workspace-list>

@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { useRemoveWorkspace } from '../hooks';
+import { usePeer } from '../hooks';
 
 export default function RemoveWorkspaceButton({
   workspaceAddress,
   children,
   ...props
 }: { workspaceAddress: string } & React.HTMLAttributes<HTMLButtonElement>) {
-  const remove = useRemoveWorkspace();
+  const peer = usePeer();
 
   return (
     <button
@@ -23,7 +23,7 @@ export default function RemoveWorkspaceButton({
         }
 
         if (isSure) {
-          remove(workspaceAddress);
+          peer.removeStorageByWorkspace(workspaceAddress);
         }
       }}
     >

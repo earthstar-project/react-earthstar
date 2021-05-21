@@ -1,15 +1,14 @@
 import * as React from 'react';
-import { AuthorKeypair, StorageAsync } from 'stone-soup';
-import LiveSyncer from './_LiveSyncer';
+import { AuthorKeypair, StorageAsync, Peer } from 'stone-soup';
 import {
+  PeerContext,
   CurrentAuthorContext,
   CurrentWorkspaceContext,
   IsLiveContext,
   PubsContext,
-  StorageContext,
+  AddWorkspaceContext,
 } from '../contexts';
 import FocusSyncer from './_FocusSyncer';
-import { usePrevious } from '@reach/utils';
 
 export default function EarthstarPeer({
   initWorkspaces = [],
@@ -28,58 +27,43 @@ export default function EarthstarPeer({
   children: React.ReactNode;
   onCreateWorkspace: (workspaceAddress: string) => StorageAsync;
 }) {
-  const [storages, setStorages] = React.useState(
-    initWorkspaces.reduce((acc, workspaceAddress) => {
-      return {
-        ...acc,
-        [workspaceAddress]: onCreateWorkspace(workspaceAddress),
-      };
-    }, {} as Record<string, StorageAsync>)
-  );
+  const [peer, setPeer] = React.useState(() => new Peer());
 
-  const addStorage = React.useCallback(
-    (workspaceAddress: string) => {
-      const storage = onCreateWorkspace(workspaceAddress);
+  React.useEffect(() => {
+    const unsub = peer.storageMap.bus.on('*', () => {
+      setPeer(peer);
+    });
 
-      setStorages(prev => ({
-        ...prev,
-        [workspaceAddress]: storage,
-      }));
-    },
-    [onCreateWorkspace]
-  );
+    return () => {
+      unsub();
+    };
+  }, [peer]);
+
+  const addWorkspace = React.useCallback((workspaceAddress: string) => {
+    const storage = onCreateWorkspace(workspaceAddress);
+
+    peer.addStorage(storage);
+  }, []);
+
+  React.useEffect(() => {
+    initWorkspaces.forEach(workspaceAddress => {
+      peer.addStorage(onCreateWorkspace(workspaceAddress));
+    });
+  }, []);
 
   const [pubs, setPubs] = React.useState(initPubs);
 
   const [currentAuthor, setCurrentAuthor] = React.useState(initCurrentAuthor);
 
   const [currentWorkspace, setCurrentWorkspace] = React.useState(
-    initCurrentWorkspace && storages[initCurrentWorkspace]
+    initCurrentWorkspace && peer.getStorage(initCurrentWorkspace)
       ? initCurrentWorkspace
       : null
   );
   const [isLive, setIsLive] = React.useState(initIsLive);
 
-  const prevStorages = usePrevious(storages);
-
-  // Close any workspace storages which have been removed from storages
-  React.useEffect(() => {
-    const storagesSet = new Set(Object.values(storages));
-
-    const difference = Array.from(Object.values(prevStorages || [])).filter(
-      storage => !storagesSet.has(storage)
-    );
-
-    difference.forEach(
-      storage => {
-        storage.close();
-      },
-      [storages, prevStorages]
-    );
-  }, [storages, prevStorages]);
-
   return (
-    <StorageContext.Provider value={{ storages, setStorages, addStorage }}>
+    <PeerContext.Provider value={peer}>
       <PubsContext.Provider value={{ pubs, setPubs }}>
         <CurrentAuthorContext.Provider
           value={{ currentAuthor, setCurrentAuthor }}
@@ -88,18 +72,15 @@ export default function EarthstarPeer({
             value={{ currentWorkspace, setCurrentWorkspace }}
           >
             <IsLiveContext.Provider value={{ isLive, setIsLive }}>
-              {children}
-              {Object.keys(storages).map(workspaceAddress => (
-                <LiveSyncer
-                  key={workspaceAddress}
-                  workspaceAddress={workspaceAddress}
-                />
-              ))}
-              <FocusSyncer />
+              <AddWorkspaceContext.Provider value={addWorkspace}>
+                {children}
+
+                <FocusSyncer />
+              </AddWorkspaceContext.Provider>
             </IsLiveContext.Provider>
           </CurrentWorkspaceContext.Provider>
         </CurrentAuthorContext.Provider>
       </PubsContext.Provider>
-    </StorageContext.Provider>
+    </PeerContext.Provider>
   );
 }

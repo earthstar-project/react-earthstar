@@ -5,7 +5,7 @@ import WorkspaceCreatorForm from '../WorkspaceCreatorForm';
 import EarthbarTab from './EarthbarTab';
 import EarthbarTabLabel from './EarthbarTabLabel';
 import EarthbarTabPanel from './EarthbarTabPanel';
-import { useCurrentWorkspace, useWorkspaces } from '../../hooks';
+import { useCurrentWorkspace, usePeer } from '../../hooks';
 import { getWorkspaceName } from '../../util';
 import { usePrevious } from '@reach/utils';
 import { EarthbarContext } from './contexts';
@@ -15,7 +15,8 @@ export default function WorkspaceTab() {
   const [selectedOption, setSelectedOption] = React.useState(
     currentWorkspace || 'ADD_WORKSPACE'
   );
-  const workspaces = useWorkspaces();
+  const peer = usePeer();
+  const workspaces = peer.workspaces();
 
   const previousWorkspace = usePrevious(currentWorkspace);
 

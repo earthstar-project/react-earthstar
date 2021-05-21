@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useIsLive, useStorages, useSync } from '../hooks';
+import { useIsLive, useSync } from '../hooks';
 
 export default function FocusSyncer() {
   const [isLive] = useIsLive();

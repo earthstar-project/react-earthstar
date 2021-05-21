@@ -1,12 +1,7 @@
 import * as React from 'react';
 import { isErr } from 'stone-soup';
 import Alert from '@reach/alert';
-import {
-  useInvitation,
-  useWorkspaces,
-  usePubs,
-  useCurrentWorkspace,
-} from '../hooks';
+import { usePeer, useInvitation, usePubs, useCurrentWorkspace } from '../hooks';
 import WorkspaceLabel from '../components/WorkspaceLabel';
 import {
   WhatIsAPub,
@@ -19,7 +14,8 @@ export default function InvitationRedemptionForm({
 }: {
   onRedeem?: (workspace: string, pubs: string[]) => void;
 }) {
-  const workspaces = useWorkspaces();
+  const peer = usePeer();
+  const workspaces = peer.workspaces();
   const [pubs] = usePubs();
   const [, setCurrentWorkspace] = useCurrentWorkspace();
   const [code, setCode] = React.useState('');

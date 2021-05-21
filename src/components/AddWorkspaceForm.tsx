@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { isErr } from 'stone-soup';
+import { AddWorkspaceContext } from '../contexts';
 
-import { useAddWorkspace, useWorkspacePubs } from '../hooks';
+import { useWorkspacePubs } from '../hooks';
 
 export default function AddWorkspaceForm() {
   const [workspaceAddress, setWorkspaceAddress] = React.useState('');
   const [initialPub, setInitialPub] = React.useState('');
 
-  const add = useAddWorkspace();
+  const add = React.useContext(AddWorkspaceContext);
   const [, setPubs] = useWorkspacePubs(workspaceAddress);
 
   return (

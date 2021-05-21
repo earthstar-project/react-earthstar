@@ -3,86 +3,24 @@ import {
   AuthorKeypair,
   isErr,
   EarthstarError,
-  StorageAsync,
   StorageCache,
   checkWorkspaceIsValid,
+  StorageAsync,
 } from 'stone-soup';
 import { getLocalStorage, makeStorageKey } from './util';
 import {
+  PeerContext,
   CurrentAuthorContext,
   CurrentWorkspaceContext,
   IsLiveContext,
   PubsContext,
-  StorageContext,
+  AddWorkspaceContext,
 } from './contexts';
 
-export function useWorkspaces() {
-  const [storages] = useStorages();
+export function usePeer() {
+  const peer = React.useContext(PeerContext);
 
-  return Object.keys(storages);
-}
-
-export function useAddWorkspace() {
-  const { storages, addStorage } = React.useContext(StorageContext);
-
-  return React.useCallback(
-    (address: string) => {
-      if (storages[address]) {
-        return void 0;
-      }
-
-      try {
-        addStorage(address);
-
-        return void 0;
-      } catch (err) {
-        if (isErr(err)) {
-          return err;
-        }
-
-        return new EarthstarError('Something went wrong!');
-      }
-    },
-    [storages, addStorage]
-  );
-}
-
-export function useRemoveWorkspace(): (address: string) => void {
-  const [storages, setStorages] = useStorages();
-  const [pubs, setPubs] = usePubs();
-  const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
-
-  return React.useCallback(
-    (address: string) => {
-      if (currentWorkspace === address) {
-        setCurrentWorkspace(null);
-      }
-
-      setStorages(prev => {
-        const prevCopy = { ...prev };
-
-        delete prevCopy[address];
-
-        return prevCopy;
-      });
-
-      const storage = storages[address];
-
-      if (storage) {
-        const nextPubs = { ...pubs };
-        delete nextPubs[address];
-        setPubs(nextPubs);
-      }
-    },
-    [
-      setStorages,
-      currentWorkspace,
-      setCurrentWorkspace,
-      storages,
-      pubs,
-      setPubs,
-    ]
-  );
+  return peer;
 }
 
 export function useWorkspacePubs(
@@ -139,7 +77,9 @@ export function useCurrentWorkspace(): [
   string | null,
   React.Dispatch<React.SetStateAction<string | null>>
 ] {
-  const workspaces = useWorkspaces();
+  const peer = usePeer();
+  const workspaces = peer.workspaces();
+
   const { currentWorkspace, setCurrentWorkspace } = React.useContext(
     CurrentWorkspaceContext
   );
@@ -190,14 +130,14 @@ export function useSync() {
 
 export function useStorage(workspaceAddress?: string) {
   const [currentWorkspace] = useCurrentWorkspace();
-  const [storages] = useStorages();
+  const peer = usePeer();
 
   const address = workspaceAddress || currentWorkspace;
 
   const [, reRender] = React.useState(true);
 
   const [currentStorage, setCurrentStorage] = React.useState(() => {
-    return address ? storages[address] : null;
+    return address ? peer.getStorage(address) : undefined;
   });
 
   if (!currentStorage) {
@@ -207,18 +147,24 @@ export function useStorage(workspaceAddress?: string) {
   const cacheRef = React.useRef<null | StorageCache>(null);
 
   if (cacheRef.current === null) {
-    cacheRef.current = new StorageCache(currentStorage);
+    // TODO: Remove cast here once types are updated.
+    cacheRef.current = new StorageCache(currentStorage as StorageAsync);
   }
 
   React.useEffect(() => {
     if (address && address !== currentStorage.workspace) {
-      setCurrentStorage(storages[address]);
-      console.log('remaking proxy');
+      const storage = peer.getStorage(address);
+
+      setCurrentStorage(storage);
+
       cacheRef.current?._onCacheUpdatedCallbacks.clear();
-      cacheRef.current = new StorageCache(storages[address]);
+      cacheRef.current = storage
+        ? // TODO: Remove cast here once types are updated.
+          new StorageCache(storage as StorageAsync)
+        : null;
       reRender(prev => !prev);
     }
-  }, [address, storages, currentStorage.workspace]);
+  }, [address, peer, currentStorage.workspace]);
 
   React.useEffect(() => {
     const unsub = cacheRef.current?.onCacheUpdated(() => {
@@ -235,17 +181,8 @@ export function useStorage(workspaceAddress?: string) {
   return cacheRef.current as StorageCache;
 }
 
-export function useStorages(): [
-  Record<string, StorageAsync>,
-  React.Dispatch<React.SetStateAction<Record<string, StorageAsync>>>
-] {
-  const { storages, setStorages } = React.useContext(StorageContext);
-
-  return [storages, setStorages];
-}
-
 export function useInvitation(invitationCode: string) {
-  const add = useAddWorkspace();
+  const addWorkspace = React.useContext(AddWorkspaceContext);
   const [existingPubs, setPubs] = usePubs();
 
   try {
@@ -290,7 +227,7 @@ export function useInvitation(invitationCode: string) {
     }
 
     const redeem = (excludedPubs: string[] = []) => {
-      add(plussedWorkspace);
+      addWorkspace(plussedWorkspace);
 
       // In case the workspace in the invitation already has known pubs
       // We want to keep those around.
