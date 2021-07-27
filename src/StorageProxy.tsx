@@ -1,4 +1,4 @@
-import { IStorage, Query, WriteEvent } from 'earthstar';
+import { IStorage, Query, WriteEvent } from "earthstar";
 
 type Thunk = () => void;
 type Cb = (evt: WriteEvent) => void;
@@ -83,14 +83,14 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   // the Proxy handler
   let handler = {
     // when a property is looked up on the proxy object:
-    get: function(target: any, prop: any) {
+    get: function (target: any, prop: any) {
       // target is the storage object
       // prop is a string, the name of the property being accessed
 
       // look up the property
       let result = target[prop];
 
-      if (typeof result !== 'function') {
+      if (typeof result !== "function") {
         // if it's just a primitive property, just return it.
 
         return result;
@@ -100,14 +100,14 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
 
         return (...args: any[]): any => {
           // notice certain functions...
-          if (prop === 'getDocument' || prop === 'getContent') {
+          if (prop === "getDocument" || prop === "getContent") {
             // args: (path: string)
 
             let path: string = args[0];
 
             ___watchedPaths.add(path);
           }
-          if (prop === 'documents' || prop === 'contents') {
+          if (prop === "documents" || prop === "contents") {
             // args: (query?: Query)
             let query: Query = args[0] || {};
 
@@ -130,7 +130,7 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   proxy.watchedDocQueries = ___watchedDocQueries;
 
   proxy.clearWatches = () => {
-    console.log('CLEARED');
+    console.log("CLEARED");
     ___watchedPaths.clear();
     ___watchedDocQueries.clear();
   };
@@ -138,8 +138,6 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   // let users of the proxy subscribe to writeEvents they will care about
   let ___cbs = new Set<Cb>();
   proxy.subscribe = (cb: any): UnsubFn => {
-    console.log('SOMETHING SUBSCRIBED!');
-
     ___cbs.add(cb);
     return () => {
       ___cbs.delete(cb);
@@ -153,9 +151,6 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
   proxy.unsubFromStorage = storage.onWrite.subscribe((evt: WriteEvent) => {
     // We've gotten a write event.  Do we care about it?
     // Filter the events to only the docs and queries we're watching.
-    console.log('STORAGEPROXY SUB FIRED');
-    console.log(___watchedPaths);
-    console.log(___watchedDocQueries);
 
     let shouldRunCallbacks = false;
 
@@ -190,13 +185,7 @@ export function makeStorageProxy(storage: IStorage): StorageProxy {
     // Run the callbacks
 
     if (shouldRunCallbacks) {
-      console.log('SHOULD RUN CALLBACKS!');
-
-      if (___cbs.size > 0) {
-        console.log('SENDING FROM PROXY...');
-      }
-
-      ___cbs.forEach(cb => cb(evt));
+      ___cbs.forEach((cb) => cb(evt));
     }
   });
 

@@ -1,21 +1,21 @@
 import {
   cleanUpQuery,
+  Document,
+  documentIsExpired,
+  isErr,
   IStorageAsync,
   IValidator,
   Query,
-  StorageBase,
-  WorkspaceAddress,
-  Document,
-  ValidationError,
-  queryMatchesDoc,
-  documentIsExpired,
   QueryForForget,
-  isErr,
-  WriteResult,
+  queryMatchesDoc,
   QueryNoLimitBytes,
   sorted,
+  StorageBase,
   uniq,
-} from 'earthstar';
+  ValidationError,
+  WorkspaceAddress,
+  WriteResult,
+} from "earthstar";
 
 // Example flows:
 
@@ -54,9 +54,9 @@ export default class StorageMemoryCache extends StorageBase {
     workspace: WorkspaceAddress,
     createBackingStorage: (
       validators: IValidator[],
-      workspace: WorkspaceAddress
+      workspace: WorkspaceAddress,
     ) => IStorageAsync,
-    timeToLive?: number
+    timeToLive?: number,
   ) {
     super(validators, workspace);
 
@@ -73,7 +73,7 @@ export default class StorageMemoryCache extends StorageBase {
       expires: Date.now() * 1000,
     });
 
-    this._backingStorage.onWrite.subscribe(event => {
+    this._backingStorage.onWrite.subscribe((event) => {
       this.onWrite.send({
         ...event,
         fromSessionId: this._backingStorage.sessionId,
@@ -106,14 +106,13 @@ export default class StorageMemoryCache extends StorageBase {
       return [];
     }
 
-    const isEmpty =
-      query === undefined ||
+    const isEmpty = query === undefined ||
       (query &&
         Object.keys(query).length === 0 &&
         query.constructor === Object);
 
     const cacheResult = this._queryCache.get(
-      isEmpty ? this._emptyQuery : query
+      isEmpty ? this._emptyQuery : query,
     );
 
     console.log(query, cacheResult);
@@ -121,7 +120,7 @@ export default class StorageMemoryCache extends StorageBase {
     const isCacheHit = cacheResult && cacheResult.expires >= now;
 
     if (!isCacheHit || (cacheResult && cacheResult.expires < now)) {
-      this._backingStorage.documents(query).then(result => {
+      this._backingStorage.documents(query).then((result) => {
         this._queryCache.set(query, {
           docs: result,
           expires: now + this._timeToLive,
@@ -142,9 +141,9 @@ export default class StorageMemoryCache extends StorageBase {
 
     this._upsertDocument(doc);
 
-    this._backingStorage.ingestDocument(doc, fromSessionId).then(result => {
+    this._backingStorage.ingestDocument(doc, fromSessionId).then((result) => {
       if (isErr(result)) {
-        console.log('argh');
+        console.log("argh");
         return;
       }
 
@@ -175,12 +174,12 @@ export default class StorageMemoryCache extends StorageBase {
       });
     }
 
-    const stableQuery =
-      (query && this._queryNoLimitCache.get(query)) || this._emptyQuery;
+    const stableQuery = (query && this._queryNoLimitCache.get(query)) ||
+      this._emptyQuery;
 
     // do query and get unique paths
     let docs = this.documents(stableQuery);
-    let paths = sorted(uniq(docs.map(doc => doc.path)));
+    let paths = sorted(uniq(docs.map((doc) => doc.path)));
     // re-apply limit
     if (query?.limit !== undefined) {
       paths = paths.slice(0, query.limit);
@@ -195,7 +194,7 @@ export default class StorageMemoryCache extends StorageBase {
       this._getDocumentQueries.set(path, {
         path,
         limit: 1,
-        history: 'latest',
+        history: "latest",
       });
     }
 
@@ -216,7 +215,7 @@ export default class StorageMemoryCache extends StorageBase {
       let newDocQuery: Query = {
         path: docToUpsert.path,
         limit: 1,
-        history: 'latest',
+        history: "latest",
       };
       this._getDocumentQueries.set(docToUpsert.path, newDocQuery);
 
@@ -236,16 +235,15 @@ export default class StorageMemoryCache extends StorageBase {
       const { docs, expires } = entry[1];
 
       let foundIndex = docs.findIndex(
-        doc =>
-          doc.path === docToUpsert.path && doc.author === docToUpsert.author
+        (doc) =>
+          doc.path === docToUpsert.path && doc.author === docToUpsert.author,
       );
 
       // TODO: does not take history, limit, limitBytes into account...
       //let dontRiskIt = key.limit || key.limitBytes || key.history;
-      let matchesQuery =
-        query === this._emptyQuery || query === undefined
-          ? true
-          : queryMatchesDoc(query, docToUpsert);
+      let matchesQuery = query === this._emptyQuery || query === undefined
+        ? true
+        : queryMatchesDoc(query, docToUpsert);
 
       let next = {
         docs,
@@ -262,7 +260,7 @@ export default class StorageMemoryCache extends StorageBase {
       }
 
       if (foundIndex !== -1 && matchesQuery) {
-        next.docs = docs.map(doc =>
+        next.docs = docs.map((doc) =>
           doc.author === docToUpsert.author && doc.path === docToUpsert.path
             ? docToUpsert
             : doc
@@ -273,10 +271,10 @@ export default class StorageMemoryCache extends StorageBase {
     }
 
     console.log(this._queryCache.entries());
-    console.log('SENDING FROM CACHE');
+    console.log("SENDING FROM CACHE");
 
     this.onWrite.send({
-      kind: 'DOCUMENT_WRITE',
+      kind: "DOCUMENT_WRITE",
       document: docToUpsert,
       fromSessionId: this.sessionId,
       isLocal: true,
@@ -289,9 +287,9 @@ export default class StorageMemoryCache extends StorageBase {
 
     let now = this._now || Date.now() * 1000;
     this._queryCache.forEach(({ docs, expires }, key, map) => {
-      if (docs.some(doc => documentIsExpired(doc, now))) {
+      if (docs.some((doc) => documentIsExpired(doc, now))) {
         map.set(key, {
-          docs: docs.filter(doc => !documentIsExpired(doc, now)),
+          docs: docs.filter((doc) => !documentIsExpired(doc, now)),
           expires,
         });
       }
@@ -306,16 +304,16 @@ export default class StorageMemoryCache extends StorageBase {
     if (query.limit === 0 || query.limitBytes === 0) {
       return;
     }
-    if (query.history !== 'all') {
+    if (query.history !== "all") {
       throw new ValidationError(
-        'forgetDocuments can only be called with history: "all"'
+        'forgetDocuments can only be called with history: "all"',
       );
     }
 
     this._queryCache.forEach(({ docs, expires }, key, map) => {
-      if (docs.some(doc => queryMatchesDoc(query, doc))) {
+      if (docs.some((doc) => queryMatchesDoc(query, doc))) {
         map.set(key, {
-          docs: docs.filter(doc => !queryMatchesDoc(query, doc)),
+          docs: docs.filter((doc) => !queryMatchesDoc(query, doc)),
           expires,
         });
       }
