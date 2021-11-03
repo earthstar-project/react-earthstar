@@ -25,46 +25,30 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
     "components-example": "parcel examples/components/index.html",
-    "earthbar-example": "parcel examples/earthbar/index.html"
+    "earthbar-example": "parcel examples/earthbar/index.html",
+    "test": "jest"
   },
   "peerDependencies": {
     "react": "~16.13.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
   },
   "name": "react-earthstar",
   "author": "Sam Gwilym",
   "module": "dist/react-earthstar.esm.js",
   "devDependencies": {
+    "@babel/preset-react": "^7.16.0",
+    "@babel/preset-typescript": "^7.16.0",
     "@testing-library/react-hooks": "^3.4.2",
     "@types/jest": "^26.0.14",
     "@types/react-dom": "^16.9.8",
-    "babel-jest": "^26.5.2",
+    "@types/use-sync-external-store": "^0.0.2",
     "eslint-plugin-react-hooks": "^4.1.2",
-    "husky": "^4.3.0",
+    "jest": "^27.3.1",
     "jest-localstorage-mock": "^2.4.6",
     "parcel": "^1.12.4",
     "react": "~16.13.1",
     "react-dom": "^16.13.1",
     "react-test-renderer": "^16.13.1",
-    "ts-jest": "^26.4.1",
-    "tsdx": "^0.14.0",
-    "tslib": "^2.0.1",
     "typescript": "4.0.3"
   },
   "resolutions": {
@@ -78,7 +62,8 @@
     "@reach/descendants": "0.11.2",
     "@reach/utils": "^0.11.2",
     "fast-equals": "^2.0.0",
-    "stone-soup": "^6.1.0",
-    "use-deep-compare-effect": "^1.4.0"
+    "stone-soup": "^6.2.0",
+    "use-deep-compare-effect": "^1.4.0",
+    "use-sync-external-store": "1.0.0-alpha-00ced1e2b-20211102"
   }
 }

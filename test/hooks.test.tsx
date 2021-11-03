@@ -1,22 +1,18 @@
 import * as React from 'react';
 import {
-  ValidatorEs4,
-  StorageMemory,
-  generateAuthorKeypair,
   AuthorKeypair,
   isErr,
   EarthstarError,
-  StorageToAsync,
-} from 'earthstar';
+  Crypto,
+  StorageAsync,
+  StorageDriverAsyncMemory,
+  FormatValidatorEs4
+} from 'stone-soup';
 import { renderHook, act } from '@testing-library/react-hooks';
 import {
   EarthstarPeer,
-  useWorkspaces,
-  useAddWorkspace,
-  useRemoveWorkspace,
   useWorkspacePubs,
   usePubs,
-  useStorages,
   useCurrentWorkspace,
   useInvitation,
   useMakeInvitation,
@@ -24,9 +20,8 @@ import {
   useLocalStorageEarthstarSettings,
   useStorage,
 } from '../src';
-import StorageMemoryCache from '../src/StorageMemoryCache';
 
-const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
+const keypair = Crypto.generateAuthorKeypair('onee') as AuthorKeypair;
 
 const WORKSPACE_ADDR_A = '+testa.a123';
 const WORKSPACE_ADDR_B = '+testb.b234';
@@ -51,11 +46,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
       initIsLive={false}
       initCurrentWorkspace={WORKSPACE_ADDR_A}
       onCreateWorkspace={workspaceAddress => {
-        return new StorageMemoryCache([ValidatorEs4], workspaceAddress, () => {
-          return new StorageToAsync(
-            new StorageMemory([ValidatorEs4], workspaceAddress)
-          );
-        });
+        return new StorageAsync(workspaceAddress, FormatValidatorEs4, new StorageDriverAsyncMemory(workspaceAddress))
       }}
     >
       {children}
@@ -63,79 +54,6 @@ const wrapper = ({ children }: { children: React.ReactNode }) => {
     </EarthstarPeer>
   );
 };
-
-test('useWorkspace', () => {
-  const { result } = renderHook(() => useWorkspaces(), { wrapper });
-
-  expect(result.current).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-    WORKSPACE_ADDR_C,
-  ]);
-});
-
-test('useAddWorkspace ', () => {
-  const useTest = () => {
-    const add = useAddWorkspace();
-    const workspaces = useWorkspaces();
-
-    return { add, workspaces };
-  };
-
-  const { result } = renderHook(() => useTest(), { wrapper });
-
-  act(() => {
-    result.current.add('+testd.d789');
-  });
-
-  expect(result.current.workspaces).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-    WORKSPACE_ADDR_C,
-    '+testd.d789',
-  ]);
-
-  // Can't add a workspace twice
-  act(() => {
-    result.current.add(WORKSPACE_ADDR_A);
-  });
-
-  expect(result.current.workspaces).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-    WORKSPACE_ADDR_C,
-    '+testd.d789',
-  ]);
-});
-
-test('useRemoveWorkspace', async () => {
-  const useTest = () => {
-    const [storages] = useStorages();
-    const remove = useRemoveWorkspace();
-    const workspaces = useWorkspaces();
-
-    return { remove, workspaces, storages };
-  };
-
-  const { result } = renderHook(() => useTest(), {
-    wrapper,
-  });
-
-  const storage = result.current.storages[WORKSPACE_ADDR_C];
-
-  expect(storage.isClosed()).toBeFalsy();
-
-  await act(() => {
-    result.current.remove(WORKSPACE_ADDR_C);
-  });
-
-  expect(storage.isClosed()).toBeTruthy();
-
-  expect(result.current.workspaces).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-  ]);
-});
 
 test('useWorkspacePubs', () => {
   const { result } = renderHook(() => useWorkspacePubs(WORKSPACE_ADDR_A), {
@@ -171,7 +89,7 @@ test('useCurrentWorkspace', () => {
   const { result } = renderHook(() => useCurrentWorkspace(), {
     wrapper,
   });
-
+  
   expect(result.current[0]).toEqual(WORKSPACE_ADDR_A);
 
   act(() => {
@@ -192,7 +110,7 @@ test('useStorage', async () => {
     wrapper,
   });
 
-  expect(result.current.documents()).toEqual([]);
+  expect(result.current.getAllDocs()).toEqual([]);
 
   act(() => {
     result.current.set(keypair, {
@@ -201,20 +119,22 @@ test('useStorage', async () => {
       content: 'Hello world!',
     });
   });
+  
+  await waitForNextUpdate()
 
-  expect(result.current.getContent('/storage-test/test.txt')).toEqual(
+  expect(result.current.getLatestDocAtPath('/storage-test/test.txt')?.content).toEqual(
     'Hello world!'
   );
 
-  expect(result.current.documents().length).toEqual(1);
+  expect(result.current.getAllDocs().length).toEqual(1);
 
-  const query = { pathStartsWith: `/storage-test` };
+  const query = { filter : {pathStartsWith: `/storage-test`} };
 
-  expect(result.current.documents(query)).toEqual([]);
+  expect(result.current.queryDocs(query)).toEqual([]);
 
   await waitForNextUpdate();
 
-  expect(result.current.documents(query)[0].content).toEqual('Hello world!');
+  expect(result.current.queryDocs(query)[0].content).toEqual('Hello world!');
 });
 
 test('useInvitation', () => {

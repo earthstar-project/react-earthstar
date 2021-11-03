@@ -3,7 +3,7 @@ import WorkspaceLabel from '../WorkspaceLabel';
 import SyncingCheckbox from '../SyncingCheckbox';
 import InvitationRedemptionForm from '../InvitationRedemptionForm';
 import WorkspaceCreatorForm from '../WorkspaceCreatorForm';
-import { useWorkspaces } from '../../hooks';
+import { usePeer } from '../../hooks';
 import { WorkspaceOptions } from './WorkspaceOptions';
 import { EarthbarContext } from './contexts';
 import EarthbarTabPanel from './EarthbarTabPanel';
@@ -59,17 +59,17 @@ function WorkspaceList({
 }: {
   navToWorkspace: (address: string) => void;
 }) {
-  const workspaces = useWorkspaces();
+  const peer = usePeer();
 
   return (
     <div>
       <section>
         <h1>{'Your workspaces'}</h1>
-        {workspaces.length > 0 ? (
+        {peer.workspaces().length > 0 ? (
           <>
             <SyncingCheckbox />
             <ul data-re-workspace-list-workspaces>
-              {workspaces.map(address => (
+              {peer.workspaces().map(address => (
                 <WorkspaceRow
                   key={address}
                   navToWorkspace={() => navToWorkspace(address)}

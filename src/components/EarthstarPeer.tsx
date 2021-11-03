@@ -8,7 +8,7 @@ import {
   PubsContext,
   AddWorkspaceContext,
 } from '../contexts';
-import FocusSyncer from './_FocusSyncer';
+//import FocusSyncer from './_FocusSyncer';
 
 export default function EarthstarPeer({
   initWorkspaces = [],
@@ -27,7 +27,15 @@ export default function EarthstarPeer({
   children: React.ReactNode;
   onCreateWorkspace: (workspaceAddress: string) => StorageAsync;
 }) {
-  const [peer, setPeer] = React.useState(() => new Peer());
+  const [peer, setPeer] = React.useState(() => {
+    const p = new Peer();
+    
+    initWorkspaces.forEach(workspaceAddress => {
+      p.addStorage(onCreateWorkspace(workspaceAddress));
+    });
+    
+    return p;
+  });
 
   React.useEffect(() => {
     const unsub = peer.storageMap.bus.on('*', () => {
@@ -45,21 +53,11 @@ export default function EarthstarPeer({
     peer.addStorage(storage);
   }, []);
 
-  React.useEffect(() => {
-    initWorkspaces.forEach(workspaceAddress => {
-      peer.addStorage(onCreateWorkspace(workspaceAddress));
-    });
-  }, []);
-
   const [pubs, setPubs] = React.useState(initPubs);
 
   const [currentAuthor, setCurrentAuthor] = React.useState(initCurrentAuthor);
 
-  const [currentWorkspace, setCurrentWorkspace] = React.useState(
-    initCurrentWorkspace && peer.getStorage(initCurrentWorkspace)
-      ? initCurrentWorkspace
-      : null
-  );
+  const [currentWorkspace, setCurrentWorkspace] = React.useState<string|null>(initCurrentWorkspace);
   const [isLive, setIsLive] = React.useState(initIsLive);
 
   return (
@@ -75,7 +73,7 @@ export default function EarthstarPeer({
               <AddWorkspaceContext.Provider value={addWorkspace}>
                 {children}
 
-                <FocusSyncer />
+                {/*<FocusSyncer />*/}
               </AddWorkspaceContext.Provider>
             </IsLiveContext.Provider>
           </CurrentWorkspaceContext.Provider>

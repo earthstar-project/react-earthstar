@@ -1,21 +1,21 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   AuthorKeypair,
-  isErr,
-  EarthstarError,
-  StorageCache,
   checkWorkspaceIsValid,
-  StorageAsync,
-} from 'stone-soup';
-import { getLocalStorage, makeStorageKey } from './util';
+  EarthstarError,
+  isErr,
+  StorageCache,
+} from "stone-soup";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 import {
-  PeerContext,
+  AddWorkspaceContext,
   CurrentAuthorContext,
   CurrentWorkspaceContext,
   IsLiveContext,
+  PeerContext,
   PubsContext,
-  AddWorkspaceContext,
-} from './contexts';
+} from "./contexts";
+import { getLocalStorage, makeStorageKey } from "./util";
 
 export function usePeer() {
   const peer = React.useContext(PeerContext);
@@ -24,7 +24,7 @@ export function usePeer() {
 }
 
 export function useWorkspacePubs(
-  workspaceAddress?: string
+  workspaceAddress?: string,
 ): [string[], (pubs: React.SetStateAction<string[]>) => void] {
   const [existingPubs, setPubs] = usePubs();
   const [currentWorkspace] = useCurrentWorkspace();
@@ -35,7 +35,7 @@ export function useWorkspacePubs(
   const setWorkspacePubs = React.useCallback(
     (pubs: React.SetStateAction<string[]>) => {
       if (!address) {
-        console.warn('Tried to set pubs on an unknown workspace');
+        console.warn("Tried to set pubs on an unknown workspace");
         return;
       }
 
@@ -47,7 +47,7 @@ export function useWorkspacePubs(
         return { ...rest, [address]: Array.from(new Set(next)) };
       });
     },
-    [setPubs, address]
+    [setPubs, address],
   );
 
   return [workspacePubs, setWorkspacePubs];
@@ -55,7 +55,7 @@ export function useWorkspacePubs(
 
 export function usePubs(): [
   Record<string, string[]>,
-  React.Dispatch<React.SetStateAction<Record<string, string[]>>>
+  React.Dispatch<React.SetStateAction<Record<string, string[]>>>,
 ] {
   const { pubs, setPubs } = React.useContext(PubsContext);
 
@@ -64,10 +64,10 @@ export function usePubs(): [
 
 export function useCurrentAuthor(): [
   AuthorKeypair | null,
-  React.Dispatch<React.SetStateAction<AuthorKeypair | null>>
+  React.Dispatch<React.SetStateAction<AuthorKeypair | null>>,
 ] {
   const { currentAuthor, setCurrentAuthor } = React.useContext(
-    CurrentAuthorContext
+    CurrentAuthorContext,
   );
 
   return [currentAuthor, setCurrentAuthor];
@@ -75,19 +75,19 @@ export function useCurrentAuthor(): [
 
 export function useCurrentWorkspace(): [
   string | null,
-  React.Dispatch<React.SetStateAction<string | null>>
+  React.Dispatch<React.SetStateAction<string | null>>,
 ] {
   const peer = usePeer();
   const workspaces = peer.workspaces();
 
   const { currentWorkspace, setCurrentWorkspace } = React.useContext(
-    CurrentWorkspaceContext
+    CurrentWorkspaceContext,
   );
 
   React.useEffect(() => {
     if (currentWorkspace && workspaces.includes(currentWorkspace) === false) {
       console.warn(
-        `Tried to set current workspace to ${currentWorkspace}, which is not a known workspace.`
+        `Tried to set current workspace to ${currentWorkspace}, which is not a known workspace.`,
       );
       setCurrentWorkspace(null);
     }
@@ -128,43 +128,78 @@ export function useSync() {
 }
 */
 
+function clone<T>(instance: T): T {
+  return Object.assign(
+    Object.create(
+      // Set the prototype of the new object to the prototype of the instance.
+      // Used to allow new object behave like class instance.
+      Object.getPrototypeOf(instance),
+    ),
+    // Prevent shallow copies of nested structures like arrays, etc
+    JSON.parse(JSON.stringify(instance)),
+  );
+}
+
 export function useStorage(workspaceAddress?: string) {
+  /*
   const [currentWorkspace] = useCurrentWorkspace();
   const peer = usePeer();
+
+  const address = workspaceAddress || currentWorkspace;
+
+  const [currentStorage] = React.useState(() => {
+    return address ? peer.getStorage(address) : undefined;
+  });
+
+  if (!currentStorage) {
+    throw new Error("Tried to use useStorage with no workspace specified!");
+  }
+
+  const storageCache = new StorageCache(currentStorage);
+
+  const subscribe = React.useCallback((notify: () => void) => {
+    console.log('SUBSCRIBED')
+    
+    const unsub = storageCache.onCacheUpdated(() => {
+      notify();
+    });
+
+    return unsub;
+  }, []);
+
+  const getSnapshot = () => storageCache;
+
+  return useSyncExternalStore(subscribe, getSnapshot);
+  */
+  
+  const [currentWorkspace] = useCurrentWorkspace();
+  const peer = usePeer();
+  
+  const storages = peer.storages()
 
   const address = workspaceAddress || currentWorkspace;
 
   const [, reRender] = React.useState(true);
 
   const [currentStorage, setCurrentStorage] = React.useState(() => {
-    return address ? peer.getStorage(address) : undefined;
+    return address ? peer.getStorage(address) : null;
   });
 
   if (!currentStorage) {
     throw new Error('Tried to use useStorage with no workspace specified!');
   }
 
-  const cacheRef = React.useRef<null | StorageCache>(null);
-
-  if (cacheRef.current === null) {
-    // TODO: Remove cast here once types are updated.
-    cacheRef.current = new StorageCache(currentStorage as StorageAsync);
-  }
+  const cacheRef = React.useRef(new StorageCache(currentStorage));
 
   React.useEffect(() => {
     if (address && address !== currentStorage.workspace) {
-      const storage = peer.getStorage(address);
-
-      setCurrentStorage(storage);
-
+      setCurrentStorage(storages[address]);
+      console.log('remaking proxy');
       cacheRef.current?._onCacheUpdatedCallbacks.clear();
-      cacheRef.current = storage
-        ? // TODO: Remove cast here once types are updated.
-          new StorageCache(storage as StorageAsync)
-        : null;
+      cacheRef.current = new StorageCache(storages[address]);
       reRender(prev => !prev);
     }
-  }, [address, peer, currentStorage.workspace]);
+  }, [address, storages, currentStorage.workspace]);
 
   React.useEffect(() => {
     const unsub = cacheRef.current?.onCacheUpdated(() => {
@@ -188,29 +223,29 @@ export function useInvitation(invitationCode: string) {
   try {
     const url = new URL(invitationCode);
 
-    const isEarthstarURL = url.protocol === 'earthstar:';
+    const isEarthstarURL = url.protocol === "earthstar:";
 
     if (!isEarthstarURL) {
-      return new EarthstarError('Invitation not a valid Earthstar URL');
+      return new EarthstarError("Invitation not a valid Earthstar URL");
     }
 
-    const version = url.searchParams.get('v');
+    const version = url.searchParams.get("v");
 
-    if (version !== '1') {
+    if (version !== "1") {
       return new EarthstarError(
-        'Unrecognised Earthstar invitation format version'
+        "Unrecognised Earthstar invitation format version",
       );
     }
 
-    const workspace = url.searchParams.get('workspace');
+    const workspace = url.searchParams.get("workspace");
 
     if (workspace === null) {
       return new EarthstarError(
-        'No workspace found in Earthstar invitation URL'
+        "No workspace found in Earthstar invitation URL",
       );
     }
 
-    const plussedWorkspace = workspace.replace(' ', '+');
+    const plussedWorkspace = workspace.replace(" ", "+");
 
     const workspaceIsValid = checkWorkspaceIsValid(plussedWorkspace);
 
@@ -218,12 +253,12 @@ export function useInvitation(invitationCode: string) {
       return workspaceIsValid;
     }
 
-    const pubs = url.searchParams.getAll('pub');
+    const pubs = url.searchParams.getAll("pub");
 
     try {
-      pubs.forEach(pubUrl => new URL(pubUrl));
+      pubs.forEach((pubUrl) => new URL(pubUrl));
     } catch {
-      return new EarthstarError('Malformed Pub URL found');
+      return new EarthstarError("Malformed Pub URL found");
     }
 
     const redeem = (excludedPubs: string[] = []) => {
@@ -236,11 +271,11 @@ export function useInvitation(invitationCode: string) {
       const nextPubs = Array.from(
         new Set([
           ...existingWorkspacePubs,
-          ...pubs.filter(pubUrl => !excludedPubs.includes(pubUrl)),
-        ])
+          ...pubs.filter((pubUrl) => !excludedPubs.includes(pubUrl)),
+        ]),
       );
 
-      setPubs(prevPubs => ({
+      setPubs((prevPubs) => ({
         ...prevPubs,
         [plussedWorkspace]: nextPubs,
       }));
@@ -248,20 +283,20 @@ export function useInvitation(invitationCode: string) {
 
     return { redeem, workspace: plussedWorkspace, pubs };
   } catch {
-    return new EarthstarError('Not a valid Earthstar URL');
+    return new EarthstarError("Not a valid Earthstar URL");
   }
 }
 
 export function useMakeInvitation(
   excludedPubs: string[] = [],
-  workspaceAddress?: string
+  workspaceAddress?: string,
 ) {
   const [pubs] = useWorkspacePubs(workspaceAddress);
   const [currentWorkspace] = useCurrentWorkspace();
   const address = workspaceAddress || currentWorkspace;
 
-  const pubsToUse = pubs.filter(pubUrl => !excludedPubs.includes(pubUrl));
-  const pubsString = pubsToUse.map(pubUrl => `&pub=${pubUrl}`).join('');
+  const pubsToUse = pubs.filter((pubUrl) => !excludedPubs.includes(pubUrl));
+  const pubsString = pubsToUse.map((pubUrl) => `&pub=${pubUrl}`).join("");
 
   if (!address) {
     return "Couldn't create invitation code!";
@@ -272,7 +307,7 @@ export function useMakeInvitation(
 
 export function useIsLive(): [
   boolean,
-  React.Dispatch<React.SetStateAction<boolean>>
+  React.Dispatch<React.SetStateAction<boolean>>,
 ] {
   const { isLive, setIsLive } = React.useContext(IsLiveContext);
 
@@ -280,11 +315,11 @@ export function useIsLive(): [
 }
 
 export function useLocalStorageEarthstarSettings(storageKey: string) {
-  const lsAuthorKey = makeStorageKey(storageKey, 'current-author');
-  const lsPubsKey = makeStorageKey(storageKey, 'pubs');
-  const lsWorkspacesKey = makeStorageKey(storageKey, 'workspaces');
-  const lsCurrentWorkspaceKey = makeStorageKey(storageKey, 'current-workspace');
-  const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
+  const lsAuthorKey = makeStorageKey(storageKey, "current-author");
+  const lsPubsKey = makeStorageKey(storageKey, "pubs");
+  const lsWorkspacesKey = makeStorageKey(storageKey, "workspaces");
+  const lsCurrentWorkspaceKey = makeStorageKey(storageKey, "current-workspace");
+  const lsIsLiveKey = makeStorageKey(storageKey, "is-live");
 
   // load the initial state from localStorage
   const initWorkspaces = getLocalStorage<string[]>(lsWorkspacesKey);
