@@ -1766,6 +1766,20 @@
     "@types/prop-types" "*"
     csstype "^3.0.2"
 
+"@types/react@^17.0.34":
+  version "17.0.34"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.34.tgz#797b66d359b692e3f19991b6b07e4b0c706c0102"
+  integrity sha512-46FEGrMjc2+8XhHXILr+3+/sTe3OfzSPU9YGKILLrUYbQ1CLQC9Daqo1KzENGXAWwrFwiY0l4ZbF20gRvgpWTg==
+  dependencies:
+    "@types/prop-types" "*"
+    "@types/scheduler" "*"
+    csstype "^3.0.2"
+
+"@types/scheduler@*":
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.2.tgz#1a62f89525723dde24ba1b01b092bf5df8ad4d39"
+  integrity sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==
+
 "@types/stack-utils@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
@@ -1785,10 +1799,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/use-sync-external-store@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.2.tgz#8341da05beb7dc3b6339eaa8a1b1e8a6e3472175"
-  integrity sha512-gHIGn4QNww3pIUE97gshEqGP+aFpFAg3hQvdD9JHKqlnM+l0Q86gMAyQ0ZjibXj8QY+HaKP8cpIgxHgXt9zPQQ==
+"@types/use-sync-external-store@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.3.tgz#b6725d5f4af24ace33b36fafd295136e75509f43"
+  integrity sha512-EwmlvuaxPNej9+T4v5AuBPJa2x2UOJVdjCtDHgcDqitUeOtjnJKJ+apYjVcAoBEMjKW1VVFGZLUb5+qqa09XFA==
 
 "@types/warning@^3.0.0":
   version "3.0.0"
@@ -7873,10 +7887,10 @@ use-deep-compare-effect@^1.4.0:
     "@types/use-deep-compare-effect" "^1.2.0"
     dequal "^2.0.2"
 
-use-sync-external-store@1.0.0-alpha-00ced1e2b-20211102:
-  version "1.0.0-alpha-00ced1e2b-20211102"
-  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.0.0-alpha-00ced1e2b-20211102.tgz#493e0ab4ca1614b06e10b221f897cf664ae13ca9"
-  integrity sha512-3mf6AYpYeBFZFZoxYQvcBcgU7vvmBYhBYE6zAliOhvIXt1ma/pQ4u24ioORPXtI7KpFfZGXz5l+UgT3qqBFq5g==
+use-sync-external-store@1.0.0-alpha-13455d26d-20211104:
+  version "1.0.0-alpha-13455d26d-20211104"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.0.0-alpha-13455d26d-20211104.tgz#a07e8a80b1f1e6a2ce1615086c12bfca240786fd"
+  integrity sha512-i8kknuDdF0zlKcay4tta1XgV/tLTTqxYyovcBSFodeeLVU+2QRLYLKEVWvFfqGEuUgTbbI91LYynTxfr+8QrNA==
 
 use@^3.1.0:
   version "3.1.1"

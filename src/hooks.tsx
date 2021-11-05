@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import {
   AuthorKeypair,
   checkWorkspaceIsValid,
@@ -6,7 +7,7 @@ import {
   isErr,
   StorageCache,
 } from "stone-soup";
-import { useSyncExternalStore } from "use-sync-external-store/shim";
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 import {
   AddWorkspaceContext,
   CurrentAuthorContext,
@@ -128,20 +129,7 @@ export function useSync() {
 }
 */
 
-function clone<T>(instance: T): T {
-  return Object.assign(
-    Object.create(
-      // Set the prototype of the new object to the prototype of the instance.
-      // Used to allow new object behave like class instance.
-      Object.getPrototypeOf(instance),
-    ),
-    // Prevent shallow copies of nested structures like arrays, etc
-    JSON.parse(JSON.stringify(instance)),
-  );
-}
-
 export function useStorage(workspaceAddress?: string) {
-  /*
   const [currentWorkspace] = useCurrentWorkspace();
   const peer = usePeer();
 
@@ -155,65 +143,33 @@ export function useStorage(workspaceAddress?: string) {
     throw new Error("Tried to use useStorage with no workspace specified!");
   }
 
-  const storageCache = new StorageCache(currentStorage);
+  const storageCache = React.useMemo(
+    () => new StorageCache(currentStorage),
+    [],
+  );
+
+  const memoStorage = React.useMemo(() => storageCache, [storageCache.version]);
+
+  const getSnapshot = React.useCallback(() => memoStorage, [memoStorage]);
+  
+  const selector = React.useCallback((storage: StorageCache) => storage, [])
 
   const subscribe = React.useCallback((notify: () => void) => {
-    console.log('SUBSCRIBED')
-    
-    const unsub = storageCache.onCacheUpdated(() => {
+    console.log("registered!");
+
+    return storageCache.onCacheUpdated(() => {
+      console.log("notified!");
       notify();
     });
+  }, [storageCache]);
 
-    return unsub;
-  }, []);
-
-  const getSnapshot = () => storageCache;
-
-  return useSyncExternalStore(subscribe, getSnapshot);
-  */
-  
-  const [currentWorkspace] = useCurrentWorkspace();
-  const peer = usePeer();
-  
-  const storages = peer.storages()
-
-  const address = workspaceAddress || currentWorkspace;
-
-  const [, reRender] = React.useState(true);
-
-  const [currentStorage, setCurrentStorage] = React.useState(() => {
-    return address ? peer.getStorage(address) : null;
-  });
-
-  if (!currentStorage) {
-    throw new Error('Tried to use useStorage with no workspace specified!');
-  }
-
-  const cacheRef = React.useRef(new StorageCache(currentStorage));
-
-  React.useEffect(() => {
-    if (address && address !== currentStorage.workspace) {
-      setCurrentStorage(storages[address]);
-      console.log('remaking proxy');
-      cacheRef.current?._onCacheUpdatedCallbacks.clear();
-      cacheRef.current = new StorageCache(storages[address]);
-      reRender(prev => !prev);
-    }
-  }, [address, storages, currentStorage.workspace]);
-
-  React.useEffect(() => {
-    const unsub = cacheRef.current?.onCacheUpdated(() => {
-      reRender(prev => !prev);
-    });
-
-    return () => {
-      if (unsub) {
-        unsub();
-      }
-    };
-  }, [currentStorage]);
-
-  return cacheRef.current as StorageCache;
+  return useSyncExternalStoreWithSelector(
+    subscribe,
+    getSnapshot,
+    getSnapshot,
+    selector,
+    (storageA, storageB) => storageA.version === storageB.version,
+  );
 }
 
 export function useInvitation(invitationCode: string) {
