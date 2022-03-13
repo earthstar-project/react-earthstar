@@ -1,148 +1,177 @@
-import * as React from 'react';
+import * as React from "react";
 import {
   AuthorKeypair,
-  isErr,
-  EarthstarError,
   Crypto,
-  StorageAsync,
-  StorageDriverAsyncMemory,
-  FormatValidatorEs4
-} from 'stone-soup';
-import { renderHook, act } from '@testing-library/react-hooks';
+  EarthstarError,
+  FormatValidatorEs4,
+  isErr,
+  Replica,
+  ReplicaDriverMemory,
+} from "earthstar";
 import {
-  EarthstarPeer,
-  useWorkspacePubs,
-  usePubs,
-  useCurrentWorkspace,
-  useInvitation,
-  useMakeInvitation,
+  act,
+  renderHook,
+  RenderHookResult,
+} from "@testing-library/react-hooks";
+import {
   LocalStorageSettingsWriter,
+  Peer,
+  useAddShare,
+  useCurrentShare,
+  useInvitation,
   useLocalStorageEarthstarSettings,
-  useStorage,
-} from '../src';
+  useMakeInvitation,
+  usePeer,
+  useReplicaServers,
+  useReplica,
+} from "../src";
+import { JSDOM } from "jsdom";
 
-const keypair = Crypto.generateAuthorKeypair('onee') as AuthorKeypair;
+const dom = new JSDOM();
+(global as any).window = dom.window;
 
-const WORKSPACE_ADDR_A = '+testa.a123';
-const WORKSPACE_ADDR_B = '+testb.b234';
-const WORKSPACE_ADDR_C = '+testc.c567';
+const SHARE_ADDR_A = "+testa.a123";
+const SHARE_ADDR_B = "+testb.b234";
+const SHARE_ADDR_C = "+testc.c567";
 
-const PUB_A = 'https://a.pub';
-const PUB_B = 'https://b.pub';
-const PUB_C = 'https://c.pub';
+const PUB_A = "https://a.pub";
+const PUB_B = "https://b.pub";
+const PUB_C = "https://c.pub";
 
-const pubs = {
-  [WORKSPACE_ADDR_A]: [PUB_A],
-  [WORKSPACE_ADDR_B]: [PUB_B],
-  [WORKSPACE_ADDR_C]: [PUB_C],
-};
+const pubs = [PUB_A, PUB_B, PUB_C];
 
-const wrapper = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <EarthstarPeer
-      initWorkspaces={[WORKSPACE_ADDR_A, WORKSPACE_ADDR_B, WORKSPACE_ADDR_C]}
-      initPubs={pubs}
-      initCurrentAuthor={keypair}
-      initIsLive={false}
-      initCurrentWorkspace={WORKSPACE_ADDR_A}
-      onCreateWorkspace={workspaceAddress => {
-        return new StorageAsync(workspaceAddress, FormatValidatorEs4, new StorageDriverAsyncMemory(workspaceAddress))
-      }}
-    >
-      {children}
-      <LocalStorageSettingsWriter storageKey={'tests'} />
-    </EarthstarPeer>
-  );
-};
+async function getKeypair() {
+  const keypair = await Crypto.generateAuthorKeypair("onee") as AuthorKeypair;
 
-test('useWorkspacePubs', () => {
-  const { result } = renderHook(() => useWorkspacePubs(WORKSPACE_ADDR_A), {
-    wrapper,
+  return keypair;
+}
+
+async function renderPeerHook<P, T>(
+  arg: (props: P) => T,
+): Promise<RenderHookResult<P, T>> {
+  const keypair = await getKeypair();
+
+  return renderHook(arg, {
+    wrapper: ({ children }) => (
+      <Peer
+        initShares={[SHARE_ADDR_A, SHARE_ADDR_B, SHARE_ADDR_C]}
+        initReplicaServers={pubs}
+        initIdentity={keypair}
+        initIsLive={false}
+        initCurrentShare={SHARE_ADDR_A}
+        onCreateShare={(shareAddress) => {
+          return new Replica(
+            shareAddress,
+            FormatValidatorEs4,
+            new ReplicaDriverMemory(shareAddress),
+          );
+        }}
+      >
+        {children}
+        <LocalStorageSettingsWriter storageKey={"tests"} />
+      </Peer>
+    ),
   });
+}
 
-  expect(result.current[0]).toEqual([PUB_A]);
-
-  act(() => {
-    result.current[1](prev => [...prev, PUB_B]);
-  });
-
-  expect(result.current[0]).toEqual([PUB_A, PUB_B]);
-});
-
-test('usePubs', () => {
-  const { result } = renderHook(() => usePubs(), {
-    wrapper,
-  });
+test("usePubs", async () => {
+  const { result } = await renderPeerHook(() => useReplicaServers());
 
   expect(result.current[0]).toEqual(pubs);
 
   act(() => {
-    result.current[1]({ [WORKSPACE_ADDR_A]: [PUB_C] });
+    result.current[1]([PUB_C]);
   });
 
-  expect(result.current[0]).toEqual({ [WORKSPACE_ADDR_A]: [PUB_C] });
+  expect(result.current[0]).toEqual([PUB_C]);
 });
 
-test.todo('useSync');
+test("useAddShare", async () => {
+  const useTest = () => {
+    const add = useAddShare();
+    const peer = usePeer();
 
-test('useCurrentWorkspace', () => {
-  const { result } = renderHook(() => useCurrentWorkspace(), {
-    wrapper,
+    return { peer, add };
+  };
+
+  const { result } = await renderPeerHook(() => useTest());
+
+  await act(async () => {
+    await result.current.add("+good.a123");
   });
-  
-  expect(result.current[0]).toEqual(WORKSPACE_ADDR_A);
+
+  expect(result.current.peer.hasShare("+good.a123")).toBeTruthy();
 
   act(() => {
-    result.current[1](WORKSPACE_ADDR_B);
+    result.current.peer.removeReplicaByShare("+good.a123");
   });
 
-  expect(result.current[0]).toEqual(WORKSPACE_ADDR_B);
+  await act(async () => {
+    await result.current.add("bad_name.2341");
+  });
+
+  expect(result.current.peer.hasShare("bad_name.2341")).toBeFalsy();
+});
+
+test("useCurrentShare", async () => {
+  const { result } = await renderPeerHook(() => useCurrentShare());
+
+  expect(result.current[0]).toEqual(SHARE_ADDR_A);
 
   act(() => {
-    result.current[1]('+somethingunknown.a123');
+    result.current[1](SHARE_ADDR_B);
+  });
+
+  expect(result.current[0]).toEqual(SHARE_ADDR_B);
+
+  act(() => {
+    result.current[1]("+somethingunknown.a123");
   });
 
   expect(result.current[0]).toEqual(null);
 });
 
-test('useStorage', async () => {
-  
-  
-  
-  const { result, waitForNextUpdate } = renderHook(() => useStorage(), {
-    wrapper,
-  });
+test("useReplica", async () => {
+  const { result, waitForNextUpdate } = await renderPeerHook(() =>
+    useReplica()
+  );
 
   expect(result.current.getAllDocs()).toEqual([]);
+  expect(result.current.getLatestDocAtPath("/storage-test/test.txt"))
+    .toBeUndefined();
 
-  act(() => {
-    result.current.set(keypair, {
-      path: '/storage-test/test.txt',
-      format: 'es.4',
-      content: 'Hello world!',
+  const keypair = await getKeypair();
+
+  // Do not await the below. It'll make this test break.
+  act(async () => {
+    await result.current.set(keypair, {
+      path: "/storage-test/test.txt",
+      format: "es.4",
+      content: "Hello world!",
     });
   });
-  
-  await waitForNextUpdate()
 
-  expect(result.current.getLatestDocAtPath('/storage-test/test.txt')?.content).toEqual(
-    'Hello world!'
-  );
+  await waitForNextUpdate();
+
+  expect(result.current.getLatestDocAtPath("/storage-test/test.txt")?.content)
+    .toEqual(
+      "Hello world!",
+    );
 
   expect(result.current.getAllDocs().length).toEqual(1);
 
-  const query = { filter : {pathStartsWith: `/storage-test`} };
+  const query = { filter: { pathStartsWith: `/storage-test` } };
 
   expect(result.current.queryDocs(query)).toEqual([]);
 
   await waitForNextUpdate();
 
-  expect(result.current.queryDocs(query)[0].content).toEqual('Hello world!');
+  expect(result.current.queryDocs(query)[0].content).toEqual("Hello world!");
 });
 
-test('useInvitation', () => {
+test("useInvitation", async () => {
   const VALID_URL =
-    'earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=1';
+    "earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=1";
 
   const useTest = () => {
     const [code, setCode] = React.useState(VALID_URL);
@@ -151,89 +180,91 @@ test('useInvitation', () => {
     return { invitationResult, setCode };
   };
 
-  const { result } = renderHook(() => useTest(), { wrapper });
+  const { result } = await renderPeerHook(() => useTest());
 
   expect(isErr(result.current.invitationResult)).toBeFalsy();
 
-  act(() => result.current.setCode('http://dogs.com'));
+  act(() => result.current.setCode("http://dogs.com"));
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'Invitation not a valid Earthstar URL'
+    "Invitation not a valid Earthstar URL",
   );
 
   act(() =>
     result.current.setCode(
-      'earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=46'
+      "earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=46",
     )
   );
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'Unrecognised Earthstar invitation format version'
+    "Unrecognised Earthstar invitation format version",
   );
 
   act(() =>
     result.current.setCode(
-      'earthstar:///?pub=http://pub1.org&pub=https://pub2.org&v=1'
+      "earthstar:///?pub=http://pub1.org&pub=https://pub2.org&v=1",
     )
   );
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'No workspace found in Earthstar invitation URL'
+    "No workspace found in Earthstar invitation URL",
   );
 
   act(() =>
     result.current.setCode(
-      'earthstar:///?workspace=+gardening.abc&pub=blorp&v=1'
+      "earthstar:///?workspace=+gardening.abc&pub=blorp&v=1",
     )
   );
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'Malformed Pub URL found'
+    "Malformed Pub URL found",
   );
 
-  act(() => result.current.setCode('bong'));
+  act(() => result.current.setCode("bong"));
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'Not a valid Earthstar URL'
+    "Not a valid Earthstar URL",
   );
 });
 
-test('useMakeInvitation', () => {
+test("useMakeInvitation", async () => {
   const useTest = () => {
-    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
-    const [excludedPubs, setExcludedPubs] = React.useState<string[]>([]);
-    const invitationCode = useMakeInvitation(excludedPubs, workspace);
+    const [workspace, setWorkspace] = React.useState(SHARE_ADDR_A);
+    const [includedPubs, setIncludedPubs] = React.useState<string[]>([PUB_A]);
+    const invitationCode = useMakeInvitation(includedPubs, workspace);
 
-    return { setWorkspace, setExcludedPubs, invitationCode };
+    return { setWorkspace, setIncludedPubs, invitationCode };
   };
 
-  const { result } = renderHook(() => useTest(), { wrapper });
+  const { result } = await renderPeerHook(() => useTest());
 
   expect(result.current.invitationCode).toEqual(
-    'earthstar:///?workspace=+testa.a123&pub=https://a.pub&v=1'
+    "earthstar:///?workspace=+testa.a123&pub=https://a.pub&v=1",
   );
 
   act(() => {
-    result.current.setExcludedPubs([PUB_A]);
+    result.current.setIncludedPubs([]);
   });
 
   expect(result.current.invitationCode).toEqual(
-    'earthstar:///?workspace=+testa.a123&v=1'
+    "earthstar:///?workspace=+testa.a123&v=1",
   );
 });
 
-test('useLocalStorageSettings', () => {
-  const { result } = renderHook(
-    () => useLocalStorageEarthstarSettings('tests'),
-    { wrapper }
+test("useLocalStorageSettings", async () => {
+  const useTest = () => {
+    const settings = useLocalStorageEarthstarSettings("tests");
+    const add = useAddShare();
+
+    return { settings, add };
+  };
+
+  const { result } = await renderPeerHook(
+    () => useTest(),
   );
 
-  expect(result.current.initWorkspaces).toHaveLength(3);
-  expect(result.current.initPubs).toEqual({
-    '+testa.a123': ['https://a.pub'],
-    '+testb.b234': ['https://b.pub'],
-    '+testc.c567': ['https://c.pub'],
-  });
-  expect(result.current.initCurrentAuthor).toBeDefined();
-  expect(result.current.initCurrentWorkspace).toBe(WORKSPACE_ADDR_A);
+  expect(result.current.settings.initShares).toHaveLength(3);
+  expect(result.current.settings.initReplicaServers).toEqual([PUB_A, PUB_B, PUB_C]);
+  expect(result.current.settings.initIdentity).toBeDefined();
+  expect(result.current.settings.initCurrentShare).toBe(SHARE_ADDR_A);
 });

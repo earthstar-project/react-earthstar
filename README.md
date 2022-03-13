@@ -2,43 +2,17 @@
 
 ## What is this?
 
-react-earthstar is a UI toolkit for making collaborative, offline-first applets for small groups. Your applet's data is stored with the peers who use it, and on infrastructure you own or trust.
+A library for using React with [Earthstar](https://earthstar-project.org), a library for building syncing, decentralised online tools.
+
+Featuring:
 
 - Don't-have-to-think-about-it realtime collaborative data
 - No-servers-involved authentication
 - No-distinction-between-the-two offline and online support
 
-This is all made possible by the [Earthstar](https://github.com/earthstar-project/earthstar) protocol.
+## Earthstar
 
-## What's Earthstar?
-
-We all want apps where we can look at and change data together: stuff like documents, events, or messages.
-
-But where is all that kept? And who do we trust it with?
-
-Earthstar is **on offline-first, distributed, syncable, embedded document database for use in p2p software — in browsers and outside of browsers**.
-
-Earthstar's model is: **Workspaces** store **Documents**, which are written and edited by **Authors**. Workspaces' data are propagated by **Pub Servers**.
-
-### Workspaces
-
-It's like a shared folder for a small group of people. You could have separate workspaces for your family, your D&D party, or book club. A workspace stores many documents.
-
-### Documents
-
-Documents are stored at paths like `/wiki/gardening/cabbage.txt` They can store any data which can be represented as a UTF-8 string, and their contents can be edited and deleted. They can have editing permissions. They can even be set to automatically delete themselves after a period of time.
-
-### Authors
-
-Authors are identities used for writing and editing documents. They have a public address and a secret, which are used together to cryptographically prove an author is who they say they are. You can have one or many.
-
-### Pubs
-
-While peers _could_ sync data directly to one another, with small groups there's a decent chance no-one else is online when you are. Pubs are little mini-servers used to sync workspace data with peers. They have no special authority over data. They are designed to be very easy to run.
-
-## So what's react-earthstar again?
-
-This package offers several layers of convenience around Earthstar: React hooks for writing and reading data from workspaces, pre-made components for common tasks, and even a full-blown control centre that does all the table-stakes stuff for you.
+Earthstar models collaborative online tools using the concepts of Shares, Replicas, Documents, and Identities. To learn more about what that all means, check out our [how it works](http://earthstar-project.org/get-started/how-it-works) page.
 
 ## Getting started
 
@@ -52,31 +26,184 @@ yarn add earthstar react-earthstar
 npm install earthstar react-earthstar
 ```
 
-Start by placing the `EarthstarPeer` component somewhere near the root of your app:
+Start by placing the `Peer` component somewhere near the root of your app:
 
 ```jsx
-import { EarthstarPeer } from 'react-earthstar';
+import { Peer } from 'react-earthstar';
+import { FormatValidatorEs4 } from 'earthstar';
+import { ReplicaDriverIndexedDB } from 'earthstar/browser';
 
 function App() {
   return (
-    <EarthstarPeer>
+    <Peer
+      onCreateShare={(address) => {
+        // Here we're teaching Peer how to persist data for shares.
+        const driver = new ReplicaDriverIndexedDB(address);
+        return new Replica(address, FormatValidatorEs4, driver);
+      }}
+    >
       <h1>{'The beginnings of my app!'}</h1>
       <SomeCoolFeature />
-    </EarthstarPeer>
+    </Peer>
   );
 }
 ```
 
-Under the hood, `EarthstarPeer` coordinates the state of your Earthstar app: things like the current user, known workspaces, or whether syncing is active or not.
+`<Peer>`  coordinates the state of your Earthstar app: things like share replicas, the current identity in use, or 
 
-With `EarthstarPeer` wrapped around your app, you're ready to go.
+With you app wrapped in `<Peer>`, you now use all of react-earthstar's hooks!
 
-## Build your app
+## Hooks
 
-Click below for learning about these with their own docs
+### useReplica
 
-- [EarthstarPeer](docs/earthstarpeer.md) - Learn more about configuring <EarthstarPeer>
-- [Hooks](docs/hooks.md) - Learn how to access and write data and app state with hooks
-- [Earthbar](docs/earthbar.md) - Pre-made, customisable control center for common earthstar tasks — learn how to customise and style it here
-- [Components](docs/components.md) - Pre-made UIs to make your life easy! - learn what's available and how to style here
-- [Styling](docs/styling.md) How to style components from this package with pre-made themes, or do it yourself!
+This is the workhorse of the library, used for querying documents from replicas.
+
+```js
+const replica = useReplica();
+
+const txtDocs = replica.queryDocs({ filter: { pathEndsWith: '.txt' } });
+```
+
+This hook returns an instance of Earthstar's [`ReplicaCache` class](https://doc.deno.land/https://deno.land/x/earthstar@v8.2.4/mod.ts/~/ReplicaCache), with the exact same API.
+
+When you query docs the replica keeps track of what was queried for, and only updates React when the results of those queries are updated. This results in a best-of-both-worlds API where we can have the same API as the vanilla Earthstar library, and components which only re-render when they need to. Nice!
+
+### useCurrentShare
+
+A hook to get and set the active share.
+
+```jsx
+const [currentShare, setCurrentShare] = useCurrentShare();
+
+return <div>{`You are currently browsing the docs of ${currentShare}!`}</div>;
+```
+
+### useIdentity
+
+A convenience hook for getting and setting an Earthstar identity keypair.
+
+```js
+const replica = useReplica();
+const [identity, setIdentity] = useIdentity();
+
+const set = () => {
+  replica.set(identity, { content: 'Hi!', 'path': '/greetings.txt', format: 'es.4' });
+};
+```
+
+### usePeer
+
+```js
+const peer = usePeer();
+
+const allShares = peer.shares();
+```
+
+Returns an instance of Earthstar's [`Peer` class](https://doc.deno.land/https://deno.land/x/earthstar/mod.ts/~/Peer). Useful for getting the list of all shares, adding or removing replicas, etc.
+
+### useIsLive
+
+Get and set whether synchronisation with remote peers is active or not.
+
+```jsx
+const [isLive, setIsLive] = useIsLive();
+
+return <label><input checked={isLive} onChange={(e) => { setIsLive(e.target.checked )}} /> Syncing?</label>
+```
+
+### useInvitation
+
+Earthstar has a [specification for URL-style invitations](https://github.com/earthstar-project/earthstar/issues/36). This hook parses such URLs and adds any shares or replica servers derived from them.
+
+```jsx
+const redeem = useInvitation("earthstar:///?workspace=+gardening.abc&pub=http://pub1.org& v=1");
+
+return <button onClick={() => redeem()}>Join!</button>
+```
+
+### useMakeInvitation
+
+You can also create invitations to be used by others:
+
+```js
+const invitation = useInvitation(['wss://my.server'], '+gardening.a123');
+```
+
+### useAddShare
+
+Adds a share using the `onCreateShare` passed to `<Peer>`:
+
+```js
+consnt add = useAddShare();
+
+add('+archery.k456');
+```
+
+### useLocalStorageEarthstarSettings
+
+`<Peer>`` holds state which you probably want to persist between sessions. You can use this hook to access this state (written by the `<LocalStorageSettingsWriter/>` component).
+
+```jsx
+const settings = useLocalStorageEarthstarSettings('my-app');
+
+return <Peer {...settings} {...etc} />;
+```
+
+## Components
+
+There are a few components needed to make things work, as well as a few convenience ones.
+
+### <Peer>
+
+You'll need this somewhere in your app to use react-earthstar.
+
+```jsx
+<Peer
+  onCreateShare={(address) => {
+    // Here we're teaching Peer how to persist data for shares.
+    const driver = new ReplicaDriverIndexedDB(address);
+    return new Replica(address, FormatValidatorEs4, driver);
+  }}
+>
+  <MyGreatAppUsingEarthstar/>
+</Peer>
+```
+
+`<Peer>` also has a bunch of props for setting its initial state, e.g. `initShares`, `initReplicaServers`, `initIdentity`, etc. These can be hydrated and persisted to local storage using `useEarthstarLocalStorageSettings` and `<LocalStorageSettingsWriter>`.
+
+This component will also automatically start synchronising with any replica servers it knows of.
+
+### <LocalStorageSettingsWriter>
+
+Stick this somewhere within `<Peer>` and it'll automatically persist many settings to local storage, namespaced by a key of your choice.
+
+```jsx
+<Peer>
+  <LocalStorageSettingsWriter storageKey="my-app"/>
+</Peer>
+```
+
+### <ShareLabel>
+
+Renders the human readable portion of a share address, and omits the obscuring portion: e.g. '+gardening.b34ue9ug' becomes '+gardening'. Good for making sure you don't disclose share addresses to people looking over your users' shoulders.
+
+```jsx
+<ShareLabel address="+potatoes.b34ou9e8">
+```
+
+### <IdentityLabel>
+
+Renders the shortname portion of an identity's address, omitting the public key, e.g. `@cinn.euu8euheuigoe...` just becomes `@cinn`.
+
+```jsx
+<IdentityLabel address="@devy.a234gue9Juhxo9eu...">
+```
+
+### <CurrentIdentityLabel>
+
+Does the same as `<IdentityLabel>` but doesn't take an address prop and just uses the current identity provided by `<Peer>`.
+
+## What about Earthbar?
+
+Earthbar was an out-of-the-box UI for managing many Earthstar related tasks. It attempted to pack a lot of functionality and flexibility into this repo, and it was huge. It's been removed from react-earthstar for maintainability reasons, and we will be bringing back something similar in a separate package somewhere down the road.

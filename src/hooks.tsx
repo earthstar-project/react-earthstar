@@ -1,180 +1,162 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { unstable_batchedUpdates } from 'react-dom'
 import {
   AuthorKeypair,
-  checkWorkspaceIsValid,
+  checkShareIsValid,
   EarthstarError,
   isErr,
-  StorageCache,
-} from "stone-soup";
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
+  ReplicaCache,
+} from "earthstar";
 import {
-  AddWorkspaceContext,
-  CurrentAuthorContext,
-  CurrentWorkspaceContext,
+  AddShareContext,
+  IdentityContext,
+  CurrentShareContext,
   IsLiveContext,
   PeerContext,
-  PubsContext,
+  ReplicaServersContext,
 } from "./contexts";
 import { getLocalStorage, makeStorageKey } from "./util";
 
 export function usePeer() {
   const peer = React.useContext(PeerContext);
 
-  return peer;
+  const [trigger, setTrigger] = React.useState(true);
+
+  const memoPeer = React.useMemo(() => peer, [trigger]);
+
+  React.useEffect(() => {
+    const unsub = peer.replicaMap.bus.on("*", () => {
+      setTrigger((prev) => !prev);
+    });
+
+    return () => {
+      unsub();
+    };
+  }, [peer]);
+
+  return memoPeer;
 }
 
-export function useWorkspacePubs(
-  workspaceAddress?: string,
-): [string[], (pubs: React.SetStateAction<string[]>) => void] {
-  const [existingPubs, setPubs] = usePubs();
-  const [currentWorkspace] = useCurrentWorkspace();
-
-  const address = workspaceAddress || currentWorkspace;
-  const workspacePubs = address ? existingPubs[address] || [] : [];
-
-  const setWorkspacePubs = React.useCallback(
-    (pubs: React.SetStateAction<string[]>) => {
-      if (!address) {
-        console.warn("Tried to set pubs on an unknown workspace");
-        return;
-      }
-
-      setPubs(({ [address]: prevWorkspacePubs, ...rest }) => {
-        if (Array.isArray(pubs)) {
-          return { ...rest, [address]: Array.from(new Set(pubs)) };
-        }
-        const next = pubs(prevWorkspacePubs || []);
-        return { ...rest, [address]: Array.from(new Set(next)) };
-      });
-    },
-    [setPubs, address],
-  );
-
-  return [workspacePubs, setWorkspacePubs];
+export function useAddShare() {
+  return React.useContext(AddShareContext);
 }
 
-export function usePubs(): [
-  Record<string, string[]>,
-  React.Dispatch<React.SetStateAction<Record<string, string[]>>>,
+export function useReplicaServers(): [
+  string[],
+  React.Dispatch<React.SetStateAction<string[]>>,
 ] {
-  const { pubs, setPubs } = React.useContext(PubsContext);
+  const { replicaServers, setReplicaServers } = React.useContext(ReplicaServersContext);
 
-  return [pubs, setPubs];
+  return [replicaServers, setReplicaServers];
 }
 
-export function useCurrentAuthor(): [
+export function useIdentity(): [
   AuthorKeypair | null,
   React.Dispatch<React.SetStateAction<AuthorKeypair | null>>,
 ] {
-  const { currentAuthor, setCurrentAuthor } = React.useContext(
-    CurrentAuthorContext,
+  const { identity, setIdentity } = React.useContext(
+    IdentityContext,
   );
 
-  return [currentAuthor, setCurrentAuthor];
+  return [identity, setIdentity];
 }
 
-export function useCurrentWorkspace(): [
+export function useCurrentShare(): [
   string | null,
   React.Dispatch<React.SetStateAction<string | null>>,
 ] {
   const peer = usePeer();
-  const workspaces = peer.workspaces();
 
-  const { currentWorkspace, setCurrentWorkspace } = React.useContext(
-    CurrentWorkspaceContext,
+  const { currentShare, setCurrentShare } = React.useContext(
+    CurrentShareContext,
   );
 
   React.useEffect(() => {
-    if (currentWorkspace && workspaces.includes(currentWorkspace) === false) {
+    if (currentShare && peer.hasShare(currentShare) === false) {
       console.warn(
-        `Tried to set current workspace to ${currentWorkspace}, which is not a known workspace.`,
+        `Tried to set current workspace to ${currentShare}, which is not a known workspace.`,
       );
-      setCurrentWorkspace(null);
+      setCurrentShare(null);
     }
-  }, [currentWorkspace, workspaces, setCurrentWorkspace]);
+  }, [currentShare, setCurrentShare]);
 
-  return [currentWorkspace, setCurrentWorkspace];
+  return [currentShare, setCurrentShare];
 }
 
-/*
-export function useSync() {
-  const [storages] = useStorages();
-  const [pubs] = usePubs();
-
-  return React.useCallback(
-    (address: string) => {
-      return new Promise((resolve, reject) => {
-        const storage = storages[address];
-
-        if (!storage) {
-          reject(new Error('Workspace not found'));
-        }
-
-        const workspacePubs = pubs[address];
-
-        if (!workspacePubs) {
-          reject(new Error('No pubs found for workspace'));
-        }
-
-        Promise.all(
-          workspacePubs.map(pubUrl => syncLocalAndHttp(storage, pubUrl))
-        )
-          .then(resolve)
-          .catch(reject);
-      });
-    },
-    [pubs, storages]
-  );
-}
-*/
-
-export function useStorage(workspaceAddress?: string) {
-  const [currentWorkspace] = useCurrentWorkspace();
+export function useReplica(shareAddress?: string | undefined) {
+  const [currentShare] = useCurrentShare();
   const peer = usePeer();
 
-  const address = workspaceAddress || currentWorkspace;
+  const address = shareAddress || currentShare;
 
-  const [currentStorage] = React.useState(() => {
-    return address ? peer.getStorage(address) : undefined;
-  });
+  const replicaCache = React.useMemo(
+    () => {
 
-  if (!currentStorage) {
-    throw new Error("Tried to use useStorage with no workspace specified!");
-  }
+      const replica = address ? peer.getReplica(address) : undefined;
 
-  const storageCache = React.useMemo(
-    () => new StorageCache(currentStorage),
-    [],
+      if (!replica) {
+        throw new Error("Tried to use useReplica with no share specified!");
+      }
+
+      return new ReplicaCache(replica, 1000, (cb) => {
+        unstable_batchedUpdates(cb)
+      });
+    },
+    [address, peer],
   );
 
-  const memoStorage = React.useMemo(() => storageCache, [storageCache.version]);
+  const [, setTrigger] = React.useState(true);
 
-  const getSnapshot = React.useCallback(() => memoStorage, [memoStorage]);
-  
-  const selector = React.useCallback((storage: StorageCache) => storage, [])
-
-  const subscribe = React.useCallback((notify: () => void) => {
-    console.log("registered!");
-
-    return storageCache.onCacheUpdated(() => {
-      console.log("notified!");
-      notify();
+  React.useLayoutEffect(() => {
+    const unsub = replicaCache.onCacheUpdated(() => {
+      setTrigger(prev => !prev)
     });
-  }, [storageCache]);
 
-  return useSyncExternalStoreWithSelector(
-    subscribe,
-    getSnapshot,
-    getSnapshot,
-    selector,
-    (storageA, storageB) => storageA.version === storageB.version,
-  );
+    return () => {
+      unsub();
+      replicaCache.close();
+    };
+  }, [replicaCache]);
+
+  return replicaCache;
+
+  // Keeping the below around for React 18.
+  /*
+    const replicaCache = React.useMemo(() => {
+      const replica = address ? peer.getReplica(address) : undefined;
+         if (!replica) {
+        throw new Error("Tried to use useReplica with no share specified!");
+      }
+         return new ReplicaCache(replica, 1000);
+       [address, peer])
+       const [currentVersion, setVersion] = React.useState(replicaCache.version);
+       const memoReplica = React.useMemo(() => {
+      return replicaCache;
+       [currentVersion, replicaCache]);
+       React.useEffect(() => {
+      replicaCache.onCacheUpdated(() => {
+        setVersion(replicaCache.version);
+         
+      ;
+         nst subscribe = React.useCallback((onStoreChange: () => void) => {
+        turn memoReplica.onCacheUpdated(() => {
+          StoreChange();
+        ;
+       [memoReplica, replicaCache]);
+         nst getSnapshot = React.useCallback(() => memoReplica, []);
+         turn useSyncExternalStoreWithSelector(
+        bscribe,
+        tSnapshot,
+        tSnapshot,
+        ache) => cache,
+        acheA, cacheB) => cacheA.version === cacheB.version,
+      */
+
 }
 
 export function useInvitation(invitationCode: string) {
-  const addWorkspace = React.useContext(AddWorkspaceContext);
-  const [existingPubs, setPubs] = usePubs();
+  const addShare = React.useContext(AddShareContext);
+  const [, setPubs] = useReplicaServers();
 
   try {
     const url = new URL(invitationCode);
@@ -203,10 +185,10 @@ export function useInvitation(invitationCode: string) {
 
     const plussedWorkspace = workspace.replace(" ", "+");
 
-    const workspaceIsValid = checkWorkspaceIsValid(plussedWorkspace);
+    const shareIsValid = checkShareIsValid(plussedWorkspace);
 
-    if (isErr(workspaceIsValid)) {
-      return workspaceIsValid;
+    if (isErr(shareIsValid)) {
+      return shareIsValid;
     }
 
     const pubs = url.searchParams.getAll("pub");
@@ -218,23 +200,22 @@ export function useInvitation(invitationCode: string) {
     }
 
     const redeem = (excludedPubs: string[] = []) => {
-      addWorkspace(plussedWorkspace);
-
-      // In case the workspace in the invitation already has known pubs
-      // We want to keep those around.
-      const existingWorkspacePubs = existingPubs[plussedWorkspace] || [];
+      addShare(plussedWorkspace);
 
       const nextPubs = Array.from(
         new Set([
-          ...existingWorkspacePubs,
           ...pubs.filter((pubUrl) => !excludedPubs.includes(pubUrl)),
         ]),
       );
 
-      setPubs((prevPubs) => ({
-        ...prevPubs,
-        [plussedWorkspace]: nextPubs,
-      }));
+      setPubs((prevPubs) =>
+        Array.from(
+          new Set([
+            ...prevPubs,
+            ...nextPubs,
+          ]),
+        )
+      );
     };
 
     return { redeem, workspace: plussedWorkspace, pubs };
@@ -244,14 +225,14 @@ export function useInvitation(invitationCode: string) {
 }
 
 export function useMakeInvitation(
-  excludedPubs: string[] = [],
-  workspaceAddress?: string,
+  includedPubs: string[] = [],
+  shareAddress?: string,
 ) {
-  const [pubs] = useWorkspacePubs(workspaceAddress);
-  const [currentWorkspace] = useCurrentWorkspace();
-  const address = workspaceAddress || currentWorkspace;
+  const [pubs] = useReplicaServers();
+  const [currentShare] = useCurrentShare();
+  const address = shareAddress || currentShare;
 
-  const pubsToUse = pubs.filter((pubUrl) => !excludedPubs.includes(pubUrl));
+  const pubsToUse = pubs.filter((pubUrl) => includedPubs.includes(pubUrl));
   const pubsString = pubsToUse.map((pubUrl) => `&pub=${pubUrl}`).join("");
 
   if (!address) {
@@ -271,24 +252,51 @@ export function useIsLive(): [
 }
 
 export function useLocalStorageEarthstarSettings(storageKey: string) {
-  const lsAuthorKey = makeStorageKey(storageKey, "current-author");
-  const lsPubsKey = makeStorageKey(storageKey, "pubs");
-  const lsWorkspacesKey = makeStorageKey(storageKey, "workspaces");
-  const lsCurrentWorkspaceKey = makeStorageKey(storageKey, "current-workspace");
+  const lsIdentityKey = makeStorageKey(storageKey, "identity");
+  const lsPubsKey = makeStorageKey(storageKey, "replica-servers");
+  const lsSharesKey = makeStorageKey(storageKey, "shares");
+  const lsCurrentShareKey = makeStorageKey(storageKey, "current-share");
   const lsIsLiveKey = makeStorageKey(storageKey, "is-live");
 
+  const allKeys = React.useMemo(
+    () => [
+      lsIdentityKey,
+      lsPubsKey,
+      lsSharesKey,
+      lsCurrentShareKey,
+      lsIsLiveKey,
+    ],
+    [lsIdentityKey, lsPubsKey, lsSharesKey, lsCurrentShareKey, lsIsLiveKey],
+  );
+
   // load the initial state from localStorage
-  const initWorkspaces = getLocalStorage<string[]>(lsWorkspacesKey);
-  const initPubs = getLocalStorage<Record<string, string[]>>(lsPubsKey);
-  const initCurrentAuthor = getLocalStorage<AuthorKeypair>(lsAuthorKey);
-  const initCurrentWorkspace = getLocalStorage<string>(lsCurrentWorkspaceKey);
+  const initShares = getLocalStorage<string[]>(lsSharesKey);
+  const initReplicaServers = getLocalStorage<string[]>(lsPubsKey);
+  const initIdentity = getLocalStorage<AuthorKeypair>(lsIdentityKey);
+  const initCurrentShare = getLocalStorage<string>(lsCurrentShareKey);
   const initIsLive = getLocalStorage<boolean>(lsIsLiveKey);
 
+  const [, setTrigger] = React.useState(true);
+
+  const onStorage = React.useCallback((event: StorageEvent) => {
+    if (event.key && allKeys.includes(event.key)) {
+      setTrigger((prev) => !prev);
+    }
+  }, [allKeys]);
+
+  React.useEffect(() => {
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [onStorage]);
+
   return {
-    ...(initWorkspaces ? { initWorkspaces } : {}),
-    ...(initPubs ? { initPubs } : {}),
-    ...(initCurrentAuthor ? { initCurrentAuthor } : {}),
-    ...(initCurrentWorkspace ? { initCurrentWorkspace } : {}),
-    ...(initIsLive ? { initIsLive } : {}),
+    initShares: initShares || [],
+    initReplicaServers: initReplicaServers || [],
+    initIdentity: initIdentity || null,
+    initCurrentShare: initCurrentShare || null,
+    initIsLive: initIsLive || true,
   };
 }

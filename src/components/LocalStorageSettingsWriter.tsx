@@ -1,49 +1,52 @@
-import * as React from 'react';
+import * as React from "react";
 import {
-  useCurrentAuthor,
-  useCurrentWorkspace,
+  useIdentity,
+  useCurrentShare,
   useIsLive,
   usePeer,
-  usePubs,
-} from '../hooks';
-import { makeStorageKey } from '../util';
+  useReplicaServers,
+} from "../hooks";
+import { makeStorageKey } from "../util";
 
-export default function LocalStorageSettingsWriter({
+export function LocalStorageSettingsWriter({
   storageKey,
 }: {
   storageKey: string;
 }) {
-  const lsAuthorKey = makeStorageKey(storageKey, 'current-author');
-  const lsPubsKey = makeStorageKey(storageKey, 'pubs');
-  const lsWorkspacesKey = makeStorageKey(storageKey, 'workspaces');
-  const lsCurrentWorkspaceKey = makeStorageKey(storageKey, 'current-workspace');
-  const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
+  const lsIdentityKey = makeStorageKey(storageKey, "identity");
+  const lsPubsKey = makeStorageKey(storageKey, "replica-servers");
+  const lsSharesKey = makeStorageKey(storageKey, "shares");
+  const lsCurrentShareKey = makeStorageKey(storageKey, "current-share");
+  const lsIsLiveKey = makeStorageKey(storageKey, "is-live");
 
   const peer = usePeer();
-  const workspaces = peer.workspaces();
-  const [pubs] = usePubs();
-  const [currentAuthor] = useCurrentAuthor();
-  const [currentWorkspace] = useCurrentWorkspace();
+
+  const [pubs] = useReplicaServers();
+  const [currentIdentity] = useIdentity();
+  const [currentShare] = useCurrentShare();
   const [isLive] = useIsLive();
 
   React.useEffect(() => {
-    localStorage.setItem(lsWorkspacesKey, JSON.stringify(workspaces));
-  });
+    return peer.replicaMap.bus.on("*", () => {
+      console.log("writing shares...");
+      localStorage.setItem(lsSharesKey, JSON.stringify(peer.shares()));
+    });
+  }, [peer, lsSharesKey]);
 
   React.useEffect(() => {
     localStorage.setItem(lsPubsKey, JSON.stringify(pubs));
   }, [pubs, lsPubsKey]);
 
   React.useEffect(() => {
-    localStorage.setItem(lsAuthorKey, JSON.stringify(currentAuthor));
-  }, [currentAuthor, lsAuthorKey]);
+    localStorage.setItem(lsIdentityKey, JSON.stringify(currentIdentity));
+  }, [currentIdentity, lsIdentityKey]);
 
   React.useEffect(() => {
     localStorage.setItem(
-      lsCurrentWorkspaceKey,
-      JSON.stringify(currentWorkspace)
+      lsCurrentShareKey,
+      JSON.stringify(currentShare),
     );
-  }, [currentWorkspace, lsCurrentWorkspaceKey]);
+  }, [currentShare, lsCurrentShareKey]);
 
   React.useEffect(() => {
     localStorage.setItem(lsIsLiveKey, JSON.stringify(isLive));

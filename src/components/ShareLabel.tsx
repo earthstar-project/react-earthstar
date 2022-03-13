@@ -9,18 +9,19 @@ Given a workspace address, returns an element which:
 
 */
 
-import * as React from 'react';
-import { getWorkspaceName } from '../util';
+import * as React from "react";
+import { getWorkspaceName } from "../util";
 
-export default function WorkspaceLabel({
+export function ShareLabel({
   address,
   ...props
 }: { address: string } & React.HTMLAttributes<HTMLSpanElement>) {
   return (
     <span
       {...props}
-      data-re-workspace-label
       title={address}
-    >{`+${getWorkspaceName(address)}`}</span>
+    >
+      {`+${getWorkspaceName(address)}`}
+    </span>
   );
 }
