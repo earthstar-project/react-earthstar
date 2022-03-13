@@ -1,7 +1,7 @@
 import * as React from "react";
 import {
-  useIdentity,
   useCurrentShare,
+  useIdentity,
   useIsLive,
   usePeer,
   useReplicaServers,

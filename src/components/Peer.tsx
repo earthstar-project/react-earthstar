@@ -2,8 +2,8 @@ import * as React from "react";
 import { AuthorKeypair, Peer as EsPeer, Replica } from "earthstar";
 import {
   AddShareContext,
-  IdentityContext,
   CurrentShareContext,
+  IdentityContext,
   IsLiveContext,
   PeerContext,
   ReplicaServersContext,
@@ -48,7 +48,9 @@ export function Peer({
     }
   }, []);
 
-  const [replicaServers, setReplicaServers] = React.useState(initReplicaServers);
+  const [replicaServers, setReplicaServers] = React.useState(
+    initReplicaServers,
+  );
 
   const [identity, setIdentity] = React.useState(
     initIdentity,
@@ -61,7 +63,9 @@ export function Peer({
 
   return (
     <PeerContext.Provider value={peer}>
-      <ReplicaServersContext.Provider value={{ replicaServers, setReplicaServers }}>
+      <ReplicaServersContext.Provider
+        value={{ replicaServers, setReplicaServers }}
+      >
         <IdentityContext.Provider
           value={{ identity, setIdentity }}
         >
@@ -71,7 +75,9 @@ export function Peer({
             <IsLiveContext.Provider value={{ isLive, setIsLive }}>
               <AddShareContext.Provider value={addShare}>
                 {children}
-                {replicaServers.map((url) => <ReplicaSyncer key={url} pubUrl={url} />)}
+                {replicaServers.map((url) => (
+                  <ReplicaSyncer key={url} pubUrl={url} />
+                ))}
               </AddShareContext.Provider>
             </IsLiveContext.Provider>
           </CurrentShareContext.Provider>

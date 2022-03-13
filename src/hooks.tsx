@@ -1,5 +1,5 @@
 import * as React from "react";
-import { unstable_batchedUpdates } from 'react-dom'
+import { unstable_batchedUpdates } from "react-dom";
 import {
   AuthorKeypair,
   checkShareIsValid,
@@ -9,8 +9,8 @@ import {
 } from "earthstar";
 import {
   AddShareContext,
-  IdentityContext,
   CurrentShareContext,
+  IdentityContext,
   IsLiveContext,
   PeerContext,
   ReplicaServersContext,
@@ -45,7 +45,9 @@ export function useReplicaServers(): [
   string[],
   React.Dispatch<React.SetStateAction<string[]>>,
 ] {
-  const { replicaServers, setReplicaServers } = React.useContext(ReplicaServersContext);
+  const { replicaServers, setReplicaServers } = React.useContext(
+    ReplicaServersContext,
+  );
 
   return [replicaServers, setReplicaServers];
 }
@@ -91,7 +93,6 @@ export function useReplica(shareAddress?: string | undefined) {
 
   const replicaCache = React.useMemo(
     () => {
-
       const replica = address ? peer.getReplica(address) : undefined;
 
       if (!replica) {
@@ -99,7 +100,7 @@ export function useReplica(shareAddress?: string | undefined) {
       }
 
       return new ReplicaCache(replica, 1000, (cb) => {
-        unstable_batchedUpdates(cb)
+        unstable_batchedUpdates(cb);
       });
     },
     [address, peer],
@@ -109,7 +110,7 @@ export function useReplica(shareAddress?: string | undefined) {
 
   React.useLayoutEffect(() => {
     const unsub = replicaCache.onCacheUpdated(() => {
-      setTrigger(prev => !prev)
+      setTrigger((prev) => !prev);
     });
 
     return () => {
@@ -136,7 +137,7 @@ export function useReplica(shareAddress?: string | undefined) {
        React.useEffect(() => {
       replicaCache.onCacheUpdated(() => {
         setVersion(replicaCache.version);
-         
+
       ;
          nst subscribe = React.useCallback((onStoreChange: () => void) => {
         turn memoReplica.onCacheUpdated(() => {
@@ -151,7 +152,6 @@ export function useReplica(shareAddress?: string | undefined) {
         ache) => cache,
         acheA, cacheB) => cacheA.version === cacheB.version,
       */
-
 }
 
 export function useInvitation(invitationCode: string) {

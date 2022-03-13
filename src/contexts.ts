@@ -13,14 +13,14 @@ export const IdentityContext = React.createContext<{
   setIdentity: React.Dispatch<
     React.SetStateAction<AuthorKeypair | null>
   >;
-}>({ identity: null, setIdentity: () => { } });
+}>({ identity: null, setIdentity: () => {} });
 
 export const CurrentShareContext = React.createContext<{
   currentShare: null | string;
   setCurrentShare: React.Dispatch<React.SetStateAction<string | null>>;
 }>({
   currentShare: null,
-  setCurrentShare: () => { },
+  setCurrentShare: () => {},
 });
 
 export const IsLiveContext = React.createContext<{
@@ -28,9 +28,9 @@ export const IsLiveContext = React.createContext<{
   setIsLive: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   isLive: true,
-  setIsLive: () => { },
+  setIsLive: () => {},
 });
 
 export const AddShareContext = React.createContext<
   (shareAddress: string) => Promise<void>
->(async () => { });
+>(async () => {});

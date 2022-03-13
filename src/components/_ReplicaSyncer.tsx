@@ -7,15 +7,13 @@ export function ReplicaSyncer({ pubUrl }: { pubUrl: string }) {
 
   React.useEffect(() => {
     if (isLive) {
-
       const unsub = peer.sync(pubUrl);
       return () => {
-        unsub()
-      }
+        unsub();
+      };
     }
 
     return () => {
-
     };
   }, [peer, isLive, pubUrl]);
 
