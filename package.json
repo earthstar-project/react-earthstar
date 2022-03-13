@@ -1,6 +1,6 @@
 {
-  "version": "2.0.1",
-  "description": "A React toolkit for making collaborative, offline-first apps for small groups.",
+  "version": "3.0.0",
+  "description": "A React toolkit for making collaborative, decentralised, offline-first tools you can truly call your own.",
   "repository": {
     "type": "git",
     "url": "https://github.com/earthstar-project/react-earthstar"
@@ -14,71 +14,64 @@
     "earthstar"
   ],
   "license": "AGPL-3.0",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "src",
-    "styles"
-  ],
-  "engines": {
-    "node": ">=10"
-  },
-  "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "components-example": "parcel examples/components/index.html",
-    "earthbar-example": "parcel examples/earthbar/index.html"
-  },
-  "peerDependencies": {
-    "earthstar": "^6.3.5",
-    "react": "~16.13.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
+  "main": "./dist/react-earthstar.cjs",
+  "module": "./dist/react-earthstar.js",
+  "types": "./dist/react-earthstar.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/react-earthstar.d.ts",
+      "node": {
+        "require": "./dist/react-earthstar.cjs",
+        "import": "./dist/react-earthstar.mjs"
+      },
+      "default": "./dist/react-earthstar.js"
     }
   },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "rollup --config rollup.config.ts --configPlugin typescript",
+    "prepare": "yarn build",
+    "example": "parcel examples/index.html"
+  },
+  "peerDependencies": {
+    "earthstar": "8.2.4",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0"
   },
   "name": "react-earthstar",
   "author": "Sam Gwilym",
-  "module": "dist/react-earthstar.esm.js",
   "devDependencies": {
-    "@testing-library/react-hooks": "^3.4.2",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.0",
+    "@babel/preset-typescript": "^7.16.0",
+    "@rollup/plugin-typescript": "^8.3.1",
+    "@testing-library/react-hooks": "^7.0.2",
     "@types/jest": "^26.0.14",
-    "@types/react-dom": "^16.9.8",
-    "babel-jest": "^26.5.2",
-    "earthstar": "^6.3.5",
+    "@types/jsdom": "^16.2.14",
+    "@types/react": "^17.0.39",
+    "earthstar": "8.2.4",
     "eslint-plugin-react-hooks": "^4.1.2",
-    "husky": "^4.3.0",
+    "jest": "v28.0.0-alpha.4",
     "jest-localstorage-mock": "^2.4.6",
-    "parcel": "^1.12.4",
-    "react": "~16.13.1",
-    "react-dom": "^16.13.1",
-    "react-test-renderer": "^16.13.1",
-    "ts-jest": "^26.4.1",
-    "tsdx": "^0.14.0",
-    "tslib": "^2.0.1",
-    "typescript": "4.0.3"
+    "jsdom": "^19.0.0",
+    "parcel": "^2.3.2",
+    "react": "17.0.2",
+    "react-dom": "^17.0.2",
+    "react-test-renderer": "^17.0.2",
+    "rollup": "^2.68.0",
+    "rollup-plugin-ts": "^2.0.5",
+    "typescript": "^4.5.5"
   },
   "resolutions": {
     "**/@typescript-eslint/eslint-plugin": "^4.1.1",
     "**/@typescript-eslint/parser": "^4.1.1"
-  },
-  "dependencies": {
-    "@reach/alert": "^0.11.2",
-    "@reach/auto-id": "^0.11.2",
-    "@reach/combobox": "^0.12.1",
-    "@reach/descendants": "0.11.2",
-    "@reach/utils": "^0.11.2",
-    "use-deep-compare-effect": "^1.4.0"
   }
 }

@@ -5,3 +5,4 @@ dist
 .cache
 .vscode
 package-lock.json
+.parcel-cache

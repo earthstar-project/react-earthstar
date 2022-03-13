@@ -1,63 +1,52 @@
-import * as React from 'react';
+import * as React from "react";
 import {
-  useCurrentAuthor,
-  useCurrentWorkspace,
+  useCurrentShare,
+  useIdentity,
   useIsLive,
-  usePubs,
-  useStorages,
-  useSubscribeToStorages,
-} from '../hooks';
-import { makeStorageKey } from '../util';
+  usePeer,
+  useReplicaServers,
+} from "../hooks";
+import { makeStorageKey } from "../util";
 
-export default function LocalStorageSettingsWriter({
+export function LocalStorageSettingsWriter({
   storageKey,
 }: {
   storageKey: string;
 }) {
-  const lsAuthorKey = makeStorageKey(storageKey, 'current-author');
-  const lsPubsKey = makeStorageKey(storageKey, 'pubs');
-  const lsWorkspacesKey = makeStorageKey(storageKey, 'workspaces');
-  const lsCurrentWorkspaceKey = makeStorageKey(storageKey, 'current-workspace');
-  const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
+  const lsIdentityKey = makeStorageKey(storageKey, "identity");
+  const lsPubsKey = makeStorageKey(storageKey, "replica-servers");
+  const lsSharesKey = makeStorageKey(storageKey, "shares");
+  const lsCurrentShareKey = makeStorageKey(storageKey, "current-share");
+  const lsIsLiveKey = makeStorageKey(storageKey, "is-live");
 
-  const [storages] = useStorages();
-  const [pubs] = usePubs();
-  const [currentAuthor] = useCurrentAuthor();
-  const [currentWorkspace] = useCurrentWorkspace();
+  const peer = usePeer();
+
+  const [pubs] = useReplicaServers();
+  const [currentIdentity] = useIdentity();
+  const [currentShare] = useCurrentShare();
   const [isLive] = useIsLive();
 
-  const onWrite = React.useCallback(() => {
-    const storagesStringified = JSON.stringify(
-      Object.keys(storages).map(key => key)
-    );
-
-    localStorage.setItem(lsWorkspacesKey, storagesStringified);
-  }, [storages, lsWorkspacesKey]);
-
-  // Persist workspace docs on storage events
-  useSubscribeToStorages({
-    onWrite,
-  });
-
-  // Persist workspace docs when onWrite's value changes
   React.useEffect(() => {
-    onWrite();
-  }, [onWrite]);
+    return peer.replicaMap.bus.on("*", () => {
+      console.log("writing shares...");
+      localStorage.setItem(lsSharesKey, JSON.stringify(peer.shares()));
+    });
+  }, [peer, lsSharesKey]);
 
   React.useEffect(() => {
     localStorage.setItem(lsPubsKey, JSON.stringify(pubs));
   }, [pubs, lsPubsKey]);
 
   React.useEffect(() => {
-    localStorage.setItem(lsAuthorKey, JSON.stringify(currentAuthor));
-  }, [currentAuthor, lsAuthorKey]);
+    localStorage.setItem(lsIdentityKey, JSON.stringify(currentIdentity));
+  }, [currentIdentity, lsIdentityKey]);
 
   React.useEffect(() => {
     localStorage.setItem(
-      lsCurrentWorkspaceKey,
-      JSON.stringify(currentWorkspace)
+      lsCurrentShareKey,
+      JSON.stringify(currentShare),
     );
-  }, [currentWorkspace, lsCurrentWorkspaceKey]);
+  }, [currentShare, lsCurrentShareKey]);
 
   React.useEffect(() => {
     localStorage.setItem(lsIsLiveKey, JSON.stringify(isLive));

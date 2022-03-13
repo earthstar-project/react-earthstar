@@ -1,578 +1,239 @@
-import * as React from 'react';
+import * as React from "react";
+import { unstable_batchedUpdates } from "react-dom";
 import {
   AuthorKeypair,
-  ValidatorEs4,
-  Query,
-  Document,
-  isErr,
+  checkShareIsValid,
   EarthstarError,
-  WriteResult,
-  ValidationError,
-  WriteEvent,
-  IStorageAsync,
-  StorageToAsync,
-  StorageLocalStorage,
-  syncLocalAndHttp,
-} from 'earthstar';
-import useDeepCompareEffect from 'use-deep-compare-effect';
-import { getLocalStorage, makeStorageKey, useMemoQueryOpts } from './util';
+  isErr,
+  ReplicaCache,
+} from "earthstar";
 import {
-  CurrentAuthorContext,
-  CurrentWorkspaceContext,
+  AddShareContext,
+  CurrentShareContext,
+  IdentityContext,
   IsLiveContext,
-  PubsContext,
-  StorageContext,
-} from './contexts';
+  PeerContext,
+  ReplicaServersContext,
+} from "./contexts";
+import { getLocalStorage, makeStorageKey } from "./util";
 
-export function useWorkspaces() {
-  const [storages] = useStorages();
+export function usePeer() {
+  const peer = React.useContext(PeerContext);
 
-  return Object.keys(storages);
-}
+  const [trigger, setTrigger] = React.useState(true);
 
-export function useAddWorkspace() {
-  const [storages, setStorages] = useStorages();
-
-  return React.useCallback(
-    (address: string) => {
-      if (storages[address]) {
-        return void 0;
-      }
-
-      try {
-        const newStorage = new StorageLocalStorage([ValidatorEs4], address);
-        const newAsyncedStorage = new StorageToAsync(newStorage, 0);
-
-        setStorages(prev => ({
-          ...prev,
-          [address]: newAsyncedStorage,
-        }));
-
-        return void 0;
-      } catch (err) {
-        if (isErr(err)) {
-          return err;
-        }
-
-        return new EarthstarError('Something went wrong!');
-      }
-    },
-    [setStorages, storages]
-  );
-}
-
-export function useRemoveWorkspace(): (address: string) => void {
-  const [storages, setStorages] = useStorages();
-  const [pubs, setPubs] = usePubs();
-  const [currentWorkspace, setCurrentWorkspace] = useCurrentWorkspace();
-
-  return React.useCallback(
-    (address: string) => {
-      if (currentWorkspace === address) {
-        setCurrentWorkspace(null);
-      }
-
-      setStorages(prev => {
-        const prevCopy = { ...prev };
-
-        delete prevCopy[address];
-
-        return prevCopy;
-      });
-
-      const storage = storages[address];
-
-      if (storage) {
-        const nextPubs = { ...pubs };
-        delete nextPubs[address];
-        setPubs(nextPubs);
-      }
-    },
-    [
-      setStorages,
-      currentWorkspace,
-      setCurrentWorkspace,
-      storages,
-      pubs,
-      setPubs,
-    ]
-  );
-}
-
-export function useWorkspacePubs(
-  workspaceAddress?: string
-): [string[], (pubs: React.SetStateAction<string[]>) => void] {
-  const [existingPubs, setPubs] = usePubs();
-  const [currentWorkspace] = useCurrentWorkspace();
-
-  const address = workspaceAddress || currentWorkspace;
-  const workspacePubs = address ? existingPubs[address] || [] : [];
-
-  const setWorkspacePubs = React.useCallback(
-    (pubs: React.SetStateAction<string[]>) => {
-      if (!address) {
-        console.warn('Tried to set pubs on an unknown workspace');
-        return;
-      }
-
-      setPubs(({ [address]: prevWorkspacePubs, ...rest }) => {
-        if (Array.isArray(pubs)) {
-          return { ...rest, [address]: Array.from(new Set(pubs)) };
-        }
-        const next = pubs(prevWorkspacePubs || []);
-        return { ...rest, [address]: Array.from(new Set(next)) };
-      });
-    },
-    [setPubs, address]
-  );
-
-  return [workspacePubs, setWorkspacePubs];
-}
-
-export function usePubs(): [
-  Record<string, string[]>,
-  React.Dispatch<React.SetStateAction<Record<string, string[]>>>
-] {
-  const { pubs, setPubs } = React.useContext(PubsContext);
-
-  return [pubs, setPubs];
-}
-
-export function useCurrentAuthor(): [
-  AuthorKeypair | null,
-  React.Dispatch<React.SetStateAction<AuthorKeypair | null>>
-] {
-  const { currentAuthor, setCurrentAuthor } = React.useContext(
-    CurrentAuthorContext
-  );
-
-  return [currentAuthor, setCurrentAuthor];
-}
-
-export function useCurrentWorkspace(): [
-  string | null,
-  React.Dispatch<React.SetStateAction<string | null>>
-] {
-  const workspaces = useWorkspaces();
-  const { currentWorkspace, setCurrentWorkspace } = React.useContext(
-    CurrentWorkspaceContext
-  );
+  const memoPeer = React.useMemo(() => peer, [trigger]);
 
   React.useEffect(() => {
-    if (currentWorkspace && workspaces.includes(currentWorkspace) === false) {
-      console.warn(
-        `Tried to set current workspace to ${currentWorkspace}, which is not a known workspace.`
-      );
-      setCurrentWorkspace(null);
-    }
-  }, [currentWorkspace, workspaces, setCurrentWorkspace]);
-
-  return [currentWorkspace, setCurrentWorkspace];
-}
-
-export function useSync() {
-  const [storages] = useStorages();
-  const [pubs] = usePubs();
-
-  return React.useCallback(
-    (address: string) => {
-      return new Promise((resolve, reject) => {
-        const storage = storages[address];
-
-        if (!storage) {
-          reject(new Error('Workspace not found'));
-        }
-
-        const workspacePubs = pubs[address];
-
-        if (!workspacePubs) {
-          reject(new Error('No pubs found for workspace'));
-        }
-
-        Promise.all(
-          workspacePubs.map(pubUrl => syncLocalAndHttp(storage, pubUrl))
-        )
-          .then(resolve)
-          .catch(reject);
-      });
-    },
-    [pubs, storages]
-  );
-}
-
-export function usePaths(query: Query, workspaceAddress?: string): string[] {
-  const storage = useStorage(workspaceAddress);
-
-  if (!storage) {
-    console.warn(`Couldn't find workspace with address ${workspaceAddress}`);
-  }
-
-  const queryMemo = useMemoQueryOpts(query);
-
-  const [localPaths, setLocalPaths] = React.useState<string[]>([]);
-
-  useDeepCompareEffect(() => {
-    let ignore = false;
-
-    storage?.paths(queryMemo).then(pathResult => {
-      if (!ignore) {
-        setLocalPaths(pathResult);
-      }
+    const unsub = peer.replicaMap.bus.on("*", () => {
+      setTrigger((prev) => !prev);
     });
 
     return () => {
-      ignore = true;
+      unsub();
     };
-  }, [storage, queryMemo, setLocalPaths]);
+  }, [peer]);
 
-  const onWrite = React.useCallback(
-    event => {
-      if (!storage) {
-        return;
-      }
-
-      if (
-        queryMemo.pathStartsWith &&
-        !event.document.path.startsWith(queryMemo.pathStartsWith)
-      ) {
-        return;
-      }
-
-      if (
-        queryMemo.pathEndsWith &&
-        !event.document.path.endsWith(queryMemo.pathEndsWith)
-      ) {
-        return;
-      }
-
-      storage.paths(queryMemo).then(result => {
-        setLocalPaths(result);
-      });
-    },
-    [queryMemo, storage]
-  );
-
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    history: query.history,
-    onWrite,
-  });
-
-  return localPaths;
+  return memoPeer;
 }
 
-type QueryStatus = 'idle' | 'pending' | 'success' | 'error';
+export function useAddShare() {
+  return React.useContext(AddShareContext);
+}
 
-export function useDocument(
-  path: string,
-  workspaceAddress?: string
-): [
-  Document | undefined,
-  (
-    content: string,
-    deleteAfter?: number | null | undefined
-  ) => Promise<WriteResult | ValidationError>,
-  () => Promise<WriteResult | ValidationError>,
-  QueryStatus
+export function useReplicaServers(): [
+  string[],
+  React.Dispatch<React.SetStateAction<string[]>>,
 ] {
-  const [currentAuthor] = useCurrentAuthor();
+  const { replicaServers, setReplicaServers } = React.useContext(
+    ReplicaServersContext,
+  );
 
-  const storage = useStorage(workspaceAddress);
+  return [replicaServers, setReplicaServers];
+}
 
-  const [localDocument, setLocalDocument] = React.useState<
-    Document | undefined
-  >(undefined);
-  const [status, setStatus] = React.useState<QueryStatus>('idle');
+export function useIdentity(): [
+  AuthorKeypair | null,
+  React.Dispatch<React.SetStateAction<AuthorKeypair | null>>,
+] {
+  const { identity, setIdentity } = React.useContext(
+    IdentityContext,
+  );
+
+  return [identity, setIdentity];
+}
+
+export function useCurrentShare(): [
+  string | null,
+  React.Dispatch<React.SetStateAction<string | null>>,
+] {
+  const peer = usePeer();
+
+  const { currentShare, setCurrentShare } = React.useContext(
+    CurrentShareContext,
+  );
 
   React.useEffect(() => {
-    let ignore = false;
+    if (currentShare && peer.hasShare(currentShare) === false) {
+      console.warn(
+        `Tried to set current workspace to ${currentShare}, which is not a known workspace.`,
+      );
+      setCurrentShare(null);
+    }
+  }, [currentShare, setCurrentShare]);
 
-    setStatus('pending');
-    storage
-      ?.getDocument(path)
-      .then(doc => {
-        if (!ignore) {
-          setLocalDocument(doc);
-          setStatus('success');
-        }
-      })
-      .catch(() => {
-        setStatus('error');
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [storage, path]);
-
-  const onWrite = React.useCallback(
-    event => {
-      setLocalDocument(event.document);
-    },
-    [setLocalDocument]
-  );
-
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    paths: [path],
-    onWrite,
-  });
-
-  const set = React.useCallback(
-    (content: string, deleteAfter?: number | null | undefined) => {
-      return new Promise<ValidationError | WriteResult>((resolve, reject) => {
-        if (!storage) {
-          return reject(
-            new ValidationError(
-              `useDocument couldn't get the workspace ${workspaceAddress}`
-            )
-          );
-        }
-
-        if (!currentAuthor) {
-          console.warn(
-            'Tried to set a document when no current author was set.'
-          );
-          return reject(
-            new ValidationError(
-              'Tried to set a document when no current author was set.'
-            )
-          );
-        }
-
-        storage
-          .set(currentAuthor, {
-            format: 'es.4',
-            path,
-            content,
-            deleteAfter,
-          })
-          .then(result => {
-            if (isErr(result)) {
-              console.group();
-              console.warn(
-                `There was a problem setting the document at ${path}:`
-              );
-              console.warn(result.message);
-              console.groupEnd();
-              return reject(result);
-            }
-
-            return resolve(result);
-          });
-      });
-    },
-    [path, currentAuthor, workspaceAddress, storage]
-  );
-
-  const deleteDoc = () => {
-    return set('');
-  };
-
-  return [localDocument, set, deleteDoc, status];
+  return [currentShare, setCurrentShare];
 }
 
-export function useDocuments(
-  query: Query,
-  workspaceAddress?: string
-): Document[] {
-  const storage = useStorage(workspaceAddress);
+export function useReplica(shareAddress?: string | undefined) {
+  const [currentShare] = useCurrentShare();
+  const peer = usePeer();
 
-  const [docs, setDocs] = React.useState<Document[]>([]);
+  const address = shareAddress || currentShare;
 
-  const queryMemo = useMemoQueryOpts(query);
+  const replicaCache = React.useMemo(
+    () => {
+      const replica = address ? peer.getReplica(address) : undefined;
 
-  React.useEffect(() => {
-    let ignore = false;
-
-    storage
-      ?.paths(queryMemo)
-      .then(pathsResult => {
-        return Promise.all(pathsResult.map(path => storage?.getDocument(path)));
-      })
-      .then(docsResult => {
-        if (!ignore) {
-          setDocs(
-            docsResult.filter((doc): doc is Document => doc !== undefined)
-          );
-        }
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [storage, queryMemo]);
-
-  const onWrite = React.useCallback(
-    event => {
-      storage
-        ?.paths(queryMemo)
-        .then(pathsResult => {
-          if (!pathsResult.includes(event.document.path)) {
-            return;
-          }
-
-          return Promise.all(
-            pathsResult.map(path => storage?.getDocument(path))
-          );
-        })
-        .then(docsResult => {
-          if (docsResult === undefined) {
-            return;
-          }
-
-          setDocs(
-            docsResult.filter((doc): doc is Document => doc !== undefined)
-          );
-        });
-    },
-    [storage, setDocs, queryMemo]
-  );
-
-  useSubscribeToStorages({
-    workspaces: storage ? [storage.workspace] : undefined,
-    onWrite,
-  });
-
-  return docs;
-}
-
-export function useStorages(): [
-  Record<string, IStorageAsync>,
-  React.Dispatch<React.SetStateAction<Record<string, IStorageAsync>>>
-] {
-  const { storages, setStorages } = React.useContext(StorageContext);
-
-  return [storages, setStorages];
-}
-
-export function useSubscribeToStorages(options: {
-  workspaces?: string[];
-  paths?: string[];
-  history?: Query['history'];
-  onWrite: (event: WriteEvent) => void;
-}) {
-  const [storages] = useStorages();
-
-  useDeepCompareEffect(() => {
-    const onWrite = (event: WriteEvent) => {
-      if (event.isLatest === false && options.history !== 'all') {
-        return;
+      if (!replica) {
+        throw new Error("Tried to use useReplica with no share specified!");
       }
 
-      options.onWrite(event);
-    };
-
-    const unsubscribes = Object.values(storages)
-      .filter(storage => {
-        if (options.workspaces) {
-          return options.workspaces.includes(storage.workspace);
-        }
-
-        return true;
-      })
-      .map(storage => {
-        return storage.onWrite.subscribe(event => {
-          if (options.paths) {
-            if (options.paths.includes(event.document.path)) {
-              onWrite(event);
-            }
-            return;
-          }
-
-          onWrite(event);
-        });
+      return new ReplicaCache(replica, 1000, (cb) => {
+        unstable_batchedUpdates(cb);
       });
+    },
+    [address, peer],
+  );
+
+  const [, setTrigger] = React.useState(true);
+
+  React.useLayoutEffect(() => {
+    const unsub = replicaCache.onCacheUpdated(() => {
+      setTrigger((prev) => !prev);
+    });
 
     return () => {
-      unsubscribes.forEach(unsubscribe => unsubscribe());
+      unsub();
+      replicaCache.close();
     };
-  }, [storages, options]);
+  }, [replicaCache]);
+
+  return replicaCache;
+
+  // Keeping the below around for React 18.
+  /*
+    const replicaCache = React.useMemo(() => {
+      const replica = address ? peer.getReplica(address) : undefined;
+         if (!replica) {
+        throw new Error("Tried to use useReplica with no share specified!");
+      }
+         return new ReplicaCache(replica, 1000);
+       [address, peer])
+       const [currentVersion, setVersion] = React.useState(replicaCache.version);
+       const memoReplica = React.useMemo(() => {
+      return replicaCache;
+       [currentVersion, replicaCache]);
+       React.useEffect(() => {
+      replicaCache.onCacheUpdated(() => {
+        setVersion(replicaCache.version);
+
+      ;
+         nst subscribe = React.useCallback((onStoreChange: () => void) => {
+        turn memoReplica.onCacheUpdated(() => {
+          StoreChange();
+        ;
+       [memoReplica, replicaCache]);
+         nst getSnapshot = React.useCallback(() => memoReplica, []);
+         turn useSyncExternalStoreWithSelector(
+        bscribe,
+        tSnapshot,
+        tSnapshot,
+        ache) => cache,
+        acheA, cacheB) => cacheA.version === cacheB.version,
+      */
 }
 
 export function useInvitation(invitationCode: string) {
-  const add = useAddWorkspace();
-  const [existingPubs, setPubs] = usePubs();
+  const addShare = React.useContext(AddShareContext);
+  const [, setPubs] = useReplicaServers();
 
   try {
     const url = new URL(invitationCode);
 
-    const isEarthstarURL = url.protocol === 'earthstar:';
+    const isEarthstarURL = url.protocol === "earthstar:";
 
     if (!isEarthstarURL) {
-      return new EarthstarError('Invitation not a valid Earthstar URL');
+      return new EarthstarError("Invitation not a valid Earthstar URL");
     }
 
-    const version = url.searchParams.get('v');
+    const version = url.searchParams.get("v");
 
-    if (version !== '1') {
+    if (version !== "1") {
       return new EarthstarError(
-        'Unrecognised Earthstar invitation format version'
+        "Unrecognised Earthstar invitation format version",
       );
     }
 
-    const workspace = url.searchParams.get('workspace');
+    const workspace = url.searchParams.get("workspace");
 
     if (workspace === null) {
       return new EarthstarError(
-        'No workspace found in Earthstar invitation URL'
+        "No workspace found in Earthstar invitation URL",
       );
     }
 
-    const plussedWorkspace = workspace.replace(' ', '+');
+    const plussedWorkspace = workspace.replace(" ", "+");
 
-    const workspaceIsValid = ValidatorEs4._checkWorkspaceIsValid(
-      plussedWorkspace
-    );
+    const shareIsValid = checkShareIsValid(plussedWorkspace);
 
-    if (isErr(workspaceIsValid)) {
-      return workspaceIsValid;
+    if (isErr(shareIsValid)) {
+      return shareIsValid;
     }
 
-    const pubs = url.searchParams.getAll('pub');
+    const pubs = url.searchParams.getAll("pub");
 
     try {
-      pubs.forEach(pubUrl => new URL(pubUrl));
+      pubs.forEach((pubUrl) => new URL(pubUrl));
     } catch {
-      return new EarthstarError('Malformed Pub URL found');
+      return new EarthstarError("Malformed Pub URL found");
     }
 
     const redeem = (excludedPubs: string[] = []) => {
-      add(plussedWorkspace);
-
-      // In case the workspace in the invitation already has known pubs
-      // We want to keep those around.
-      const existingWorkspacePubs = existingPubs[plussedWorkspace] || [];
+      addShare(plussedWorkspace);
 
       const nextPubs = Array.from(
         new Set([
-          ...existingWorkspacePubs,
-          ...pubs.filter(pubUrl => !excludedPubs.includes(pubUrl)),
-        ])
+          ...pubs.filter((pubUrl) => !excludedPubs.includes(pubUrl)),
+        ]),
       );
 
-      setPubs(prevPubs => ({
-        ...prevPubs,
-        [plussedWorkspace]: nextPubs,
-      }));
+      setPubs((prevPubs) =>
+        Array.from(
+          new Set([
+            ...prevPubs,
+            ...nextPubs,
+          ]),
+        )
+      );
     };
 
     return { redeem, workspace: plussedWorkspace, pubs };
   } catch {
-    return new EarthstarError('Not a valid Earthstar URL');
+    return new EarthstarError("Not a valid Earthstar URL");
   }
 }
 
 export function useMakeInvitation(
-  excludedPubs: string[] = [],
-  workspaceAddress?: string
+  includedPubs: string[] = [],
+  shareAddress?: string,
 ) {
-  const [pubs] = useWorkspacePubs(workspaceAddress);
-  const [currentWorkspace] = useCurrentWorkspace();
-  const address = workspaceAddress || currentWorkspace;
+  const [pubs] = useReplicaServers();
+  const [currentShare] = useCurrentShare();
+  const address = shareAddress || currentShare;
 
-  const pubsToUse = pubs.filter(pubUrl => !excludedPubs.includes(pubUrl));
-  const pubsString = pubsToUse.map(pubUrl => `&pub=${pubUrl}`).join('');
+  const pubsToUse = pubs.filter((pubUrl) => includedPubs.includes(pubUrl));
+  const pubsString = pubsToUse.map((pubUrl) => `&pub=${pubUrl}`).join("");
 
   if (!address) {
     return "Couldn't create invitation code!";
@@ -583,52 +244,59 @@ export function useMakeInvitation(
 
 export function useIsLive(): [
   boolean,
-  React.Dispatch<React.SetStateAction<boolean>>
+  React.Dispatch<React.SetStateAction<boolean>>,
 ] {
   const { isLive, setIsLive } = React.useContext(IsLiveContext);
 
   return [isLive, setIsLive];
 }
 
-export function useStorage(workspaceAddress?: string) {
-  const [currentWorkspace] = useCurrentWorkspace();
-  const [storages] = useStorages();
-
-  const address = workspaceAddress || currentWorkspace;
-
-  return React.useMemo(() => {
-    return address ? storages[address] : null;
-  }, [address, storages]);
-}
-
 export function useLocalStorageEarthstarSettings(storageKey: string) {
-  const lsAuthorKey = makeStorageKey(storageKey, 'current-author');
-  const lsPubsKey = makeStorageKey(storageKey, 'pubs');
-  const lsWorkspacesKey = makeStorageKey(storageKey, 'workspaces');
-  const lsCurrentWorkspaceKey = makeStorageKey(storageKey, 'current-workspace');
-  const lsIsLiveKey = makeStorageKey(storageKey, 'is-live');
+  const lsIdentityKey = makeStorageKey(storageKey, "identity");
+  const lsPubsKey = makeStorageKey(storageKey, "replica-servers");
+  const lsSharesKey = makeStorageKey(storageKey, "shares");
+  const lsCurrentShareKey = makeStorageKey(storageKey, "current-share");
+  const lsIsLiveKey = makeStorageKey(storageKey, "is-live");
+
+  const allKeys = React.useMemo(
+    () => [
+      lsIdentityKey,
+      lsPubsKey,
+      lsSharesKey,
+      lsCurrentShareKey,
+      lsIsLiveKey,
+    ],
+    [lsIdentityKey, lsPubsKey, lsSharesKey, lsCurrentShareKey, lsIsLiveKey],
+  );
 
   // load the initial state from localStorage
-  const workspacesInStorage = getLocalStorage<string[]>(lsWorkspacesKey);
-  const initPubs = getLocalStorage<Record<string, string[]>>(lsPubsKey);
-  const initCurrentAuthor = getLocalStorage<AuthorKeypair>(lsAuthorKey);
-  const initCurrentWorkspace = getLocalStorage<string>(lsCurrentWorkspaceKey);
+  const initShares = getLocalStorage<string[]>(lsSharesKey);
+  const initReplicaServers = getLocalStorage<string[]>(lsPubsKey);
+  const initIdentity = getLocalStorage<AuthorKeypair>(lsIdentityKey);
+  const initCurrentShare = getLocalStorage<string>(lsCurrentShareKey);
   const initIsLive = getLocalStorage<boolean>(lsIsLiveKey);
 
-  const initWorkspaces = workspacesInStorage
-    ? workspacesInStorage.map(workspaceAddress => {
-        return new StorageToAsync(
-          new StorageLocalStorage([ValidatorEs4], workspaceAddress),
-          0
-        );
-      })
-    : null;
+  const [, setTrigger] = React.useState(true);
+
+  const onStorage = React.useCallback((event: StorageEvent) => {
+    if (event.key && allKeys.includes(event.key)) {
+      setTrigger((prev) => !prev);
+    }
+  }, [allKeys]);
+
+  React.useEffect(() => {
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [onStorage]);
 
   return {
-    ...(initWorkspaces ? { initWorkspaces } : {}),
-    ...(initPubs ? { initPubs } : {}),
-    ...(initCurrentAuthor ? { initCurrentAuthor } : {}),
-    ...(initCurrentWorkspace ? { initCurrentWorkspace } : {}),
-    ...(initIsLive ? { initIsLive } : {}),
+    initShares: initShares || [],
+    initReplicaServers: initReplicaServers || [],
+    initIdentity: initIdentity || null,
+    initCurrentShare: initCurrentShare || null,
+    initIsLive: initIsLive || true,
   };
 }

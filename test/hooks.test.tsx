@@ -1,514 +1,177 @@
-import * as React from 'react';
+import * as React from "react";
 import {
-  ValidatorEs4,
-  StorageMemory,
-  Query,
-  generateAuthorKeypair,
   AuthorKeypair,
-  WriteEvent,
-  isErr,
+  Crypto,
   EarthstarError,
-  StorageToAsync,
-  syncLocalAsync,
-  sleep,
-} from 'earthstar';
-import { renderHook, act } from '@testing-library/react-hooks';
+  FormatValidatorEs4,
+  isErr,
+  Replica,
+  ReplicaDriverMemory,
+} from "earthstar";
 import {
-  EarthstarPeer,
-  useWorkspaces,
-  useAddWorkspace,
-  useRemoveWorkspace,
-  useWorkspacePubs,
-  usePubs,
-  usePaths,
-  useDocument,
-  useStorages,
-  useSubscribeToStorages,
-  useCurrentWorkspace,
-  useInvitation,
-  useMakeInvitation,
-  useDocuments,
-  useStorage,
+  act,
+  renderHook,
+  RenderHookResult,
+} from "@testing-library/react-hooks";
+import {
   LocalStorageSettingsWriter,
+  Peer,
+  useAddShare,
+  useCurrentShare,
+  useInvitation,
   useLocalStorageEarthstarSettings,
-} from '../src';
+  useMakeInvitation,
+  usePeer,
+  useReplicaServers,
+  useReplica,
+} from "../src";
+import { JSDOM } from "jsdom";
 
-const keypair = generateAuthorKeypair('onee') as AuthorKeypair;
-const otherKeypair = generateAuthorKeypair('twoo') as AuthorKeypair;
+const dom = new JSDOM();
+(global as any).window = dom.window;
 
-const WORKSPACE_ADDR_A = '+testa.a123';
-const WORKSPACE_ADDR_B = '+testb.b234';
-const WORKSPACE_ADDR_C = '+testc.c567';
+const SHARE_ADDR_A = "+testa.a123";
+const SHARE_ADDR_B = "+testb.b234";
+const SHARE_ADDR_C = "+testc.c567";
 
-const PUB_A = 'https://a.pub';
-const PUB_B = 'https://b.pub';
-const PUB_C = 'https://c.pub';
+const PUB_A = "https://a.pub";
+const PUB_B = "https://b.pub";
+const PUB_C = "https://c.pub";
 
-const pubs = {
-  [WORKSPACE_ADDR_A]: [PUB_A],
-  [WORKSPACE_ADDR_B]: [PUB_B],
-  [WORKSPACE_ADDR_C]: [PUB_C],
-};
+const pubs = [PUB_A, PUB_B, PUB_C];
 
-const wrapper = ({ children }: { children: React.ReactNode }) => {
-  const storages = [WORKSPACE_ADDR_A, WORKSPACE_ADDR_B, WORKSPACE_ADDR_C].map(
-    address => new StorageToAsync(new StorageMemory([ValidatorEs4], address), 0)
-  );
+async function getKeypair() {
+  const keypair = await Crypto.generateAuthorKeypair("onee") as AuthorKeypair;
 
-  return (
-    <EarthstarPeer
-      initWorkspaces={storages}
-      initPubs={pubs}
-      initCurrentAuthor={keypair}
-      initIsLive={false}
-      initCurrentWorkspace={WORKSPACE_ADDR_A}
-    >
-      {children}
-      <LocalStorageSettingsWriter storageKey={'tests'} />
-    </EarthstarPeer>
-  );
-};
+  return keypair;
+}
 
-test('useWorkspace', () => {
-  const { result } = renderHook(() => useWorkspaces(), { wrapper });
+async function renderPeerHook<P, T>(
+  arg: (props: P) => T,
+): Promise<RenderHookResult<P, T>> {
+  const keypair = await getKeypair();
 
-  expect(result.current).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-    WORKSPACE_ADDR_C,
-  ]);
-});
-
-test('useAddWorkspace ', () => {
-  const useTest = () => {
-    const add = useAddWorkspace();
-    const workspaces = useWorkspaces();
-
-    return { add, workspaces };
-  };
-
-  const { result } = renderHook(() => useTest(), { wrapper });
-
-  act(() => {
-    result.current.add('+testd.d789');
+  return renderHook(arg, {
+    wrapper: ({ children }) => (
+      <Peer
+        initShares={[SHARE_ADDR_A, SHARE_ADDR_B, SHARE_ADDR_C]}
+        initReplicaServers={pubs}
+        initIdentity={keypair}
+        initIsLive={false}
+        initCurrentShare={SHARE_ADDR_A}
+        onCreateShare={(shareAddress) => {
+          return new Replica(
+            shareAddress,
+            FormatValidatorEs4,
+            new ReplicaDriverMemory(shareAddress),
+          );
+        }}
+      >
+        {children}
+        <LocalStorageSettingsWriter storageKey={"tests"} />
+      </Peer>
+    ),
   });
+}
 
-  expect(result.current.workspaces).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-    WORKSPACE_ADDR_C,
-    '+testd.d789',
-  ]);
-
-  // Can't add a workspace twice
-  act(() => {
-    result.current.add(WORKSPACE_ADDR_A);
-  });
-
-  expect(result.current.workspaces).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-    WORKSPACE_ADDR_C,
-    '+testd.d789',
-  ]);
-});
-
-test('useRemoveWorkspace', async () => {
-  const useTest = () => {
-    const [storages] = useStorages();
-    const remove = useRemoveWorkspace();
-    const workspaces = useWorkspaces();
-
-    return { remove, workspaces, storages };
-  };
-
-  const { result } = renderHook(() => useTest(), {
-    wrapper,
-  });
-
-  const storage = result.current.storages[WORKSPACE_ADDR_C];
-
-  expect(storage.isClosed()).toBeFalsy();
-
-  await act(() => {
-    result.current.remove(WORKSPACE_ADDR_C);
-  });
-
-  expect(storage.isClosed()).toBeTruthy();
-
-  expect(result.current.workspaces).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-  ]);
-});
-
-test('useWorkspacePubs', () => {
-  const { result } = renderHook(() => useWorkspacePubs(WORKSPACE_ADDR_A), {
-    wrapper,
-  });
-
-  expect(result.current[0]).toEqual([PUB_A]);
-
-  act(() => {
-    result.current[1](prev => [...prev, PUB_B]);
-  });
-
-  expect(result.current[0]).toEqual([PUB_A, PUB_B]);
-});
-
-test('usePubs', () => {
-  const { result } = renderHook(() => usePubs(), {
-    wrapper,
-  });
+test("usePubs", async () => {
+  const { result } = await renderPeerHook(() => useReplicaServers());
 
   expect(result.current[0]).toEqual(pubs);
 
   act(() => {
-    result.current[1]({ [WORKSPACE_ADDR_A]: [PUB_C] });
+    result.current[1]([PUB_C]);
   });
 
-  expect(result.current[0]).toEqual({ [WORKSPACE_ADDR_A]: [PUB_C] });
+  expect(result.current[0]).toEqual([PUB_C]);
 });
 
-test.todo('useSync');
+test("useAddShare", async () => {
+  const useTest = () => {
+    const add = useAddShare();
+    const peer = usePeer();
 
-test('useCurrentWorkspace', async () => {
-  const { result } = renderHook(() => useCurrentWorkspace(), {
-    wrapper,
+    return { peer, add };
+  };
+
+  const { result } = await renderPeerHook(() => useTest());
+
+  await act(async () => {
+    await result.current.add("+good.a123");
   });
 
-  expect(result.current[0]).toEqual(WORKSPACE_ADDR_A);
+  expect(result.current.peer.hasShare("+good.a123")).toBeTruthy();
 
   act(() => {
-    result.current[1](WORKSPACE_ADDR_B);
+    result.current.peer.removeReplicaByShare("+good.a123");
   });
 
-  expect(result.current[0]).toEqual(WORKSPACE_ADDR_B);
+  await act(async () => {
+    await result.current.add("bad_name.2341");
+  });
+
+  expect(result.current.peer.hasShare("bad_name.2341")).toBeFalsy();
+});
+
+test("useCurrentShare", async () => {
+  const { result } = await renderPeerHook(() => useCurrentShare());
+
+  expect(result.current[0]).toEqual(SHARE_ADDR_A);
 
   act(() => {
-    result.current[1]('+somethingunknown.a123');
+    result.current[1](SHARE_ADDR_B);
+  });
+
+  expect(result.current[0]).toEqual(SHARE_ADDR_B);
+
+  act(() => {
+    result.current[1]("+somethingunknown.a123");
   });
 
   expect(result.current[0]).toEqual(null);
 });
 
-test('usePaths', async () => {
-  const useTest = (q: Query) => {
-    const [query, setQuery] = React.useState(q);
-    const paths = usePaths(query, WORKSPACE_ADDR_A);
-    const [storages] = useStorages();
-
-    return { paths, storage: storages[WORKSPACE_ADDR_A], setQuery };
-  };
-
-  const { result, waitForNextUpdate } = renderHook(
-    () =>
-      useTest({
-        pathStartsWith: '/test',
-      }),
-    { wrapper }
+test("useReplica", async () => {
+  const { result, waitForNextUpdate } = await renderPeerHook(() =>
+    useReplica()
   );
 
-  expect(result.current.paths).toEqual([]);
+  expect(result.current.getAllDocs()).toEqual([]);
+  expect(result.current.getLatestDocAtPath("/storage-test/test.txt"))
+    .toBeUndefined();
 
-  await act(async () => {
-    await result.current.storage.set(keypair, {
-      format: 'es.4',
-      path: '/test/1',
-      content: 'Hello!',
+  const keypair = await getKeypair();
+
+  // Do not await the below. It'll make this test break.
+  act(async () => {
+    await result.current.set(keypair, {
+      path: "/storage-test/test.txt",
+      format: "es.4",
+      content: "Hello world!",
     });
-  });
-
-  expect(result.current.paths).toEqual(['/test/1']);
-
-  act(() => {
-    result.current.setQuery({ pathStartsWith: '/nothing' });
   });
 
   await waitForNextUpdate();
 
-  expect(result.current.paths).toEqual([]);
-});
-
-test('useDocument', async () => {
-  const useTest = () => {
-    const [storages] = useStorages();
-    const [path, setPath] = React.useState('/test/test.txt');
-    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
-    const [doc, setDoc, deleteDoc] = useDocument(path, workspace);
-
-    return { setWorkspace, setPath, doc, setDoc, deleteDoc, storages };
-  };
-
-  const { result, waitForNextUpdate } = renderHook(() => useTest(), {
-    wrapper,
-  });
-
-  // Wait for the initial load of the document
-  await waitForNextUpdate();
-
-  expect(result.current.doc).toBeUndefined();
-
-  await act(async () => {
-    await result.current.setDoc('Hey!');
-  });
-
-  expect(result.current.doc?.content).toEqual('Hey!');
-
-  await act(async () => {
-    await result.current.deleteDoc();
-  });
-
-  expect(result.current.doc?.content).toEqual('');
-
-  act(() => {
-    result.current.setPath('/test/no.txt');
-  });
-
-  await waitForNextUpdate();
-
-  expect(result.current.doc?.content).toBeUndefined();
-
-  await act(async () => {
-    await result.current.storages[WORKSPACE_ADDR_B].set(keypair, {
-      format: 'es.4',
-      path: '/test/workspace-changed.txt',
-      content: 'Switched!',
-    });
-    result.current.setWorkspace(WORKSPACE_ADDR_B);
-    result.current.setPath('/test/workspace-changed.txt');
-  });
-
-  expect(result.current.doc?.content).toEqual('Switched!');
-});
-
-test('useDocuments', async () => {
-  const useTest = (q: Query) => {
-    const [query, setQuery] = React.useState(q);
-    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
-    const docs = useDocuments(query, workspace);
-    const storage = useStorage(workspace);
-
-    return { docs, storage, setQuery, setWorkspace };
-  };
-
-  const { result, waitForNextUpdate } = renderHook(
-    () =>
-      useTest({
-        pathStartsWith: '/docs-test',
-      }),
-    { wrapper }
-  );
-
-  expect(result.current.docs).toEqual([]);
-
-  await act(async () => {
-    await result.current.storage?.set(keypair, {
-      format: 'es.4',
-      path: '/docs-test/1',
-      content: 'A!',
-    });
-    await result.current.storage?.set(keypair, {
-      format: 'es.4',
-      path: '/docs-test/2',
-      content: 'B!',
-    });
-    await result.current.storage?.set(keypair, {
-      format: 'es.4',
-      path: '/docs-test/3',
-      content: 'C!',
-    });
-  });
-
-  expect(result.current.docs.length).toEqual(3);
-  expect(result.current.docs.map(doc => doc.content)).toEqual([
-    'A!',
-    'B!',
-    'C!',
-  ]);
-
-  act(() => {
-    result.current.setWorkspace(WORKSPACE_ADDR_B);
-  });
-
-  await waitForNextUpdate();
-
-  expect(result.current.docs.length).toEqual(0);
-});
-
-test('useSubscribeToStorages', async () => {
-  const useTest = (options?: {
-    workspaces?: string[];
-    paths?: string[];
-    history?: Query['history'];
-  }) => {
-    const [storages] = useStorages();
-    const [event, setEvent] = React.useState<WriteEvent | null>(null);
-
-    const onWrite = React.useCallback(
-      (event: WriteEvent) => {
-        setEvent(event);
-      },
-      [setEvent]
+  expect(result.current.getLatestDocAtPath("/storage-test/test.txt")?.content)
+    .toEqual(
+      "Hello world!",
     );
 
-    useSubscribeToStorages({
-      ...options,
-      onWrite,
-    });
+  expect(result.current.getAllDocs().length).toEqual(1);
 
-    return { event: event, storages };
-  };
+  const query = { filter: { pathStartsWith: `/storage-test` } };
 
-  const { result } = renderHook(() => useTest(), {
-    wrapper,
-  });
+  expect(result.current.queryDocs(query)).toEqual([]);
 
-  expect(result.current.event).toEqual(null);
+  await waitForNextUpdate();
 
-  await act(async () => {
-    await result.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/1',
-    });
-  });
-
-  expect(result.current.event?.document.path).toEqual('/test/1');
-  expect(result.current.event?.document.workspace).toEqual(WORKSPACE_ADDR_A);
-  expect(result.current.event?.document.author).toEqual(keypair.address);
-
-  // Can listen for specific workspaces
-  const { result: workspaceResult } = renderHook(
-    () =>
-      useTest({
-        workspaces: [WORKSPACE_ADDR_B],
-      }),
-    { wrapper }
-  );
-
-  expect(workspaceResult.current.event).toEqual(null);
-
-  await act(async () => {
-    await workspaceResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/1',
-    });
-  });
-
-  expect(workspaceResult.current.event).toEqual(null);
-
-  await act(async () => {
-    await workspaceResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/2',
-    });
-  });
-
-  expect(workspaceResult.current.event?.document.path).toEqual('/test/2');
-  expect(workspaceResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_B
-  );
-  expect(workspaceResult.current.event?.document.author).toEqual(
-    keypair.address
-  );
-
-  // Can listen for paths
-  const { result: pathResult } = renderHook(
-    () =>
-      useTest({
-        paths: ['/test/b'],
-      }),
-    { wrapper }
-  );
-
-  expect(pathResult.current.event).toEqual(null);
-
-  await act(async () => {
-    await pathResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/a',
-    });
-  });
-
-  expect(pathResult.current.event).toEqual(null);
-
-  await act(async () => {
-    await pathResult.current.storages[WORKSPACE_ADDR_B].set(keypair, {
-      format: 'es.4',
-      content: 'Hello!',
-      path: '/test/b',
-    });
-  });
-
-  expect(pathResult.current.event?.document.path).toEqual('/test/b');
-
-  // Can listen for all history
-  const { result: historyResult } = renderHook(
-    () =>
-      useTest({
-        history: 'all',
-      }),
-    { wrapper }
-  );
-
-  expect(historyResult.current.event).toEqual(null);
-
-  const publishDate = Date.now() * 1000;
-
-  await act(async () => {
-    await historyResult.current.storages[WORKSPACE_ADDR_A].set(keypair, {
-      format: 'es.4',
-      content: 'Latest!',
-      path: '/test/history',
-      timestamp: publishDate,
-    });
-  });
-
-  expect(historyResult.current.event?.document.content).toEqual('Latest!');
-  expect(historyResult.current.event?.document.author).toEqual(keypair.address);
-  expect(historyResult.current.event?.document.path).toEqual('/test/history');
-  expect(historyResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_A
-  );
-  expect(historyResult.current.event?.document.timestamp).toEqual(publishDate);
-
-  const otherStorage = new StorageMemory([ValidatorEs4], WORKSPACE_ADDR_A);
-
-  await act(async () => {
-    otherStorage.set(otherKeypair, {
-      format: 'es.4',
-      content: 'Oldest!',
-      path: '/test/history',
-      timestamp: publishDate - 10000,
-    });
-
-    await syncLocalAsync(
-      historyResult.current.storages[WORKSPACE_ADDR_A],
-      otherStorage
-    );
-  });
-
-  expect(historyResult.current.event?.isLocal).toBeFalsy();
-  expect(historyResult.current.event?.document.content).toEqual('Oldest!');
-  expect(historyResult.current.event?.document.author).toEqual(
-    otherKeypair.address
-  );
-  expect(historyResult.current.event?.document.path).toEqual('/test/history');
-  expect(historyResult.current.event?.document.workspace).toEqual(
-    WORKSPACE_ADDR_A
-  );
-  expect(historyResult.current.event?.document.timestamp).toEqual(
-    publishDate - 10000
-  );
+  expect(result.current.queryDocs(query)[0].content).toEqual("Hello world!");
 });
 
-test('useInvitation', () => {
+test("useInvitation", async () => {
   const VALID_URL =
-    'earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=1';
+    "earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=1";
 
   const useTest = () => {
     const [code, setCode] = React.useState(VALID_URL);
@@ -517,128 +180,91 @@ test('useInvitation', () => {
     return { invitationResult, setCode };
   };
 
-  const { result } = renderHook(() => useTest(), { wrapper });
+  const { result } = await renderPeerHook(() => useTest());
 
   expect(isErr(result.current.invitationResult)).toBeFalsy();
 
-  act(() => result.current.setCode('http://dogs.com'));
+  act(() => result.current.setCode("http://dogs.com"));
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'Invitation not a valid Earthstar URL'
+    "Invitation not a valid Earthstar URL",
   );
 
   act(() =>
     result.current.setCode(
-      'earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=46'
+      "earthstar:///?workspace=+gardening.abc&pub=http://pub1.org&pub=https://pub2.org&v=46",
     )
   );
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'Unrecognised Earthstar invitation format version'
+    "Unrecognised Earthstar invitation format version",
   );
 
   act(() =>
     result.current.setCode(
-      'earthstar:///?pub=http://pub1.org&pub=https://pub2.org&v=1'
+      "earthstar:///?pub=http://pub1.org&pub=https://pub2.org&v=1",
     )
   );
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'No workspace found in Earthstar invitation URL'
+    "No workspace found in Earthstar invitation URL",
   );
 
   act(() =>
     result.current.setCode(
-      'earthstar:///?workspace=+gardening.abc&pub=blorp&v=1'
+      "earthstar:///?workspace=+gardening.abc&pub=blorp&v=1",
     )
   );
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'Malformed Pub URL found'
+    "Malformed Pub URL found",
   );
 
-  act(() => result.current.setCode('bong'));
+  act(() => result.current.setCode("bong"));
 
   expect((result.current.invitationResult as EarthstarError).message).toEqual(
-    'Not a valid Earthstar URL'
+    "Not a valid Earthstar URL",
   );
 });
 
-test('useMakeInvitation', () => {
+test("useMakeInvitation", async () => {
   const useTest = () => {
-    const [workspace, setWorkspace] = React.useState(WORKSPACE_ADDR_A);
-    const [excludedPubs, setExcludedPubs] = React.useState<string[]>([]);
-    const invitationCode = useMakeInvitation(excludedPubs, workspace);
+    const [workspace, setWorkspace] = React.useState(SHARE_ADDR_A);
+    const [includedPubs, setIncludedPubs] = React.useState<string[]>([PUB_A]);
+    const invitationCode = useMakeInvitation(includedPubs, workspace);
 
-    return { setWorkspace, setExcludedPubs, invitationCode };
+    return { setWorkspace, setIncludedPubs, invitationCode };
   };
 
-  const { result } = renderHook(() => useTest(), { wrapper });
+  const { result } = await renderPeerHook(() => useTest());
 
   expect(result.current.invitationCode).toEqual(
-    'earthstar:///?workspace=+testa.a123&pub=https://a.pub&v=1'
+    "earthstar:///?workspace=+testa.a123&pub=https://a.pub&v=1",
   );
 
   act(() => {
-    result.current.setExcludedPubs([PUB_A]);
+    result.current.setIncludedPubs([]);
   });
 
   expect(result.current.invitationCode).toEqual(
-    'earthstar:///?workspace=+testa.a123&v=1'
+    "earthstar:///?workspace=+testa.a123&v=1",
   );
 });
 
-test('useLocalStorageSettings', () => {
-  const { result } = renderHook(
-    () => useLocalStorageEarthstarSettings('tests'),
-    { wrapper }
-  );
-
-  expect(result.current.initWorkspaces).toHaveLength(3);
-  expect(result.current.initPubs).toEqual({
-    '+testa.a123': ['https://a.pub'],
-    '+testb.b234': ['https://b.pub'],
-    '+testc.c567': ['https://c.pub'],
-  });
-  expect(result.current.initCurrentAuthor).toBeDefined();
-  expect(result.current.initCurrentWorkspace).toBe(WORKSPACE_ADDR_A);
-});
-
-test('useStorage', async () => {
+test("useLocalStorageSettings", async () => {
   const useTest = () => {
-    const [storages, setStorages] = useStorages();
+    const settings = useLocalStorageEarthstarSettings("tests");
+    const add = useAddShare();
 
-    const workspaces = useWorkspaces();
-
-    return { workspaces, storages, setStorages };
+    return { settings, add };
   };
 
-  const { result } = renderHook(() => useTest(), {
-    wrapper,
-  });
+  const { result } = await renderPeerHook(
+    () => useTest(),
+  );
 
-  const storage = result.current.storages[WORKSPACE_ADDR_C];
-
-  expect(storage.isClosed()).toBeFalsy();
-
-  act(() => {
-    result.current.setStorages(prev => {
-      const prevCopy = { ...prev };
-
-      delete prevCopy[WORKSPACE_ADDR_C];
-
-      return prevCopy;
-    });
-  });
-
-  // Wait a tick for Earthstar peer to close the removed storage
-  await sleep(0);
-
-  // Removed workspaces should be closed by EarthstarPeer
-  expect(storage.isClosed()).toBeTruthy();
-
-  expect(result.current.workspaces).toEqual([
-    WORKSPACE_ADDR_A,
-    WORKSPACE_ADDR_B,
-  ]);
+  expect(result.current.settings.initShares).toHaveLength(3);
+  expect(result.current.settings.initReplicaServers).toEqual([PUB_A, PUB_B, PUB_C]);
+  expect(result.current.settings.initIdentity).toBeDefined();
+  expect(result.current.settings.initCurrentShare).toBe(SHARE_ADDR_A);
 });
