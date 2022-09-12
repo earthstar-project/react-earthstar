@@ -5,13 +5,15 @@ import {
   checkShareIsValid,
   EarthstarError,
   isErr,
+  Peer,
   ReplicaCache,
+  Syncer,
+  SyncerStatus,
 } from "earthstar";
 import {
   AddShareContext,
   CurrentShareContext,
   IdentityContext,
-  IsLiveContext,
   PeerContext,
   ReplicaServersContext,
 } from "./contexts";
@@ -25,7 +27,7 @@ export function usePeer() {
   const memoPeer = React.useMemo(() => peer, [trigger]);
 
   React.useEffect(() => {
-    const unsub = peer.replicaMap.bus.on("*", () => {
+    const unsub = peer.onReplicasChange(() => {
       setTrigger((prev) => !prev);
     });
 
@@ -154,6 +156,24 @@ export function useReplica(shareAddress?: string | undefined) {
       */
 }
 
+export function useSync(
+  target: string | Peer,
+): [Syncer<undefined, unknown>, SyncerStatus] {
+  const peer = usePeer();
+
+  const syncer = peer.sync(target);
+
+  const [status, setStatus] = React.useState(syncer.getStatus);
+
+  React.useEffect(() => {
+    return syncer.onStatusChange((status) => {
+      setStatus(status);
+    });
+  }, [syncer]);
+
+  return [syncer, status];
+}
+
 export function useInvitation(invitationCode: string) {
   const addShare = React.useContext(AddShareContext);
   const [, setPubs] = useReplicaServers();
@@ -240,15 +260,6 @@ export function useMakeInvitation(
   }
 
   return `earthstar:///?workspace=${address}${pubsString}&v=1`;
-}
-
-export function useIsLive(): [
-  boolean,
-  React.Dispatch<React.SetStateAction<boolean>>,
-] {
-  const { isLive, setIsLive } = React.useContext(IsLiveContext);
-
-  return [isLive, setIsLive];
 }
 
 export function useLocalStorageEarthstarSettings(storageKey: string) {

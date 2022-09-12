@@ -23,10 +23,10 @@ export function getWorkspaceName(address: string) {
 
 export function makeStorageKey(customKey: string | undefined, key: string) {
   if (!customKey) {
-    return `earthstar-peer-${key}`;
+    return `earthstar:peer:${key}`;
   }
 
-  return `earthstar-peer-${customKey}-${key}`;
+  return `earthstar:peer:${customKey}-${key}`;
 }
 
 export function getLocalStorage<T>(key: string): T | null {

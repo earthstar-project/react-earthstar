@@ -23,14 +23,6 @@ export const CurrentShareContext = React.createContext<{
   setCurrentShare: () => {},
 });
 
-export const IsLiveContext = React.createContext<{
-  isLive: boolean;
-  setIsLive: React.Dispatch<React.SetStateAction<boolean>>;
-}>({
-  isLive: true,
-  setIsLive: () => {},
-});
-
 export const AddShareContext = React.createContext<
   (shareAddress: string) => Promise<void>
 >(async () => {});

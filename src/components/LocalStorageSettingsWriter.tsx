@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   useCurrentShare,
   useIdentity,
-  useIsLive,
   usePeer,
   useReplicaServers,
 } from "../hooks";
@@ -17,18 +16,15 @@ export function LocalStorageSettingsWriter({
   const lsPubsKey = makeStorageKey(storageKey, "replica-servers");
   const lsSharesKey = makeStorageKey(storageKey, "shares");
   const lsCurrentShareKey = makeStorageKey(storageKey, "current-share");
-  const lsIsLiveKey = makeStorageKey(storageKey, "is-live");
 
   const peer = usePeer();
 
   const [pubs] = useReplicaServers();
   const [currentIdentity] = useIdentity();
   const [currentShare] = useCurrentShare();
-  const [isLive] = useIsLive();
 
   React.useEffect(() => {
-    return peer.replicaMap.bus.on("*", () => {
-      console.log("writing shares...");
+    return peer.onReplicasChange(() => {
       localStorage.setItem(lsSharesKey, JSON.stringify(peer.shares()));
     });
   }, [peer, lsSharesKey]);
@@ -47,10 +43,6 @@ export function LocalStorageSettingsWriter({
       JSON.stringify(currentShare),
     );
   }, [currentShare, lsCurrentShareKey]);
-
-  React.useEffect(() => {
-    localStorage.setItem(lsIsLiveKey, JSON.stringify(isLive));
-  });
 
   return null;
 }

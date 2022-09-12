@@ -3,7 +3,6 @@ import {
   AuthorKeypair,
   Crypto,
   EarthstarError,
-  FormatValidatorEs4,
   isErr,
   Replica,
   ReplicaDriverMemory,
@@ -61,9 +60,10 @@ async function renderPeerHook<P, T>(
         initCurrentShare={SHARE_ADDR_A}
         onCreateShare={(shareAddress) => {
           return new Replica(
-            shareAddress,
-            FormatValidatorEs4,
-            new ReplicaDriverMemory(shareAddress),
+        { driver: 
+          new ReplicaDriverMemory(shareAddress),
+        }
+     
           );
         }}
       >
@@ -137,23 +137,22 @@ test("useReplica", async () => {
   );
 
   expect(result.current.getAllDocs()).toEqual([]);
-  expect(result.current.getLatestDocAtPath("/storage-test/test.txt"))
+  expect(result.current.getLatestDocAtPath("/storage-test/test"))
     .toBeUndefined();
 
   const keypair = await getKeypair();
 
   // Do not await the below. It'll make this test break.
   act(async () => {
-    await result.current.set(keypair, {
-      path: "/storage-test/test.txt",
-      format: "es.4",
-      content: "Hello world!",
+   await result.current.set(keypair, {
+      path: "/storage-test/test",
+      text: "Hello world!",
     });
   });
 
   await waitForNextUpdate();
 
-  expect(result.current.getLatestDocAtPath("/storage-test/test.txt")?.content)
+  expect(result.current.getLatestDocAtPath("/storage-test/test")?.text)
     .toEqual(
       "Hello world!",
     );
@@ -166,7 +165,7 @@ test("useReplica", async () => {
 
   await waitForNextUpdate();
 
-  expect(result.current.queryDocs(query)[0].content).toEqual("Hello world!");
+  expect(result.current.queryDocs(query)[0].text).toEqual("Hello world!");
 });
 
 test("useInvitation", async () => {

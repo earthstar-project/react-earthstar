@@ -4,18 +4,15 @@ import {
   AddShareContext,
   CurrentShareContext,
   IdentityContext,
-  IsLiveContext,
   PeerContext,
   ReplicaServersContext,
 } from "../contexts";
-import { ReplicaSyncer } from "./_ReplicaSyncer";
 
 export function Peer({
   initShares = [],
   initReplicaServers = [],
   initIdentity = null,
   initCurrentShare = null,
-  initIsLive = true,
   onCreateShare,
   children,
 }: {
@@ -59,7 +56,6 @@ export function Peer({
   const [currentShare, setCurrentShare] = React.useState<string | null>(
     initCurrentShare,
   );
-  const [isLive, setIsLive] = React.useState(initIsLive);
 
   return (
     <PeerContext.Provider value={peer}>
@@ -72,14 +68,9 @@ export function Peer({
           <CurrentShareContext.Provider
             value={{ currentShare, setCurrentShare }}
           >
-            <IsLiveContext.Provider value={{ isLive, setIsLive }}>
-              <AddShareContext.Provider value={addShare}>
-                {children}
-                {replicaServers.map((url) => (
-                  <ReplicaSyncer key={url} pubUrl={url} />
-                ))}
-              </AddShareContext.Provider>
-            </IsLiveContext.Provider>
+            <AddShareContext.Provider value={addShare}>
+              {children}
+            </AddShareContext.Provider>
           </CurrentShareContext.Provider>
         </IdentityContext.Provider>
       </ReplicaServersContext.Provider>
