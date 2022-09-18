@@ -154,7 +154,7 @@ return <Peer {...settings} {...etc} />;
 
 There are a few components needed to make things work, as well as a few convenience ones.
 
-### <Peer>
+### `<Peer>`
 
 You'll need this somewhere in your app to use react-earthstar.
 
@@ -174,7 +174,7 @@ You'll need this somewhere in your app to use react-earthstar.
 
 This component will also automatically start synchronising with any replica servers it knows of.
 
-### <LocalStorageSettingsWriter>
+### `<LocalStorageSettingsWriter>`
 
 Stick this somewhere within `<Peer>` and it'll automatically persist many settings to local storage, namespaced by a key of your choice.
 
@@ -184,7 +184,7 @@ Stick this somewhere within `<Peer>` and it'll automatically persist many settin
 </Peer>
 ```
 
-### <ShareLabel>
+### `<ShareLabel>`
 
 Renders the human readable portion of a share address, and omits the obscuring portion: e.g. '+gardening.b34ue9ug' becomes '+gardening'. Good for making sure you don't disclose share addresses to people looking over your users' shoulders.
 
@@ -192,7 +192,7 @@ Renders the human readable portion of a share address, and omits the obscuring p
 <ShareLabel address="+potatoes.b34ou9e8">
 ```
 
-### <IdentityLabel>
+### `<IdentityLabel>`
 
 Renders the shortname portion of an identity's address, omitting the public key, e.g. `@cinn.euu8euheuigoe...` just becomes `@cinn`.
 
@@ -200,7 +200,7 @@ Renders the shortname portion of an identity's address, omitting the public key,
 <IdentityLabel address="@devy.a234gue9Juhxo9eu...">
 ```
 
-### <CurrentIdentityLabel>
+### `<CurrentIdentityLabel>`
 
 Does the same as `<IdentityLabel>` but doesn't take an address prop and just uses the current identity provided by `<Peer>`.
 
