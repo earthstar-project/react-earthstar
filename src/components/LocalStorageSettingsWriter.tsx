@@ -1,7 +1,8 @@
 import * as React from "react";
+import { ShareSecretsContext } from "../contexts";
 import {
   useCurrentShare,
-  useIdentity,
+  useKeypair,
   usePeer,
   useReplicaServers,
 } from "../hooks";
@@ -12,15 +13,17 @@ export function LocalStorageSettingsWriter({
 }: {
   storageKey: string;
 }) {
-  const lsIdentityKey = makeStorageKey(storageKey, "identity");
-  const lsPubsKey = makeStorageKey(storageKey, "replica-servers");
+  const lsAuthorKey = makeStorageKey(storageKey, "author");
+  const lsServersKey = makeStorageKey(storageKey, "replica-servers");
   const lsSharesKey = makeStorageKey(storageKey, "shares");
   const lsCurrentShareKey = makeStorageKey(storageKey, "current-share");
+  const lsShareSecretsKey = makeStorageKey(storageKey, "share-secrets");
 
   const peer = usePeer();
 
+  const secrets = React.useContext(ShareSecretsContext)
   const [pubs] = useReplicaServers();
-  const [currentIdentity] = useIdentity();
+  const [currentIdentity] = useKeypair();
   const [currentShare] = useCurrentShare();
 
   React.useEffect(() => {
@@ -30,14 +33,19 @@ export function LocalStorageSettingsWriter({
   }, [peer, lsSharesKey]);
 
   React.useEffect(() => {
-    localStorage.setItem(lsPubsKey, JSON.stringify(pubs));
-  }, [pubs, lsPubsKey]);
+    localStorage.setItem(lsServersKey, JSON.stringify(pubs));
+  }, [pubs, lsServersKey]);
 
   React.useEffect(() => {
-    localStorage.setItem(lsIdentityKey, JSON.stringify(currentIdentity));
-  }, [currentIdentity, lsIdentityKey]);
+    localStorage.setItem(lsAuthorKey, JSON.stringify(currentIdentity));
+  }, [currentIdentity, lsAuthorKey]);
+  
+  React.useEffect(() => {
+    localStorage.setItem(lsShareSecretsKey, JSON.stringify(secrets));
+  }, [secrets, lsShareSecretsKey]);
 
   React.useEffect(() => {
+    console.log(currentShare)
     localStorage.setItem(
       lsCurrentShareKey,
       JSON.stringify(currentShare),

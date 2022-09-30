@@ -1,12 +1,12 @@
 import * as React from "react";
 
 import { IdentityLabel } from "./IdentityLabel";
-import { useIdentity } from "../hooks";
+import {  useKeypair } from "../hooks";
 
 export function CurrentIdentityLabel(
   props: React.HTMLAttributes<HTMLSpanElement>,
 ) {
-  const [currentAuthor] = useIdentity();
+  const [currentAuthor] = useKeypair();
 
   return currentAuthor
     ? <IdentityLabel {...props} address={currentAuthor.address} />

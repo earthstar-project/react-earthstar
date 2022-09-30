@@ -13,7 +13,7 @@ import {
 import {
   AddShareContext,
   CurrentShareContext,
-  IdentityContext,
+  KeypairContext,
   PeerContext,
   ReplicaServersContext,
 } from "./contexts";
@@ -54,15 +54,15 @@ export function useReplicaServers(): [
   return [replicaServers, setReplicaServers];
 }
 
-export function useIdentity(): [
+export function useKeypair(): [
   AuthorKeypair | null,
   React.Dispatch<React.SetStateAction<AuthorKeypair | null>>,
 ] {
-  const { identity, setIdentity } = React.useContext(
-    IdentityContext,
+  const { keypair, setKeypair } = React.useContext(
+    KeypairContext,
   );
 
-  return [identity, setIdentity];
+  return [keypair, setKeypair];
 }
 
 export function useCurrentShare(): [
@@ -263,34 +263,38 @@ export function useMakeInvitation(
 }
 
 export function useLocalStorageEarthstarSettings(storageKey: string) {
-  const lsIdentityKey = makeStorageKey(storageKey, "identity");
-  const lsPubsKey = makeStorageKey(storageKey, "replica-servers");
+  const lsAuthorKey = makeStorageKey(storageKey, "author");
+  const lsServersKey = makeStorageKey(storageKey, "replica-servers");
   const lsSharesKey = makeStorageKey(storageKey, "shares");
   const lsCurrentShareKey = makeStorageKey(storageKey, "current-share");
-  const lsIsLiveKey = makeStorageKey(storageKey, "is-live");
+  const lsShareSecretsKey = makeStorageKey(storageKey, "share-secrets");
+  
 
   const allKeys = React.useMemo(
     () => [
-      lsIdentityKey,
-      lsPubsKey,
+      lsAuthorKey,
+      lsServersKey,
       lsSharesKey,
       lsCurrentShareKey,
-      lsIsLiveKey,
+  lsShareSecretsKey
     ],
-    [lsIdentityKey, lsPubsKey, lsSharesKey, lsCurrentShareKey, lsIsLiveKey],
+    [lsAuthorKey, lsServersKey, lsSharesKey, lsCurrentShareKey, lsShareSecretsKey],
   );
 
   // load the initial state from localStorage
   const initShares = getLocalStorage<string[]>(lsSharesKey);
-  const initReplicaServers = getLocalStorage<string[]>(lsPubsKey);
-  const initIdentity = getLocalStorage<AuthorKeypair>(lsIdentityKey);
+  const initReplicaServers = getLocalStorage<string[]>(lsServersKey);
+  const initIdentity = getLocalStorage<AuthorKeypair>(lsAuthorKey);
   const initCurrentShare = getLocalStorage<string>(lsCurrentShareKey);
-  const initIsLive = getLocalStorage<boolean>(lsIsLiveKey);
+    const initShareSecrets = getLocalStorage<Record<string, string>>(lsShareSecretsKey)
+
 
   const [, setTrigger] = React.useState(true);
 
   const onStorage = React.useCallback((event: StorageEvent) => {
+    console.log(event.key)
     if (event.key && allKeys.includes(event.key)) {
+      
       setTrigger((prev) => !prev);
     }
   }, [allKeys]);
@@ -305,9 +309,9 @@ export function useLocalStorageEarthstarSettings(storageKey: string) {
 
   return {
     initShares: initShares || [],
+    initShareSecrets: initShareSecrets || {},
     initReplicaServers: initReplicaServers || [],
     initIdentity: initIdentity || null,
     initCurrentShare: initCurrentShare || null,
-    initIsLive: initIsLive || true,
   };
 }

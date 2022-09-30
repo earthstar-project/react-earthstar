@@ -7,7 +7,7 @@ import {
 import {
   Peer,
   useCurrentShare,
-  useIdentity,
+  useKeypair,
   usePeer,
   useReplica,
 } from "../src/index";
@@ -39,7 +39,7 @@ function AppSwitcher() {
 }
 
 function TinyApp() {
-  const [identity] = useIdentity();
+  const [identity] = useKeypair();
   const replica = useReplica();
 
   const doc = replica.getLatestDocAtPath("/something");
@@ -78,7 +78,7 @@ function TinyApp() {
 }
 
 function CurrentIdentity() {
-  const [identity, setIdentity] = useIdentity();
+  const [identity, setIdentity] = useKeypair();
 
   React.useEffect(() => {
     Crypto.generateAuthorKeypair(
