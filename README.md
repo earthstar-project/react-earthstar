@@ -142,7 +142,7 @@ add('+archery.k456');
 
 ### useLocalStorageEarthstarSettings
 
-`<Peer>`` holds state which you probably want to persist between sessions. You can use this hook to access this state (written by the `<LocalStorageSettingsWriter/>` component).
+`<Peer>` holds state which you probably want to persist between sessions. You can use this hook to access this state (written by the `<LocalStorageSettingsWriter/>` component).
 
 ```jsx
 const settings = useLocalStorageEarthstarSettings('my-app');
