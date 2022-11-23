@@ -10,7 +10,7 @@ Given a workspace address, returns an element which:
 */
 
 import * as React from "react";
-import { getWorkspaceName } from "../util";
+import { getShareName } from "../util";
 
 export function ShareLabel({
   address,
@@ -21,7 +21,7 @@ export function ShareLabel({
       {...props}
       title={address}
     >
-      {`+${getWorkspaceName(address)}`}
+      {`+${getShareName(address)}`}
     </span>
   );
 }
