@@ -2,7 +2,7 @@ import * as React from "react";
 import { render } from "react-dom";
 import * as Earthstar from "earthstar";
 import { ReplicaDriverWeb } from "earthstar/browser";
-import { useAuthorSettings, useShareSettings, useReplica, ClientSettingsContext, useShareSecretSettings } from "../src/index";
+import { useAuthorSettings, useShareSettings, useReplica, ClientSettingsContext, useShareSecretSettings, AuthorLabel, ShareLabel } from "../src/index";
 
 Earthstar.setLogLevel("example", 4);
 
@@ -38,7 +38,7 @@ function ShareSwitcher({ currentShare, setCurrentShare }: {
               setCurrentShare(e.target.value);
             }}
           />
-          {share}
+          <ShareLabel address={share} />
         </label>
         </li>
       ))}
@@ -88,9 +88,10 @@ function ShareAdder() {
 function TinyApp({ replica }: { replica: Earthstar.Replica }) {
   const [author] = useAuthorSettings();
 
-  const replicaCache = useReplica(replica);
+  const [doc] = useReplica(replica, (cache) => {
+    return [cache.getLatestDocAtPath('/something')]
+  });
 
-  const doc = replicaCache.getLatestDocAtPath("/something");
   const [value, setValue] = React.useState("");
 
   return (
@@ -106,7 +107,7 @@ function TinyApp({ replica }: { replica: Earthstar.Replica }) {
             return;
           }
           setValue("");
-          const res = await replicaCache.set(author, {
+          const res = await replica.set(author, {
             text: value,
             path: "/something",
           });
@@ -135,7 +136,11 @@ function CurrentIdentity() {
   return (
     <>
       <h2>Identity</h2>
-      <p>{identity?.address}</p>
+      { identity ? 
+        <AuthorLabel address={identity.address} iconSize={10}/>
+        : 'No identity'
+      }
+
     </>
   );
 }

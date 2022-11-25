@@ -1,12 +1,13 @@
 import * as React from "react";
-import { unstable_batchedUpdates } from "react-dom";
 import {
   AuthorKeypair,
   ClientSettings,
   IPeer,
   MultiformatReplica,
   ReplicaCache,
+  ValidationError,
 } from "earthstar";
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 
 export const ClientSettingsContext = React.createContext(new ClientSettings());
 
@@ -28,8 +29,8 @@ export function usePeerReplicas(peer: IPeer) {
 }
 
 /** Subscribe to an `Earthstar.ClientSetting`'s author.
-*
-*@returns A tuple where the first element is the author, and the second element a function to update the author.
+ *
+ * @returns A tuple where the first element is the author, and the second element a function to update the author.
  */
 export function useAuthorSettings(): [
   AuthorKeypair | null,
@@ -56,8 +57,8 @@ export function useAuthorSettings(): [
 
 export function useShareSettings(): [
   string[],
-  (shareToAdd: string) => void,
-  (shareToRemove: string) => void,
+  (shareToAdd: string) => ValidationError | string[],
+  (shareToRemove: string) => ValidationError | string[],
 ] {
   const settings = React.useContext(ClientSettingsContext);
 
@@ -70,23 +71,27 @@ export function useShareSettings(): [
 
     return unsub;
   }, [settings]);
-  
+
   const addShare = React.useCallback((addr: string) => {
-    settings.addShare(addr)
-  }, [settings])
+    return settings.addShare(addr);
+  }, [settings]);
 
   const removeShare = React.useCallback((addr: string) => {
-    settings.removeShare(addr)
-  }, [settings])
-
+    return settings.removeShare(addr);
+  }, [settings]);
 
   return [shares, addShare, removeShare];
 }
 
 export function useShareSecretSettings(): [
   Record<string, string>,
-  (share: string, secret: string) => Promise<void>,
-  (shareAddrOfSecretToRemove: string) => void,
+  (
+    share: string,
+    secret: string,
+  ) => Promise<ValidationError | Record<string, string>>,
+  (
+    shareAddrOfSecretToRemove: string,
+  ) => ValidationError | Record<string, string>,
 ] {
   const settings = React.useContext(ClientSettingsContext);
 
@@ -99,23 +104,22 @@ export function useShareSecretSettings(): [
 
     return unsub;
   }, [settings]);
-  
-  const addSecret = React.useCallback(async (addr: string, secret: string) => {
-    await settings.addSecret(addr, secret)
-  }, [settings])
-  
-  const removeSecret = React.useCallback((addr: string) => {
-    settings.removeSecret(addr)
-  }, [settings])
 
+  const addSecret = React.useCallback(async (addr: string, secret: string) => {
+    return settings.addSecret(addr, secret);
+  }, [settings]);
+
+  const removeSecret = React.useCallback((addr: string) => {
+    return settings.removeSecret(addr);
+  }, [settings]);
 
   return [secrets, addSecret, removeSecret];
 }
 
 export function useServerSettings(): [
   string[],
-  (serverToAdd: string) => void,
-  (serverToRemove: string) => void,
+  (serverToAdd: string) => ValidationError | string[],
+  (serverToRemove: string) => ValidationError | string[],
 ] {
   const settings = React.useContext(ClientSettingsContext);
 
@@ -128,79 +132,55 @@ export function useServerSettings(): [
 
     return unsub;
   }, [settings]);
-  
-  const addServer = React.useCallback((url: string) => {
-    settings.addServer(url)
-  }, [settings])
-  
-  const removeServer = React.useCallback((url: string) => {
-    settings.removeServer(url)
-  }, [settings])
 
+  const addServer = React.useCallback((url: string) => {
+    return settings.addServer(url);
+  }, [settings]);
+
+  const removeServer = React.useCallback((url: string) => {
+    return settings.removeServer(url);
+  }, [settings]);
 
   return [servers, addServer, removeServer];
 }
 
-export function useReplica(replica: MultiformatReplica) {
-  const replicaCache = React.useMemo(
+export function useReplica<CacheResult>(
+  replica: MultiformatReplica,
+  selector: (cache: ReplicaCache) => CacheResult,
+) {
+  const cache = React.useMemo(
     () => {
-      if (!replica) {
-        throw new Error("Tried to use useReplica with no share specified!");
-      }
-
-      return new ReplicaCache(replica, 1000, (cb) => {
-        unstable_batchedUpdates(cb);
-      });
+      return new ReplicaCache(replica, 1000);
     },
     [replica],
   );
+  
+  const [version, setVersion] = React.useState(cache.version);
+  
+  React.useEffect(() => {
+    setVersion(cache.version)
+    
+    return cache.onCacheUpdated(() => {
+      setVersion(cache.version)
+    })
+  }, [cache])
+  
+  const snapshot = React.useMemo(() => {
+    return {cache, version}
+  }, [version, cache])
 
-  const [, setTrigger] = React.useState(true);
+  const subscribe = (cb: () => void) => {
+    return cache.onCacheUpdated(cb);
+  };
 
-  React.useLayoutEffect(() => {
-    const unsub = replicaCache.onCacheUpdated(() => {
-      setTrigger((prev) => !prev);
-    });
-
-    return () => {
-      unsub();
-      replicaCache.close();
-    };
-  }, [replicaCache]);
-
-  return replicaCache;
-
-  // Keeping the below around for React 18.
-  /*
-    const replicaCache = React.useMemo(() => {
-      const replica = address ? peer.getReplica(address) : undefined;
-         if (!replica) {
-        throw new Error("Tried to use useReplica with no share specified!");
-      }
-         return new ReplicaCache(replica, 1000);
-       [address, peer])
-       const [currentVersion, setVersion] = React.useState(replicaCache.version);
-       const memoReplica = React.useMemo(() => {
-      return replicaCache;
-       [currentVersion, replicaCache]);
-       React.useEffect(() => {
-      replicaCache.onCacheUpdated(() => {
-        setVersion(replicaCache.version);
-
-      ;
-         nst subscribe = React.useCallback((onStoreChange: () => void) => {
-        turn memoReplica.onCacheUpdated(() => {
-          StoreChange();
-        ;
-       [memoReplica, replicaCache]);
-         nst getSnapshot = React.useCallback(() => memoReplica, []);
-         turn useSyncExternalStoreWithSelector(
-        bscribe,
-        tSnapshot,
-        tSnapshot,
-        ache) => cache,
-        acheA, cacheB) => cacheA.version === cacheB.version,
-      */
+  return useSyncExternalStoreWithSelector(
+    subscribe,
+    () => snapshot,
+    () => snapshot,
+    ({cache}) => {
+      return selector(cache)
+    },
+  );
 }
 
 /*

@@ -1,2 +1,2 @@
-export * from "./IdentityLabel";
+export * from "./AuthorLabel";
 export * from "./ShareLabel";
