@@ -88,9 +88,11 @@ function ShareAdder() {
 function TinyApp({ replica }: { replica: Earthstar.Replica }) {
   const [author] = useAuthorSettings();
 
-  const [doc] = useReplica(replica, (cache) => {
-    return [cache.getLatestDocAtPath('/something')]
-  });
+
+  
+  const cache = useReplica(replica);
+  
+  const doc = cache.getLatestDocAtPath('/something')
 
   const [value, setValue] = React.useState("");
 

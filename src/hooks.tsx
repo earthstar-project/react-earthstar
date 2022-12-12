@@ -144,9 +144,8 @@ export function useServerSettings(): [
   return [servers, addServer, removeServer];
 }
 
-export function useReplica<CacheResult>(
+export function useReplica(
   replica: MultiformatReplica,
-  selector: (cache: ReplicaCache) => CacheResult,
 ) {
   const cache = React.useMemo(
     () => {
@@ -154,33 +153,35 @@ export function useReplica<CacheResult>(
     },
     [replica],
   );
-  
+
   const [version, setVersion] = React.useState(cache.version);
-  
+
   React.useEffect(() => {
-    setVersion(cache.version)
-    
+    setVersion(cache.version);
+
     return cache.onCacheUpdated(() => {
-      setVersion(cache.version)
-    })
-  }, [cache])
-  
+      setVersion(cache.version);
+    });
+  }, [cache]);
+
   const snapshot = React.useMemo(() => {
-    return {cache, version}
-  }, [version, cache])
+    return { cache, version };
+  }, [version, cache]);
 
   const subscribe = (cb: () => void) => {
     return cache.onCacheUpdated(cb);
   };
 
-  return useSyncExternalStoreWithSelector(
+  const obj = useSyncExternalStoreWithSelector(
     subscribe,
     () => snapshot,
     () => snapshot,
-    ({cache}) => {
-      return selector(cache)
+    (obj) => {
+      return obj;
     },
   );
+
+  return obj.cache;
 }
 
 /*
