@@ -2,11 +2,11 @@ import * as React from "react";
 import { render } from "react-dom";
 import * as Earthstar from "earthstar";
 import { ReplicaDriverWeb } from "earthstar/browser";
-import { useAuthorSettings, useShareSettings, useReplica, ClientSettingsContext, useShareSecretSettings, AuthorLabel, ShareLabel } from "../src/index";
+import { useAuthorSettings, useShareSettings, useReplica, SharedSettingsContext, useShareSecretSettings, AuthorLabel, ShareLabel } from "../src/index";
 
 Earthstar.setLogLevel("example", 4);
 
-const settings = new Earthstar.ClientSettings();
+const settings = new Earthstar.SharedSettings();
 
 const { peer } = settings.getPeer({
   sync: false,
@@ -158,7 +158,7 @@ function Example() {
   console.log('got replica...', replica)
 
   return (
-    <ClientSettingsContext.Provider value={settings}>
+    <SharedSettingsContext.Provider value={settings}>
       <h1>Example</h1>
 
       <CurrentIdentity />
@@ -170,7 +170,7 @@ function Example() {
       {replica ? <TinyApp replica={replica} /> : null}
         
       <button onClick={() => settings.clear()}>Clear</button>
-    </ClientSettingsContext.Provider>
+    </SharedSettingsContext.Provider>
   );
   
   

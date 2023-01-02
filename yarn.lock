@@ -2099,6 +2099,11 @@
   resolved "https://registry.yarnpkg.com/@sgwilym/isomorphic-streams/-/isomorphic-streams-1.0.4.tgz#aff5d25b2ef3189802f27cddb5a671d8ed9eb5d4"
   integrity sha512-Nud5DPXATWxwaY0J1SeZ8dcMypdYE3d4DWO+XhhU/b6mH9L5p3TPB+dWcG5cDuLPociawHgvuNKbLQbd43oueA==
 
+"@sgwilym/urlpattern-polyfill@1.0.0-rc8":
+  version "1.0.0-rc8"
+  resolved "https://registry.yarnpkg.com/@sgwilym/urlpattern-polyfill/-/urlpattern-polyfill-1.0.0-rc8.tgz#282ce8367b3be9517f8b9dd129b2d5eb59e90a89"
+  integrity sha512-MZl5q+SURyRSNMecAtFnun78N52sCWrxhEd28btfbt97G02h4HYtIxVvEzlDL311NURUFmPyZnYKHvzFOcCfGg==
+
 "@sinclair/typebox@^0.24.1":
   version "0.24.43"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.43.tgz#2e2bce0e5e493aaf639beed0cd6c88cfde7dd3d7"
@@ -3225,16 +3230,17 @@ dotenv@^7.0.0:
   resolved "https://registry.npmjs.org/dotenv/-/dotenv-7.0.0.tgz"
   integrity sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==
 
-earthstar@^10.0.0-beta.4:
-  version "10.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/earthstar/-/earthstar-10.0.0-beta.4.tgz#af4317f97bfb62a0ff7a0ea70b0d247ba5fb6e78"
-  integrity sha512-+FAJtw5lY0djylQA9+yNRjpESaRgy8eiPr7WYNHuSGs8q9yoAd0u6sj8gH927uQQqH11sF9CLZSCeq5fT9cOUQ==
+earthstar@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/earthstar/-/earthstar-10.0.0.tgz#3895d7461df82821d8a059a8e3040acaf915ff2e"
+  integrity sha512-A+doEs/hVv9YsnT4zdbrAhpFjI+90vyYgxwWAVqphp+1dmhMeYHES1TTl3TkLMztwukUd/VCv1YWfNGi/mT/+Q==
   dependencies:
     "@deno/sham-weakref" "~0.1.0"
     "@deno/shim-timers" "~0.1.0"
     "@noble/ed25519" "1.6.0"
     "@nodelib/fs.walk" "1.2.8"
     "@sgwilym/isomorphic-streams" "1.0.4"
+    "@sgwilym/urlpattern-polyfill" "1.0.0-rc8"
     better-sqlite3 "7.5.0"
     chloride "2.4.1"
     fast-json-stable-stringify "2.1.0"
@@ -3244,6 +3250,7 @@ earthstar@^10.0.0-beta.4:
     rfc4648 "1.5.0"
     sha256-uint8array "0.10.3"
     textencoder-ponyfill "1.0.2"
+    ws "8.8.1"
 
 ed2curve@^0.1.4:
   version "0.1.4"
@@ -6030,6 +6037,11 @@ write-file-atomic@^4.0.1:
   dependencies:
     imurmurhash "^0.1.4"
     signal-exit "^3.0.7"
+
+ws@8.8.1:
+  version "8.8.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.8.1.tgz#5dbad0feb7ade8ecc99b830c1d77c913d4955ff0"
+  integrity sha512-bGy2JzvzkPowEJV++hF07hAD6niYSr0JzBNo/J29WsB57A2r7Wlc1UFcTR9IzrPvuNVO4B8LGqF8qcpsVOhJCA==
 
 ws@^8.11.0:
   version "8.11.0"

@@ -107,8 +107,8 @@ function ReplicaList() {
 
 ### `useAuthorSettings`
 
-Returns a getter and setter for the `ClientSettings`' current author setting.
-Uses the `ClientSettingsContext`.
+Returns a getter and setter for the `SharedSettings`' current author setting.
+Uses the `SharedSettingsContext`.
 
 ```js
 function CurrentAuthorAddress() {
@@ -121,7 +121,7 @@ function CurrentAuthorAddress() {
 ### `useShareSettings`
 
 Returns the shares + a callback to add a share + a callback to remove a share
-from `ClientSettings`' shares setting. Uses the `ClientSettingsContext`.
+from `SharedSettings`' shares setting. Uses the `SharedSettingsContext`.
 
 ```js
 function KnownShares() {
@@ -141,7 +141,7 @@ function KnownShares() {
 ### `useShareSecretSettings`
 
 Returns the secrets + a callback to add a secret + a callback to remove a secret
-from `ClientSettings`' share secrets setting. Uses the `ClientSettingsContext`.
+from `SharedSettings`' share secrets setting. Uses the `SharedSettingsContext`.
 
 ```js
 function KnownSecrets() {
@@ -163,7 +163,7 @@ function KnownSecrets() {
 ### `useServerSettings`
 
 Returns the server + a callback to add a server + a callback to remove a server
-from `ClientSettings`' servers setting. Uses the `ClientSettingsContext`.
+from `SharedSettings`' servers setting. Uses the `SharedSettingsContext`.
 
 ```js
 function KnownShares() {
@@ -182,20 +182,20 @@ function KnownShares() {
 
 ## Components
 
-### `<ClientSettingsContext.Provider>`
+### `<SharedSettingsContext.Provider>`
 
 If you're going to use any of the settings hooks, you should provide a single
-instance of `ClientSettings` as a context for them:
+instance of `SharedSettings` as a context for them:
 
 ```js
-const settings = new Earthstar.ClientSettings();
+const settings = new Earthstar.SharedSettings();
 
 function App() {
   return (
-    <ClientSettings.Provider value={settings}>
+    <SharedSettings.Provider value={settings}>
       // Components which use useAuthorSettings, useShareSettings etc.
       <TheRestOfTheApp />
-    </ClientSettings.Provider>
+    </SharedSettings.Provider>
   );
 }
 ```

@@ -1,7 +1,7 @@
 import * as React from "react";
 import {
   AuthorKeypair,
-  ClientSettings,
+  SharedSettings,
   IPeer,
   MultiformatReplica,
   ReplicaCache,
@@ -9,7 +9,7 @@ import {
 } from "earthstar";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 
-export const ClientSettingsContext = React.createContext(new ClientSettings());
+export const SharedSettingsContext = React.createContext(new SharedSettings());
 
 /** Subscribe to a given peer's replicas as they change. */
 export function usePeerReplicas(peer: IPeer) {
@@ -36,7 +36,7 @@ export function useAuthorSettings(): [
   AuthorKeypair | null,
   (author: AuthorKeypair | null) => void,
 ] {
-  const settings = React.useContext(ClientSettingsContext);
+  const settings = React.useContext(SharedSettingsContext);
 
   const [author, setAuthor] = React.useState(() => settings.author);
 
@@ -60,7 +60,7 @@ export function useShareSettings(): [
   (shareToAdd: string) => ValidationError | string[],
   (shareToRemove: string) => ValidationError | string[],
 ] {
-  const settings = React.useContext(ClientSettingsContext);
+  const settings = React.useContext(SharedSettingsContext);
 
   const [shares, setShares] = React.useState(() => settings.shares);
 
@@ -93,7 +93,7 @@ export function useShareSecretSettings(): [
     shareAddrOfSecretToRemove: string,
   ) => ValidationError | Record<string, string>,
 ] {
-  const settings = React.useContext(ClientSettingsContext);
+  const settings = React.useContext(SharedSettingsContext);
 
   const [secrets, setSecrets] = React.useState(() => settings.shareSecrets);
 
@@ -121,7 +121,7 @@ export function useServerSettings(): [
   (serverToAdd: string) => ValidationError | string[],
   (serverToRemove: string) => ValidationError | string[],
 ] {
-  const settings = React.useContext(ClientSettingsContext);
+  const settings = React.useContext(SharedSettingsContext);
 
   const [servers, setServers] = React.useState(() => settings.servers);
 

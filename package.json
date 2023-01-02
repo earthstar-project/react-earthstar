@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-beta.5",
+  "version": "4.0.0",
   "description": "A React toolkit for making collaborative, decentralised, offline-first tools you can truly call your own.",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "src"
   ],
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "scripts": {
     "test": "jest",
@@ -42,7 +42,7 @@
     "example": "parcel examples/index.html"
   },
   "peerDependencies": {
-    "earthstar": "^10.0.0-beta.2",
+    "earthstar": "^10.0.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },
@@ -58,7 +58,7 @@
     "@types/jsdom": "^16.2.14",
     "@types/react": "^17.0.39",
     "@types/use-sync-external-store": "^0.0.3",
-    "earthstar": "^10.0.0-beta.4",
+    "earthstar": "^10.0.0",
     "eslint-plugin-react-hooks": "^4.1.2",
     "jest": "^29.1.1",
     "jest-environment-jsdom": "^29.3.1",
