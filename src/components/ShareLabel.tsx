@@ -10,18 +10,30 @@ Given a workspace address, returns an element which:
 */
 
 import * as React from "react";
-import { getWorkspaceName } from "../util";
+import { getShareName } from "../util";
+import { Identicon } from "./_Identicon";
 
 export function ShareLabel({
   address,
+  viewingAuthorSecret,
+  iconSize = 10,
+
   ...props
-}: { address: string } & React.HTMLAttributes<HTMLSpanElement>) {
+}:
+  & { address: string; iconSize?: number; viewingAuthorSecret?: string }
+  & React.HTMLAttributes<HTMLSpanElement>) {
   return (
     <span
       {...props}
       title={address}
     >
-      {`+${getWorkspaceName(address)}`}
+      {`+${getShareName(address)}`}
+      {"\u00A0"}
+      <Identicon
+        address={address}
+        size={iconSize}
+        salt={viewingAuthorSecret}
+      />
     </span>
   );
 }

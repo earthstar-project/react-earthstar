@@ -1,32 +1,23 @@
 import * as React from "react";
-import { unstable_batchedUpdates } from "react-dom";
 import {
   AuthorKeypair,
-  checkShareIsValid,
-  EarthstarError,
-  isErr,
+  SharedSettings,
+  IPeer,
+  MultiformatReplica,
   ReplicaCache,
+  ValidationError,
 } from "earthstar";
-import {
-  AddShareContext,
-  CurrentShareContext,
-  IdentityContext,
-  IsLiveContext,
-  PeerContext,
-  ReplicaServersContext,
-} from "./contexts";
-import { getLocalStorage, makeStorageKey } from "./util";
+import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 
-export function usePeer() {
-  const peer = React.useContext(PeerContext);
+export const SharedSettingsContext = React.createContext(new SharedSettings());
 
-  const [trigger, setTrigger] = React.useState(true);
-
-  const memoPeer = React.useMemo(() => peer, [trigger]);
+/** Subscribe to a given peer's replicas as they change. */
+export function usePeerReplicas(peer: IPeer) {
+  const [replicas, setReplicas] = React.useState(peer.replicas());
 
   React.useEffect(() => {
-    const unsub = peer.replicaMap.bus.on("*", () => {
-      setTrigger((prev) => !prev);
+    const unsub = peer.onReplicasChange((replicas) => {
+      setReplicas(Array.from(replicas.values()));
     });
 
     return () => {
@@ -34,126 +25,186 @@ export function usePeer() {
     };
   }, [peer]);
 
-  return memoPeer;
+  return replicas;
 }
 
-export function useAddShare() {
-  return React.useContext(AddShareContext);
-}
-
-export function useReplicaServers(): [
-  string[],
-  React.Dispatch<React.SetStateAction<string[]>>,
-] {
-  const { replicaServers, setReplicaServers } = React.useContext(
-    ReplicaServersContext,
-  );
-
-  return [replicaServers, setReplicaServers];
-}
-
-export function useIdentity(): [
+/** Subscribe to an `Earthstar.ClientSetting`'s author.
+ *
+ * @returns A tuple where the first element is the author, and the second element a function to update the author.
+ */
+export function useAuthorSettings(): [
   AuthorKeypair | null,
-  React.Dispatch<React.SetStateAction<AuthorKeypair | null>>,
+  (author: AuthorKeypair | null) => void,
 ] {
-  const { identity, setIdentity } = React.useContext(
-    IdentityContext,
-  );
+  const settings = React.useContext(SharedSettingsContext);
 
-  return [identity, setIdentity];
-}
-
-export function useCurrentShare(): [
-  string | null,
-  React.Dispatch<React.SetStateAction<string | null>>,
-] {
-  const peer = usePeer();
-
-  const { currentShare, setCurrentShare } = React.useContext(
-    CurrentShareContext,
-  );
+  const [author, setAuthor] = React.useState(() => settings.author);
 
   React.useEffect(() => {
-    if (currentShare && peer.hasShare(currentShare) === false) {
-      console.warn(
-        `Tried to set current workspace to ${currentShare}, which is not a known workspace.`,
-      );
-      setCurrentShare(null);
-    }
-  }, [currentShare, setCurrentShare]);
-
-  return [currentShare, setCurrentShare];
-}
-
-export function useReplica(shareAddress?: string | undefined) {
-  const [currentShare] = useCurrentShare();
-  const peer = usePeer();
-
-  const address = shareAddress || currentShare;
-
-  const replicaCache = React.useMemo(
-    () => {
-      const replica = address ? peer.getReplica(address) : undefined;
-
-      if (!replica) {
-        throw new Error("Tried to use useReplica with no share specified!");
-      }
-
-      return new ReplicaCache(replica, 1000, (cb) => {
-        unstable_batchedUpdates(cb);
-      });
-    },
-    [address, peer],
-  );
-
-  const [, setTrigger] = React.useState(true);
-
-  React.useLayoutEffect(() => {
-    const unsub = replicaCache.onCacheUpdated(() => {
-      setTrigger((prev) => !prev);
+    const unsub = settings.onAuthorChanged((newAuthor) => {
+      setAuthor(newAuthor);
     });
 
-    return () => {
-      unsub();
-      replicaCache.close();
-    };
-  }, [replicaCache]);
+    return unsub;
+  }, [settings]);
 
-  return replicaCache;
+  const set = React.useCallback((newAuthor: AuthorKeypair | null) => {
+    settings.author = newAuthor;
+  }, [settings]);
 
-  // Keeping the below around for React 18.
-  /*
-    const replicaCache = React.useMemo(() => {
-      const replica = address ? peer.getReplica(address) : undefined;
-         if (!replica) {
-        throw new Error("Tried to use useReplica with no share specified!");
-      }
-         return new ReplicaCache(replica, 1000);
-       [address, peer])
-       const [currentVersion, setVersion] = React.useState(replicaCache.version);
-       const memoReplica = React.useMemo(() => {
-      return replicaCache;
-       [currentVersion, replicaCache]);
-       React.useEffect(() => {
-      replicaCache.onCacheUpdated(() => {
-        setVersion(replicaCache.version);
-
-      ;
-         nst subscribe = React.useCallback((onStoreChange: () => void) => {
-        turn memoReplica.onCacheUpdated(() => {
-          StoreChange();
-        ;
-       [memoReplica, replicaCache]);
-         nst getSnapshot = React.useCallback(() => memoReplica, []);
-         turn useSyncExternalStoreWithSelector(
-        bscribe,
-        tSnapshot,
-        tSnapshot,
-        ache) => cache,
-        acheA, cacheB) => cacheA.version === cacheB.version,
-      */
+  return [author, set];
 }
 
+export function useShareSettings(): [
+  string[],
+  (shareToAdd: string) => ValidationError | string[],
+  (shareToRemove: string) => ValidationError | string[],
+] {
+  const settings = React.useContext(SharedSettingsContext);
+
+  const [shares, setShares] = React.useState(() => settings.shares);
+
+  React.useEffect(() => {
+    const unsub = settings.onSharesChanged((newShares) => {
+      setShares(newShares);
+    });
+
+    return unsub;
+  }, [settings]);
+
+  const addShare = React.useCallback((addr: string) => {
+    return settings.addShare(addr);
+  }, [settings]);
+
+  const removeShare = React.useCallback((addr: string) => {
+    return settings.removeShare(addr);
+  }, [settings]);
+
+  return [shares, addShare, removeShare];
+}
+
+export function useShareSecretSettings(): [
+  Record<string, string>,
+  (
+    share: string,
+    secret: string,
+  ) => Promise<ValidationError | Record<string, string>>,
+  (
+    shareAddrOfSecretToRemove: string,
+  ) => ValidationError | Record<string, string>,
+] {
+  const settings = React.useContext(SharedSettingsContext);
+
+  const [secrets, setSecrets] = React.useState(() => settings.shareSecrets);
+
+  React.useEffect(() => {
+    const unsub = settings.onShareSecretsChanged((newSecrets) => {
+      setSecrets(newSecrets);
+    });
+
+    return unsub;
+  }, [settings]);
+
+  const addSecret = React.useCallback(async (addr: string, secret: string) => {
+    return settings.addSecret(addr, secret);
+  }, [settings]);
+
+  const removeSecret = React.useCallback((addr: string) => {
+    return settings.removeSecret(addr);
+  }, [settings]);
+
+  return [secrets, addSecret, removeSecret];
+}
+
+export function useServerSettings(): [
+  string[],
+  (serverToAdd: string) => ValidationError | string[],
+  (serverToRemove: string) => ValidationError | string[],
+] {
+  const settings = React.useContext(SharedSettingsContext);
+
+  const [servers, setServers] = React.useState(() => settings.servers);
+
+  React.useEffect(() => {
+    const unsub = settings.onServersChanged((newServers) => {
+      setServers(newServers);
+    });
+
+    return unsub;
+  }, [settings]);
+
+  const addServer = React.useCallback((url: string) => {
+    return settings.addServer(url);
+  }, [settings]);
+
+  const removeServer = React.useCallback((url: string) => {
+    return settings.removeServer(url);
+  }, [settings]);
+
+  return [servers, addServer, removeServer];
+}
+
+export function useReplica(
+  replica: MultiformatReplica,
+) {
+  const cache = React.useMemo(
+    () => {
+      return new ReplicaCache(replica, 1000);
+    },
+    [replica],
+  );
+
+  const [version, setVersion] = React.useState(cache.version);
+
+  React.useEffect(() => {
+    setVersion(cache.version);
+
+    return cache.onCacheUpdated(() => {
+      setVersion(cache.version);
+    });
+  }, [cache]);
+
+  const snapshot = React.useMemo(() => {
+    return { cache, version };
+  }, [version, cache]);
+
+  const subscribe = (cb: () => void) => {
+    return cache.onCacheUpdated(cb);
+  };
+
+  const obj = useSyncExternalStoreWithSelector(
+    subscribe,
+    () => snapshot,
+    () => snapshot,
+    (obj) => {
+      return obj;
+    },
+  );
+
+  return obj.cache;
+}
+
+/*
+export function useSync(
+  target: string | Peer,
+): [Syncer<undefined, unknown>, SyncerStatus] {
+  const peer = usePeer();
+
+  const syncer = peer.sync(target);
+
+  const [status, setStatus] = React.useState(syncer.getStatus);
+
+  React.useEffect(() => {
+    return syncer.onStatusChange((status) => {
+      setStatus(status);
+    });
+  }, [syncer]);
+
+  return [syncer, status];
+}
+*/
+
+/*
 export function useInvitation(invitationCode: string) {
   const addShare = React.useContext(AddShareContext);
   const [, setPubs] = useReplicaServers();
@@ -224,13 +275,13 @@ export function useInvitation(invitationCode: string) {
   }
 }
 
+
 export function useMakeInvitation(
+  shareAddress: string,
   includedPubs: string[] = [],
-  shareAddress?: string,
 ) {
   const [pubs] = useReplicaServers();
-  const [currentShare] = useCurrentShare();
-  const address = shareAddress || currentShare;
+  const address = shareAddress;
 
   const pubsToUse = pubs.filter((pubUrl) => includedPubs.includes(pubUrl));
   const pubsString = pubsToUse.map((pubUrl) => `&pub=${pubUrl}`).join("");
@@ -241,62 +292,4 @@ export function useMakeInvitation(
 
   return `earthstar:///?workspace=${address}${pubsString}&v=1`;
 }
-
-export function useIsLive(): [
-  boolean,
-  React.Dispatch<React.SetStateAction<boolean>>,
-] {
-  const { isLive, setIsLive } = React.useContext(IsLiveContext);
-
-  return [isLive, setIsLive];
-}
-
-export function useLocalStorageEarthstarSettings(storageKey: string) {
-  const lsIdentityKey = makeStorageKey(storageKey, "identity");
-  const lsPubsKey = makeStorageKey(storageKey, "replica-servers");
-  const lsSharesKey = makeStorageKey(storageKey, "shares");
-  const lsCurrentShareKey = makeStorageKey(storageKey, "current-share");
-  const lsIsLiveKey = makeStorageKey(storageKey, "is-live");
-
-  const allKeys = React.useMemo(
-    () => [
-      lsIdentityKey,
-      lsPubsKey,
-      lsSharesKey,
-      lsCurrentShareKey,
-      lsIsLiveKey,
-    ],
-    [lsIdentityKey, lsPubsKey, lsSharesKey, lsCurrentShareKey, lsIsLiveKey],
-  );
-
-  // load the initial state from localStorage
-  const initShares = getLocalStorage<string[]>(lsSharesKey);
-  const initReplicaServers = getLocalStorage<string[]>(lsPubsKey);
-  const initIdentity = getLocalStorage<AuthorKeypair>(lsIdentityKey);
-  const initCurrentShare = getLocalStorage<string>(lsCurrentShareKey);
-  const initIsLive = getLocalStorage<boolean>(lsIsLiveKey);
-
-  const [, setTrigger] = React.useState(true);
-
-  const onStorage = React.useCallback((event: StorageEvent) => {
-    if (event.key && allKeys.includes(event.key)) {
-      setTrigger((prev) => !prev);
-    }
-  }, [allKeys]);
-
-  React.useEffect(() => {
-    window.addEventListener("storage", onStorage);
-
-    return () => {
-      window.removeEventListener("storage", onStorage);
-    };
-  }, [onStorage]);
-
-  return {
-    initShares: initShares || [],
-    initReplicaServers: initReplicaServers || [],
-    initIdentity: initIdentity || null,
-    initCurrentShare: initCurrentShare || null,
-    initIsLive: initIsLive || true,
-  };
-}
+*/

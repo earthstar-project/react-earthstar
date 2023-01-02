@@ -1,118 +1,181 @@
 import * as React from "react";
 import { render } from "react-dom";
-import { AuthorKeypair, Crypto, FormatValidatorEs4, Replica, setLogLevel } from "earthstar";
-import { ReplicaDriverIndexedDB } from "earthstar/browser";
-import { Peer, useIdentity, useCurrentShare, usePeer, useReplica } from "../src/index";
+import * as Earthstar from "earthstar";
+import { ReplicaDriverWeb } from "earthstar/browser";
+import { useAuthorSettings, useShareSettings, useReplica, SharedSettingsContext, useShareSecretSettings, AuthorLabel, ShareLabel } from "../src/index";
 
-setLogLevel('example', 4)
+Earthstar.setLogLevel("example", 4);
 
-function AppSwitcher() {
-  const peer = usePeer()
-  const [currentShare, setCurrentShare] = useCurrentShare();
-  const shares = peer.shares();
+const settings = new Earthstar.SharedSettings();
 
-  return <>
-    {shares.map((share) =>
+const { peer } = settings.getPeer({
+  sync: false,
+  onCreateReplica: (addr, secret) =>
+   { 
+     console.log('making', addr, secret)
+     return  new Earthstar.Replica({
+      driver: new ReplicaDriverWeb(addr),
+      shareSecret: secret,
+    })},
+});
 
-      <label key={share}><input type="radio" value={share} checked={currentShare === share} onChange={e => {
-        setCurrentShare(e.target.value)
-      }} />{share}</label>
-    )}
-  </>
-}
-
-function TinyApp() {
-  const [identity] = useIdentity();
-  const replica = useReplica();
-
-  const doc = replica.getLatestDocAtPath('/something.txt');
-  const [value, setValue] = React.useState('')
-
-  return <>
-    <h2>Tiny app</h2>
-    <dt>Content</dt><dd>{`${doc?.content}`}</dd>
-    <form onSubmit={async (e) => {
-      console.log(replica._replica.getMaxLocalIndex())
-      const docs = await replica._replica.getLatestDocs()
-
-      console.log(docs.length)
-
-      e.preventDefault();
-
-      if (!identity) {
-        return
-      }
-      setValue('')
-      const res = await replica.set(identity, {
-        content: value,
-        path: '/something.txt',
-        format: 'es.4'
-      });
-
-      console.log(res)
-    }}>
-      <input value={value} onChange={e => setValue(e.target.value)} />
-      <button type="submit">Update content</button>
-    </form>
-  </>
-}
-
-function CurrentIdentity() {
-  const [identity, setIdentity] = useIdentity();
-
-  React.useEffect(() => {
-    Crypto.generateAuthorKeypair(
-      "test",
-    ).then((res) => {
-      setIdentity(res as AuthorKeypair);
-    });
-  }, []);
-
-
+function ShareSwitcher({ currentShare, setCurrentShare }: {
+  currentShare: string;
+  setCurrentShare: (addr: string) => void;
+}) {
+  const [shares] = useShareSettings()
 
   return (
     <>
-      <h2>Identity</h2>
-      <p>{identity?.address}</p>
+      {shares.map((share) => (
+        <li key={share}>
+        <label >
+          <input
+            type="radio"
+            value={share}
+            checked={currentShare === share}
+            onChange={(e) => {
+              setCurrentShare(e.target.value);
+            }}
+          />
+          <ShareLabel address={share} />
+        </label>
+        </li>
+      ))}
     </>
   );
 }
 
-function ShareList() {
-  const peer = usePeer();
-  const shares = peer.shares();
-  const [currentShare] = useCurrentShare()
+function ShareAdder() {
+  const [newShareName, setNewShareName] = React.useState("");
+  
+  const [, addShare] = useShareSettings();
+  const [, addSecret] = useShareSecretSettings()
 
   return (
     <>
-      <h2>Current shares</h2>
-      <ul>{shares.map((share) => <li key={share}>{share === currentShare ? <b>{share}</b> : share}</li>)}</ul>
+      <h2>Add share</h2>
+      <input
+        value={newShareName}
+        onChange={(e) => setNewShareName(e.target.value)}
+      />
+      <button
+        onClick={async () => {
+          setNewShareName("");
+
+          const keypair = await Earthstar.Crypto.generateShareKeypair(
+            newShareName,
+          );
+
+          if (Earthstar.isErr(keypair)) {
+            return;
+          }
+
+          addShare(keypair.shareAddress);
+          
+          console.log('add secret called')
+          await addSecret(keypair.shareAddress, keypair.secret)
+          
+          console.log('add secret finished')
+        }}
+      >
+        Add
+      </button>
+    </>
+  );
+}
+
+function TinyApp({ replica }: { replica: Earthstar.Replica }) {
+  const [author] = useAuthorSettings();
+
+
+  
+  const cache = useReplica(replica);
+  
+  const doc = cache.getLatestDocAtPath('/something')
+
+  const [value, setValue] = React.useState("");
+
+  return (
+    <>
+      <h2>Tiny app</h2>
+      <dt>Content</dt>
+      <dd>{`${doc?.text}`}</dd>
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+
+          if (!author) {
+            return;
+          }
+          setValue("");
+          const res = await replica.set(author, {
+            text: value,
+            path: "/something",
+          });
+
+          console.log(res);
+        }}
+      >
+        <input value={value} onChange={(e) => setValue(e.target.value)} />
+        <button type="submit">Update content</button>
+      </form>
+    </>
+  );
+}
+
+function CurrentIdentity() {
+  const [identity, setIdentity] = useAuthorSettings();
+
+  React.useEffect(() => {
+    Earthstar.Crypto.generateAuthorKeypair(
+      "test",
+    ).then((res) => {
+      setIdentity(res as Earthstar.AuthorKeypair);
+    });
+  }, []);
+
+  return (
+    <>
+      <h2>Identity</h2>
+      { identity ? 
+        <AuthorLabel address={identity.address} iconSize={10}/>
+        : 'No identity'
+      }
+
     </>
   );
 }
 
 function Example() {
+  const [currentShare, setCurrentShare] = React.useState("");
+  const [secrets] = useShareSecretSettings();
+  
+  console.log(secrets)
+
+  const replica = peer.getReplica(currentShare);
+  
+  console.log('got replica...', replica)
+
   return (
-    <>
+    <SharedSettingsContext.Provider value={settings}>
       <h1>Example</h1>
-      <Peer
-        initShares={["+test.a123", '+test2.b234', '+test3.c345', "+plaza.prm27p8eg65c"]}
-        initCurrentShare={"+plaza.prm27p8eg65c"}
-        initReplicaServers={['wss://es-rs-1.fly.dev']}
-        onCreateShare={(addr) =>
-          new Replica(
-            addr,
-            FormatValidatorEs4,
-            new ReplicaDriverIndexedDB(addr),
-          )}
-      >
-        <CurrentIdentity />
-        <AppSwitcher />
-        <ShareList />
-        <TinyApp />
-      </Peer>
-    </>
+
+      <CurrentIdentity />
+      <ShareAdder />
+      <ShareSwitcher
+        currentShare={currentShare}
+        setCurrentShare={setCurrentShare}
+      />
+      {replica ? <TinyApp replica={replica} /> : null}
+        
+      <button onClick={() => settings.clear()}>Clear</button>
+    </SharedSettingsContext.Provider>
   );
+  
+  
 }
 
 render(<Example />, document.getElementById("root"));
+
+

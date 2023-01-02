@@ -1,4 +1,4 @@
-import { isErr, parseAuthorAddress } from "earthstar";
+import { isErr, parseAuthorAddress, parseShareAddress } from "earthstar";
 
 export function getAuthorShortName(address: string): string {
   const parsedAuthor = parseAuthorAddress(address);
@@ -9,36 +9,12 @@ export function getAuthorShortName(address: string): string {
   return parsedAuthor.name;
 }
 
-const WORKSPACE_NAME_REGEX = /\+(.*)\./;
+export function getShareName(address: string) {
+  const parsedShareAddress = parseShareAddress(address);
 
-export function getWorkspaceName(address: string) {
-  const result = WORKSPACE_NAME_REGEX.exec(address);
-
-  if (result) {
-    return result[1];
+  if (isErr(parsedShareAddress)) {
+    return address;
   }
 
-  return address;
-}
-
-export function makeStorageKey(customKey: string | undefined, key: string) {
-  if (!customKey) {
-    return `earthstar-peer-${key}`;
-  }
-
-  return `earthstar-peer-${customKey}-${key}`;
-}
-
-export function getLocalStorage<T>(key: string): T | null {
-  const value = localStorage.getItem(key);
-
-  if (!value) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    return null;
-  }
+  return parsedShareAddress.name;
 }
